@@ -26,7 +26,6 @@ import {
     ChevronUpDownIcon,
     InformationCircleIcon,
 } from '@heroicons/vue/24/outline';
-import BranchSelect from '@/Components/BranchSelect.vue';
 
 const props = defineProps({
     suppliers: Array,
@@ -595,9 +594,6 @@ const importLines = (lines, replace) => {
                                 </div>
                             </div>
 
-                            <div v-if="branches?.length > 1">
-                                <BranchSelect v-model="form.branch_id" :branches="branches" :error="form.errors.branch_id" />
-                            </div>
 
                             <!-- Warehouse Selection -->
                             <div>

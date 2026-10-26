@@ -4,6 +4,7 @@ import { usePage } from '@inertiajs/vue3';
 import AppSidebar from '../Components/AppSidebar.vue';
 import AppTopBar from '../Components/AppTopBar.vue';
 import ImpersonationBanner from '../Components/ImpersonationBanner.vue';
+import { sidebarCollapsed } from '@/composables/useSidebar';
 import { CheckCircleIcon, ExclamationCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 
 // Pages that list their own form errors set own-errors so they are not shown twice.
@@ -66,8 +67,8 @@ watch(() => [flash.value?.success, flash.value?.error, generalError.value, field
                 @close-sidebar="isSidebarOpen = false" 
             />
 
-            <!-- Main Content Shell (Padded for 256px sidebar on the start side: Right in RTL, Left in LTR) -->
-            <div class="flex-1 flex flex-col min-w-0 lg:ps-64 transition-all print:ps-0 print:p-0 print:m-0 print:block">
+            <!-- Main Content Shell (Padded for the sidebar on the start side: Right in RTL, Left in LTR) -->
+            <div :class="sidebarCollapsed ? 'lg:ps-20' : 'lg:ps-72'" class="flex-1 flex flex-col min-w-0 transition-all duration-300 print:ps-0 print:p-0 print:m-0 print:block">
                 <!-- Top Sticky Navbar -->
                 <AppTopBar class="print:hidden" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 

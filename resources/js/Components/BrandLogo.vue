@@ -17,6 +17,11 @@ defineProps({
     white: {
         type: Boolean,
         default: false,
+    },
+    // Icon only (the collapsed sidebar rail).
+    compact: {
+        type: Boolean,
+        default: false,
     }
 });
 </script>
@@ -27,7 +32,7 @@ defineProps({
         <div 
             :class="[
                 size === 'sm' ? 'w-8 h-8 rounded-lg' : size === 'lg' ? 'w-14 h-14 rounded-2xl' : 'w-10 h-10 rounded-xl',
-                'bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 shadow-md flex items-center justify-center text-white flex-shrink-0 relative overflow-hidden group'
+                'bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 shadow-md flex items-center justify-center text-white flex-shrink-0 relative overflow-hidden group'
             ]"
         >
             <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -39,7 +44,7 @@ defineProps({
             </svg>
         </div>
 
-        <div class="flex flex-col leading-tight">
+        <div v-if="!compact" class="flex flex-col leading-tight">
             <span 
                 :class="[
                     size === 'sm' ? 'text-base font-bold' : size === 'lg' ? 'text-2xl font-extrabold' : 'text-xl font-bold',
@@ -53,7 +58,7 @@ defineProps({
                 v-if="showSubtitle" 
                 :class="[
                     size === 'sm' ? 'text-[10px]' : size === 'lg' ? 'text-xs' : 'text-[11px]',
-                    white ? 'text-indigo-200' : 'text-indigo-600',
+                    white ? 'text-slate-400' : 'text-indigo-600',
                     'font-medium tracking-wide'
                 ]"
             >
