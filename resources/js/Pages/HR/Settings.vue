@@ -43,8 +43,8 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
         </div>
 
         <div class="grid lg:grid-cols-2 gap-4 text-xs">
-            <!-- GOSI -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 lg:row-span-2">
+            <!-- GOSI (Saudi branches) -->
+            <div v-if="$feature('gosi')" class="bg-white border border-slate-200 rounded-2xl p-4 lg:row-span-2">
                 <div class="flex justify-between mb-3"><h3 class="font-black text-slate-700">التأمينات الاجتماعية</h3><span v-if="groups['hr.gosi'].overridden" class="text-indigo-600 font-bold">معدّلة للمنشأة</span></div>
                 <div class="grid grid-cols-2 gap-3">
                     <label v-for="[k, l] in [['saudi_employee_rate', 'سعودي — حصة الموظف %'], ['saudi_employer_rate', 'سعودي — حصة المنشأة %'], ['non_saudi_employee_rate', 'غير سعودي — حصة الموظف %'], ['non_saudi_employer_rate', 'غير سعودي — حصة المنشأة (الأخطار) %'], ['base_annuity_rate', 'نسبة المعاش المضمّنة في النسب أعلاه %'], ['min_wage', 'الحد الأدنى للأجر الخاضع'], ['max_wage', 'الحد الأعلى للأجر الخاضع']]" :key="k" class="block">
@@ -156,8 +156,8 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
                 <div v-if="$can('hr.settings.manage')" class="flex gap-2 mt-3"><button @click="save('hr.late_deduction')" class="flex-1 px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">حفظ</button></div>
             </div>
 
-            <!-- Wage protection -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 lg:col-span-2">
+            <!-- Wage protection / Mudad (Saudi branches) -->
+            <div v-if="$feature('wps')" class="bg-white border border-slate-200 rounded-2xl p-4 lg:col-span-2">
                 <h3 class="font-black text-slate-700 mb-1">حماية الأجور (مُدد) وملف البنك</h3>
                 <p class="text-slate-400 mb-3">تُطبع على ملف مُدد وملف رواتب البنك. صيغة البنك مبنية على النماذج الشائعة؛ طابق الملف مع بنكك عند أول رفع.</p>
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">

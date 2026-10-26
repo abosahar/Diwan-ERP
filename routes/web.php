@@ -173,7 +173,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Company (tenant) ERP routes: authenticated user + resolved tenant required.
-Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'erp.authorize', 'throttle:tenant-web'])->group(function () {
+Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.feature', 'erp.authorize', 'throttle:tenant-web'])->group(function () {
     // 1. Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/search', SearchController::class)->name('search');

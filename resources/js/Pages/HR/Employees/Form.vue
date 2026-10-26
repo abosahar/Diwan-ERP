@@ -79,13 +79,13 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
                         <Field label="تاريخ سريان تعديل الراتب" :error="form.errors.salary_effective_date" hint="يُجزّأ المسير إن كان التاريخ في منتصف الشهر"><input v-model="form.salary_effective_date" type="date" :class="input" /></Field>
                         <Field label="سبب التعديل" class="md:col-span-3"><input v-model="form.salary_change_reason" placeholder="زيادة سنوية، ترقية..." :class="input" /></Field>
                     </template>
-                    <label class="text-xs flex items-center gap-2"><input v-model="form.gosi_registered" type="checkbox" class="rounded" /> مسجل في التأمينات</label>
-                    <Field label="رقم التأمينات"><input v-model="form.gosi_number" :class="input" /></Field>
-                    <Field label="تاريخ أول تسجيل" hint="من 3 يوليو 2024 تُطبّق نسب النظام الجديد"><input v-model="form.gosi_join_date" type="date" :class="input" /></Field>
+                    <label v-if="$feature('gosi')" class="text-xs flex items-center gap-2"><input v-model="form.gosi_registered" type="checkbox" class="rounded" /> مسجل في التأمينات</label>
+                    <Field v-if="$feature('gosi')" label="رقم التأمينات"><input v-model="form.gosi_number" :class="input" /></Field>
+                    <Field v-if="$feature('gosi')" label="تاريخ أول تسجيل" hint="من 3 يوليو 2024 تُطبّق نسب النظام الجديد"><input v-model="form.gosi_join_date" type="date" :class="input" /></Field>
                     <Field label="أيام الإجازة السنوية"><input v-model="form.annual_leave_days" type="number" min="21" :class="input" /></Field>
                     <Field label="رصيد إجازات افتتاحي"><input v-model="form.leave_opening_balance" type="number" step="0.5" :class="input" /></Field>
                     <Field label="البنك"><input v-model="form.bank_name" :class="input" /></Field>
-                    <Field label="رمز البنك (WPS)"><input v-model="form.bank_code" :class="input" /></Field>
+                    <Field v-if="$feature('wps')" label="رمز البنك (WPS)"><input v-model="form.bank_code" :class="input" /></Field>
                     <Field label="الآيبان" :error="form.errors.iban"><input v-model="form.iban" :class="input" class="font-mono uppercase" placeholder="SA..." /></Field>
                 </div>
             </div>

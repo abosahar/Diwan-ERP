@@ -2,6 +2,7 @@
 
 use App\Exceptions\BranchRequiredException;
 use App\Http\Middleware\AuthorizeRoutePermission;
+use App\Http\Middleware\EnsureCountryFeature;
 use App\Http\Middleware\EnsurePlanAccess;
 use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\EnsureTenant;
@@ -71,6 +72,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant' => EnsureTenant::class,
             'erp.authorize' => AuthorizeRoutePermission::class,
             'plan' => EnsurePlanAccess::class,
+            'country.feature' => EnsureCountryFeature::class,
             'tenant.resolve' => ResolveTenant::class,
             'two_factor' => EnsureTwoFactorEnrolled::class,
         ]);

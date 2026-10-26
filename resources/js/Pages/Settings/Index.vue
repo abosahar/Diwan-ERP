@@ -206,7 +206,7 @@ const removeLogo = async () => {
 
 <template>
     <AppLayout>
-        <Head title="إعدادات المنشأة والزكاة" />
+        <Head :title="$feature('zatca') ? 'إعدادات المنشأة والزكاة' : 'إعدادات المنشأة'" />
 
         <div class="space-y-5 w-full pb-12">
             <!-- Top Breadcrumbs & Action Bar -->
@@ -261,6 +261,7 @@ const removeLogo = async () => {
                     </button>
 
                     <button 
+                        v-if="$feature('zatca')"
                         type="button"
                         @click="activeTab = 'zatca'"
                         :class="activeTab === 'zatca' ? 'bg-emerald-50 text-emerald-800 font-bold border border-emerald-200' : 'text-slate-600 hover:bg-slate-50 font-semibold'"
@@ -452,7 +453,7 @@ const removeLogo = async () => {
                         </div>
 
                         <!-- 2. ZATCA E-Invoicing Phase 1 & Phase 2 Tab -->
-                        <div v-show="activeTab === 'zatca'" class="space-y-6">
+                        <div v-if="$feature('zatca')" v-show="activeTab === 'zatca'" class="space-y-6">
                             <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                 <div>
                                     <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">

@@ -10,6 +10,8 @@ use App\Models\EmployeePayItem;
 use App\Models\EmployeeSalaryChange;
 use App\Models\LeaveRequest;
 use App\Services\Settings\CompanyPolicy;
+use App\Services\Tax\CountryFeatures;
+use App\Services\Tax\TaxProfile;
 use Illuminate\Support\Carbon;
 
 /**
@@ -174,7 +176,8 @@ class PayrollCalculator
      */
     public function gosi(Employee $employee, float $wage, float $ratio, Carbon $periodEnd): array
     {
-        if (! $employee->gosi_registered) {
+        // GOSI exists only in Saudi Arabia: an employee of a branch in another country pays none.
+        if (! $employee->gosi_registered || ! CountryFeatures::has('gosi', TaxProfile::forBranch($employee->branch_id ?: null))) {
             return [0.0, 0.0, 0.0];
         }
 

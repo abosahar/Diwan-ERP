@@ -10,6 +10,8 @@ use App\Models\Payroll;
 use App\Models\PayrollItem;
 use App\Services\HR\PayrollService;
 use App\Services\Settings\CompanyPolicy;
+use App\Services\Tax\CountryFeatures;
+use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -126,6 +128,8 @@ class PayrollController extends Controller
     public function wps(Request $request, Payroll $payroll)
     {
         $bank = $request->query('format') === 'bank';
+        // Mudad is the Saudi wage-protection file; the bank file is for every country.
+        abort_if(! $bank && ! CountryFeatures::has('wps', TaxProfile::forBranch($payroll->branch_id ?: null)), 404);
         if ($issues = $this->payrolls->wpsIssues($payroll)) {
             return back()->withErrors(['wps' => implode("\n", array_slice($issues, 0, 30))]);
         }

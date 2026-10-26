@@ -28,7 +28,7 @@ const isCurrent = (path, exact = false) => {
 
 // Only items the user may open (and, for country-specific ones, where the branch being worked in is);
 // groups without any visible child are hidden.
-const inCountry = (item) => !item.country || (page.props.tax?.country || 'SA') === item.country;
+const inCountry = (item) => !item.feature || (page.props.features || []).includes(item.feature);
 const visibleItems = computed(() => navigation
     .map((item) => item.children
         ? { ...item, children: item.children.filter((child) => canRoute(child.route) && inCountry(child)) }
