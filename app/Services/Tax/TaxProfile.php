@@ -246,6 +246,7 @@ class TaxProfile
             'rate' => $this->standardRate(),
             'rates' => $this->rates(),
             'tax_number_label' => $this->taxNumberLabel(),
+            'tax_number_example' => $this->country['tax_number']['example'] ?? '',
             'currency' => $this->currency(),
             'einvoicing' => $this->einvoicing(),
             'branch_id' => $this->branch?->id,

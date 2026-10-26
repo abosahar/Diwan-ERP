@@ -406,15 +406,15 @@ const removeLogo = async () => {
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">الرقم الضريبي (ZATCA VAT) *</label>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ $page.props.tax?.tax_number_label || 'الرقم الضريبي' }} *</label>
                                     <input 
                                         v-model="form.tax_number" 
                                         type="text" 
-                                        placeholder="300000000000003"
+                                        :placeholder="$page.props.tax?.tax_number_example || ''"
                                         class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono"
                                         dir="ltr"
                                     />
-                                    <p class="text-2xs text-slate-400 mt-1">الرقم المكون من 15 خانة المسجل لدى هيئة الزكاة.</p>
+                                    <p v-if="$feature('zatca')" class="text-2xs text-slate-400 mt-1">الرقم المكون من 15 خانة المسجل لدى هيئة الزكاة.</p>
                                 </div>
 
                                 <div>
