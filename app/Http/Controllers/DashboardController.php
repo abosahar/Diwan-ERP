@@ -3,8 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Expense;
 use App\Models\Invoice;
+use App\Models\Payroll;
 use App\Models\Product;
+use App\Models\Project;
+use App\Models\PurchaseInvoice;
+use App\Services\ActiveBranch;
+use App\Services\ActiveFiscalYear;
 use App\Services\Reports\Insights;
 use App\Services\Saas\OnboardingChecklist;
 use App\Services\TenantManager;
@@ -33,7 +39,10 @@ class DashboardController extends Controller
         // === KPI Metrics (Real Data) ===
         // Range predicates (not whereDate/whereMonth) so (company_id, invoice_date)
         // indexes are used; aggregates are cached briefly per company.
-        $cacheKey = 'dashboard:'.$tenantManager->getTenantId().':'.$today->toDateString();
+        // Figures follow the branch and fiscal year chosen in the top bar.
+        $year = app(ActiveFiscalYear::class)->current();
+        $scope = app(ActiveBranch::class)->isAll() ? 'all' : (string) app(ActiveBranch::class)->id();
+        $cacheKey = 'dashboard:'.$tenantManager->getTenantId().':'.$scope.':'.($year?->id ?? 0).':'.$today->toDateString();
         $cached = Cache::remember($cacheKey.':kpis', now()->addMinutes(5), function () use ($today, $startOfMonth, $lastMonthStart, $lastMonthEnd) {
             return [
                 'today' => (float) Invoice::whereBetween('invoice_date', [$today->toDateString(), $today->toDateString().' 23:59:59'])->sumBase('total'),
@@ -137,7 +146,54 @@ class DashboardController extends Controller
             ],
         ];
 
+        // === Fiscal year: revenue vs expenses per month, and where the money goes ===
+        $yearStart = $year?->start_date?->copy() ?? Carbon::now()->startOfYear();
+        $yearEnd = $year?->end_date?->copy() ?? Carbon::now()->endOfYear();
+        $yearData = Cache::remember($cacheKey.':year', now()->addMinutes(5), function () use ($yearStart, $yearEnd) {
+            $labels = [];
+            $revenue = [];
+            $expense = [];
+            $month = $yearStart->copy()->startOfMonth();
+            while ($month->lte($yearEnd)) {
+                $from = $month->toDateString();
+                $to = $month->copy()->endOfMonth()->toDateTimeString();
+                $labels[] = $month->translatedFormat('F');
+                $revenue[] = (float) Invoice::whereBetween('invoice_date', [$from, $to])->sumBase('total');
+                $expense[] = round((float) PurchaseInvoice::whereBetween('invoice_date', [$from, $to])->sumBase('total')
+                    + (float) Expense::whereBetween('expense_date', [$from, $to])->sum('total_amount')
+                    + (float) Payroll::where('status', '!=', 'draft')->whereBetween('payment_date', [$from, $to])->sum('net_total'), 2);
+                $month->addMonth();
+            }
+            $range = [$yearStart->toDateString(), $yearEnd->toDateTimeString()];
+
+            return [
+                'labels' => $labels, 'revenue' => $revenue, 'expense' => $expense,
+                'purchases' => (float) PurchaseInvoice::whereBetween('invoice_date', $range)->sumBase('total'),
+                'expenses' => (float) Expense::whereBetween('expense_date', $range)->sum('total_amount'),
+                'payroll' => (float) Payroll::where('status', '!=', 'draft')->whereBetween('payment_date', $range)->sum('net_total'),
+                'pending' => Invoice::whereIn('payment_status', ['unpaid', 'partially_paid'])->count(),
+                'overdue' => Invoice::whereIn('payment_status', ['unpaid', 'partially_paid'])->whereNotNull('due_date')->where('due_date', '<', now()->toDateString())->count(),
+            ];
+        });
+
+        // Active contracts: billed share of the contract value.
+        $projects = $request->user()?->can('projects.projects.view') || $request->user()?->isCompanyOwner()
+            ? Project::with('customer:id,name,company_name')->whereNotIn('status', ['closed', 'cancelled', 'completed'])->orderByDesc('id')->take(3)->get()
+                ->map(function (Project $p) {
+                    $billed = (float) DB::table('progress_billings')->where('project_id', $p->id)->whereIn('status', ['approved', 'invoiced'])->sum('current_value');
+                    $value = (float) $p->contract_value;
+
+                    return [
+                        'id' => $p->id, 'code' => $p->code, 'name' => $p->name, 'customer' => $p->customer?->name ?? $p->customer?->company_name,
+                        'value' => number_format($value, 2), 'billed_percent' => $value > 0 ? min(100, round($billed / $value * 100, 1)) : 0, 'status' => $p->status,
+                    ];
+                })->values()
+            : collect();
+
         return Inertia::render('Dashboard', [
+            'yearData' => $yearData,
+            'projects' => $projects,
+            'activeYearName' => $year?->name,
             // Setup steps of a new company, for its owner only.
             'onboarding' => fn () => $request->user()?->isCompanyOwner() && ($company = app(TenantManager::class)->getCompany())
                 ? app(OnboardingChecklist::class)->forDashboard($company) : null,

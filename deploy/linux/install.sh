@@ -178,7 +178,18 @@ Persistent=true
 [Install]
 WantedBy=timers.target
 UNIT
+    mkdir -p "$DIR/shared/storage/app/update-queue" && chown "$APP_USER:$APP_USER" "$DIR/shared/storage/app/update-queue" 2> /dev/null || true
+    cat > /etc/systemd/system/diwan-update.path <<UNIT
+[Unit]
+Description=Diwan ERP update requested from the dashboard
+[Path]
+PathExistsGlob=$DIR/shared/storage/app/update-queue/*
+Unit=diwan-update.service
+[Install]
+WantedBy=multi-user.target
+UNIT
     systemctl daemon-reload
+    systemctl enable --now diwan-update.path > /dev/null 2>&1 || true
     systemctl enable --now diwan-web diwan-queue diwan-scheduler diwan-update.timer > /dev/null 2>&1
     systemctl restart diwan-web diwan-queue diwan-scheduler
     ok "Diwan is running, and starts with the computer. It updates itself daily at 3:30 AM."

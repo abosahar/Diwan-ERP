@@ -6,6 +6,8 @@ use App\Models\Account;
 use App\Models\CostCenter;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
+use App\Models\Warehouse;
+use App\Services\ActiveBranch;
 use App\Services\Documents\DocumentNumberService;
 use App\Services\TenantManager;
 use Carbon\CarbonInterface;
@@ -33,6 +35,30 @@ class PostingService
         protected FiscalCalendar $calendar,
         protected DocumentNumberService $numbers,
     ) {}
+
+    /**
+     * The branch a source document belongs to: its own, its parent's (a payment's invoice),
+     * or its warehouse's (stock documents).
+     */
+    protected function branchOf(?Model $source): ?int
+    {
+        if (! $source) {
+            return null;
+        }
+        if ($id = $source->getAttribute('branch_id')) {
+            return (int) $id;
+        }
+        if (method_exists($source, 'inheritedBranchId') && ($id = $source->inheritedBranchId())) {
+            return (int) $id;
+        }
+        foreach (['warehouse_id', 'from_warehouse_id'] as $column) {
+            if ($source->getAttribute($column) && ($id = Warehouse::withoutGlobalScopes()->whereKey($source->getAttribute($column))->value('branch_id'))) {
+                return (int) $id;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Create (and by default post) a journal entry.
@@ -65,7 +91,8 @@ class PostingService
 
             $entry = JournalEntry::withoutGlobalScopes()->create([
                 'company_id' => $companyId,
-                'branch_id' => $data['branch_id'] ?? null,
+                // The entry's branch: given, else its source document's, else the one chosen in the top bar.
+                'branch_id' => $data['branch_id'] ?? $this->branchOf($source) ?? app(ActiveBranch::class)->forWrite(),
                 'entry_number' => $this->numbers->next('journal_entry', $date, $companyId),
                 'date' => $date->toDateString(),
                 'reference' => $data['reference'] ?? null,

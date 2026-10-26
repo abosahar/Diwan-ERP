@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ActiveBranch;
 use App\Traits\Auditable;
 use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -34,6 +35,15 @@ class Branch extends Model
     protected $casts = ['is_main' => 'boolean', 'is_active' => 'boolean', 'tax_registered' => 'boolean'];
 
     protected $appends = ['name'];
+
+    protected static function booted(): void
+    {
+        // The branches a user may choose from changed: forget the memo of the active-branch service.
+        $flush = fn () => app(ActiveBranch::class)->flush();
+        static::saved($flush);
+        static::deleted($flush);
+        static::restored($flush);
+    }
 
     public function getNameAttribute(): string
     {

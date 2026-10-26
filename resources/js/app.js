@@ -1,7 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, usePage } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { cur, taxLabel, taxRate } from './utils/tax';
@@ -29,6 +29,8 @@ createInertiaApp({
         
         // Tax of the user's branch in templates: {{ $taxLabel() }}, {{ $taxRate() }}%.
         app.config.globalProperties.$taxRate = taxRate;
+        // Country-specific features of the active branch: v-if="$feature('zatca')".
+        app.config.globalProperties.$feature = (key) => (usePage().props.features || []).includes(key);
         app.config.globalProperties.$taxLabel = taxLabel;
         app.config.globalProperties.$cur = cur;
 

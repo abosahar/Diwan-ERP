@@ -17,15 +17,37 @@ KEEP=3
 
 c_ok=$'\e[32m'; c_err=$'\e[31m'; c_off=$'\e[0m'
 ok()  { echo "${c_ok}✓ $*${c_off}"; }
-die() { echo "${c_err}✗ $*${c_off}" >&2; exit 1; }
+STATUS="$DIR/shared/storage/app/update-status.json"
+# What the dashboard shows the owner (state: running | done | failed | uptodate).
+status() {
+    { printf '{"state":"%s","from":"%s","to":"%s","message":"%s","at":%s}\n' "$1" "${INSTALLED:-}" "${VERSION:-}" "${2:-}" "$(date +%s)" > "$STATUS.tmp" \
+        && mv -f "$STATUS.tmp" "$STATUS"; } 2> /dev/null || true
+}
+die() { echo "${c_err}✗ $*${c_off}" >&2; status failed "$*"; exit 1; }
 
 for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do [[ -x $b ]] && eval "$("$b" shellenv)" && break; done
 PHP="$(brew --prefix php@8.3)/bin/php"
+if [[ ! -f $HOME/Library/LaunchAgents/com.diwan.update-now.plist ]]; then
+    mkdir -p "$DIR/shared/storage/app/update-queue" "$HOME/Library/LaunchAgents"
+    cat > "$HOME/Library/LaunchAgents/com.diwan.update-now.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+    <key>Label</key><string>com.diwan.update-now</string>
+    <key>ProgramArguments</key><array><string>/bin/bash</string><string>$DIR/current/deploy/mac/update.sh</string></array>
+    <key>QueueDirectories</key><array><string>$DIR/shared/storage/app/update-queue</string></array>
+    <key>ThrottleInterval</key><integer>30</integer>
+</dict></plist>
+PLIST
+    launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.diwan.update-now.plist" > /dev/null 2>&1 || true
+fi
 LOCK="$DIR/.update.lock"
 mkdir "$LOCK" 2> /dev/null || die "Another update is already running (if not, delete the folder $LOCK)."
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP" "$LOCK"' EXIT
 
+# The dashboard asks for an update by dropping a file in this folder (launchd QueueDirectories).
+rm -f "$DIR"/shared/storage/app/update-queue/* 2> /dev/null || true
 CURRENT=$(cd "$DIR/current" && pwd -P)
 INSTALLED=$(cat "$CURRENT/VERSION" 2> /dev/null || echo 0)
 
@@ -37,13 +59,16 @@ else
         [[ $(shasum -a 256 "$TMP/diwan-erp.zip" | cut -d' ' -f1) == "$(tr -d '[:space:]' < "$TMP/sha")" ]] || die "The downloaded update is corrupted."
     fi
 fi
+status running "Downloading"
 unzip -q "$TMP/diwan-erp.zip" -d "$TMP"
 VERSION=$(cat "$TMP/diwan-erp/VERSION" 2> /dev/null || echo 0)
 if [[ $VERSION == "$INSTALLED" && ${1:-} != --force ]]; then
     ok "Diwan is up to date (version $INSTALLED)."
+    status uptodate "Up to date"
     exit 0
 fi
 
+status running "Installing"
 NEW="$DIR/releases/$(date +%Y%m%d%H%M%S)-$VERSION"
 mv "$TMP/diwan-erp" "$NEW"
 rm -rf "$NEW/storage"
@@ -52,7 +77,7 @@ ln -sfn "$DIR/shared/.env" "$NEW/.env"
 ln -sfn ../storage/app/public "$NEW/public/storage"
 
 # Anything failing before the switch leaves the running version untouched.
-trap 'rm -rf "$TMP" "$LOCK" "$NEW"; echo "${c_err}✗ Update stopped; Diwan keeps running the previous version, unchanged.${c_off}" >&2' ERR
+trap 'rm -rf "$TMP" "$LOCK" "$NEW"; status failed "Update stopped; the previous version keeps running"; echo "${c_err}✗ Update stopped; Diwan keeps running the previous version, unchanged.${c_off}" >&2' ERR
 "$PHP" "$NEW/artisan" optimize > /dev/null
 if "$PHP" "$NEW/artisan" migrate:status --pending 2> /dev/null | grep -q Pending; then
     "$PHP" "$NEW/artisan" erp:backup --tag=preupdate > /dev/null || die "The backup failed, so the update was cancelled."
@@ -84,4 +109,5 @@ fi
 ls -1d "$DIR/releases"/*/ | sed 's#/$##' | sort -r | tail -n +$((KEEP + 1)) | while read -r old; do
     [[ $old == "$(cd "$DIR/current" && pwd -P)" ]] || rm -rf "$old"
 done
+status done "Updated"
 ok "Updated from $INSTALLED to $VERSION."

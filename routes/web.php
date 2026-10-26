@@ -5,6 +5,7 @@ use App\Http\Controllers\Accounting as A;
 use App\Http\Controllers\Accounting\GeneralLedgerController;
 use App\Http\Controllers\Accounting\JournalEntryController;
 use App\Http\Controllers\Accounting\TrialBalanceController;
+use App\Http\Controllers\ActiveContextController;
 use App\Http\Controllers\ApprovalRuleController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuditLogController;
@@ -60,6 +61,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Sales as S;
 use App\Http\Controllers\Sales\RecurringInvoiceController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SelfUpdateController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
@@ -172,10 +174,16 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Company (tenant) ERP routes: authenticated user + resolved tenant required.
-Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'erp.authorize', 'throttle:tenant-web'])->group(function () {
+Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.feature', 'erp.authorize', 'throttle:tenant-web'])->group(function () {
     // 1. Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/search', SearchController::class)->name('search');
+
+    // Top bar: working branch and fiscal year.
+    Route::post('/context/branch', [ActiveContextController::class, 'branch'])->name('context.branch');
+    Route::post('/context/fiscal-year', [ActiveContextController::class, 'fiscalYear'])->name('context.fiscal-year');
+    Route::get('/system/update', [SelfUpdateController::class, 'status'])->name('system.update.status');
+    Route::post('/system/update', [SelfUpdateController::class, 'apply'])->middleware('throttle:6,1')->name('system.update.apply');
 
     // Type-ahead lookups for document forms (bounded results).
     Route::prefix('lookup')->name('lookup.')->group(function () {

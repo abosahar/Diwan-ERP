@@ -149,6 +149,9 @@ agent com.diwan.queue true "" "$PHP" "$DIR/current/artisan" queue:work database 
 agent com.diwan.scheduler true "" "$PHP" "$DIR/current/artisan" schedule:work
 agent com.diwan.update false "    <key>StartCalendarInterval</key><dict><key>Hour</key><integer>3</integer><key>Minute</key><integer>30</integer></dict>" \
     /bin/bash "$DIR/current/deploy/mac/update.sh"
+mkdir -p "$DIR/shared/storage/app/update-queue"
+agent com.diwan.update-now false "    <key>QueueDirectories</key><array><string>$DIR/shared/storage/app/update-queue</string></array>
+    <key>ThrottleInterval</key><integer>30</integer>" /bin/bash "$DIR/current/deploy/mac/update.sh"
 ok "Diwan is running, starts whenever you log in to the Mac, and updates itself daily at 3:30 AM."
 
 # ------------------------------------------------------------------ 6. shortcut

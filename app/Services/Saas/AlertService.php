@@ -2,6 +2,7 @@
 
 namespace App\Services\Saas;
 
+use App\Models\Branch;
 use App\Models\Company;
 use App\Models\Employee;
 use App\Models\EmployeeDocument;
@@ -22,6 +23,7 @@ use App\Models\ZatcaDevice;
 use App\Models\ZatcaDocument;
 use App\Notifications\ErpAlert;
 use App\Services\Equipment\MaintenanceTracker;
+use App\Services\TenantManager;
 use App\Services\Zatca\EInvoiceManager;
 
 /**
@@ -74,7 +76,8 @@ class AlertService
         if ($probation) {
             $alerts[] = $this->alert('probation_ending', 'hr.employees.view', 'فترات تجربة تنتهي قريباً', "{$probation} موظف تنتهي فترة تجربته خلال 14 يوماً", route('hr.employees.index', [], false));
         }
-        $gosiMissing = $active()->where('nationality', 'SA')->where('gosi_registered', true)->where(fn ($q) => $q->whereNull('gosi_number')->orWhere('gosi_number', ''))->count();
+        $saudi = Branch::where('country_code', 'SA')->exists() || (app(TenantManager::class)->getCompany()?->country_code ?: 'SA') === 'SA';
+        $gosiMissing = ! $saudi ? 0 : $active()->where('nationality', 'SA')->where('gosi_registered', true)->where(fn ($q) => $q->whereNull('gosi_number')->orWhere('gosi_number', ''))->count();
         if ($gosiMissing) {
             $alerts[] = $this->alert('gosi_numbers', 'hr.employees.view', 'موظفون بلا رقم اشتراك في التأمينات', "{$gosiMissing} موظف سعودي مسجل في التأمينات دون رقم اشتراك", route('hr.employees.index', [], false));
         }

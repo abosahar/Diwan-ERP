@@ -12,7 +12,11 @@ import {
     UserCircleIcon,
     ArrowRightOnRectangleIcon,
     Cog6ToothIcon,
-    ShieldCheckIcon
+    ShieldCheckIcon,
+    ArrowsPointingOutIcon,
+    ArrowsPointingInIcon,
+    GlobeAltIcon,
+    CalendarDaysIcon
 } from '@heroicons/vue/24/outline';
 import LanguageSwitcher from './LanguageSwitcher.vue';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
@@ -72,6 +76,29 @@ const handleSearch = () => go(flat.value[active.value] || flat.value[0]);
 const indexOf = (item) => flat.value.indexOf(item);
 const closeSoon = () => setTimeout(() => (searchOpen.value = false), 150);
 
+// Working branch and fiscal year (chosen once here; every page follows).
+const branchSwitcher = computed(() => page.props.branchSwitcher);
+const fiscalSwitcher = computed(() => page.props.fiscalSwitcher);
+const activeBranch = computed(() => branchSwitcher.value?.items.find((b) => b.id === branchSwitcher.value.active));
+const manyCountries = computed(() => new Set((branchSwitcher.value?.items || []).map((b) => b.country)).size > 1);
+const branchLabel = (b) => (manyCountries.value ? `${b.name} — ${b.country_name}` : b.name);
+const switchBranch = (event) => {
+    const value = event.target.value;
+    router.post(route('context.branch'), { branch_id: value === 'all' ? 'all' : Number(value) }, { preserveScroll: true });
+};
+const switchYear = (event) => {
+    router.post(route('context.fiscal-year'), { fiscal_year_id: Number(event.target.value) }, { preserveScroll: true });
+};
+
+const isFullscreen = ref(false);
+const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().then(() => (isFullscreen.value = true)).catch(() => {});
+    } else {
+        document.exitFullscreen?.().then(() => (isFullscreen.value = false)).catch(() => {});
+    }
+};
+
 const logout = () => {
     router.post(route('logout'));
 };
@@ -80,7 +107,7 @@ const logout = () => {
 <template>
     <header class="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 lg:px-8 flex items-center justify-between shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
         <!-- Left / Right depending on RTL: Sidebar Toggle & Search Bar -->
-        <div class="flex items-center gap-3 lg:gap-4 flex-1 max-w-xl">
+        <div class="flex items-center gap-2 lg:gap-4 flex-1 min-w-0 max-w-3xl">
             <button 
                 @click="$emit('toggleSidebar')" 
                 type="button" 
@@ -121,16 +148,45 @@ const logout = () => {
                     </div>
                 </div>
             </form>
+
+            <!-- Fiscal year and working branch -->
+            <div v-if="branchSwitcher" class="flex items-center gap-2 sm:border-s sm:border-slate-200 sm:ps-4 shrink-0" data-context-selects>
+                <label v-if="fiscalSwitcher?.items.length" class="hidden lg:flex items-center" :title="'السنة المالية'">
+                    <CalendarDaysIcon class="w-4 h-4 text-slate-400 -me-6 ms-2 relative z-10 pointer-events-none" />
+                    <select data-fiscal-select :value="fiscalSwitcher.active" @change="switchYear"
+                        class="bg-slate-100 border border-slate-200 text-xs font-semibold rounded-lg ps-8 pe-7 py-2 text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <option v-for="y in fiscalSwitcher.items" :key="y.id" :value="y.id">السنة المالية {{ y.name }}</option>
+                    </select>
+                </label>
+
+                <label v-if="branchSwitcher.items.length > 1" class="flex items-center" title="الفرع الذي تعمل عليه">
+                    <GlobeAltIcon class="w-4 h-4 text-indigo-600 -me-6 ms-2 relative z-10 pointer-events-none" />
+                    <select data-branch-switch :value="branchSwitcher.active" @change="switchBranch"
+                        class="max-w-[8.5rem] sm:max-w-[16rem] bg-indigo-50 border border-indigo-100 text-xs font-bold rounded-lg ps-8 pe-7 py-2 text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <option v-if="branchSwitcher.can_all" value="all">كل الفروع (عرض موحّد)</option>
+                        <option v-for="b in branchSwitcher.items" :key="b.id" :value="b.id">{{ branchLabel(b) }}</option>
+                    </select>
+                </label>
+                <span v-else-if="activeBranch" class="hidden md:inline-flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-xs font-semibold rounded-lg px-3 py-2 text-slate-700">
+                    <GlobeAltIcon class="w-4 h-4 text-slate-400" /> {{ activeBranch.name }}
+                </span>
+            </div>
         </div>
 
         <!-- Center / End: Company Badge, POS Button, Language, Notifications, User Menu -->
         <div class="flex items-center gap-2 sm:gap-3">
             <!-- Active Company & Branch Pill -->
-            <div v-if="tenant" class="hidden md:flex items-center gap-2 bg-indigo-50/80 text-indigo-900 border border-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium">
+            <div v-if="tenant" class="hidden xl:flex items-center gap-2 bg-indigo-50/80 text-indigo-900 border border-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <BuildingStorefrontIcon class="w-4 h-4 text-indigo-600" />
                 <span class="font-bold">{{ tenant.name }}</span>
             </div>
+
+            <!-- Full screen -->
+            <button type="button" @click="toggleFullscreen" title="ملء الشاشة"
+                class="hidden md:flex w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 items-center justify-center transition-colors">
+                <component :is="isFullscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon" class="w-4 h-4" />
+            </button>
 
             <!-- Quick POS Cashier Action Button -->
             <Link 
@@ -143,7 +199,7 @@ const logout = () => {
             </Link>
 
             <!-- Language Switcher -->
-            <LanguageSwitcher />
+            <div class="hidden sm:block"><LanguageSwitcher /></div>
 
             <!-- Notifications Icon -->
             <Link
@@ -165,7 +221,7 @@ const logout = () => {
                         <span class="text-xs font-bold text-slate-800">{{ user?.name }}</span>
                         <span class="text-[10px] text-slate-500">{{ user?.is_super_admin ? 'مدير النظام' : 'مدير المؤسسة' }}</span>
                     </div>
-                    <ChevronDownIcon class="w-4 h-4 text-slate-400" />
+                    <ChevronDownIcon class="w-4 h-4 text-slate-400 hidden sm:block" />
                 </MenuButton>
 
                 <transition

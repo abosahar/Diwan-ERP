@@ -3,14 +3,16 @@
 namespace App\Traits;
 
 use App\Models\User;
+use App\Services\ActiveBranch;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Branch data scope: a user restricted to some branches only sees documents
- * of those branches (and documents without a branch), and cannot file one in
- * another branch. The owner and holders of "admin.data_scope.manage" see all.
- * Jobs and console commands are not restricted.
+ * Branch data scope: lists show the branch chosen in the top bar (or every
+ * branch the user may use while "all branches" is shown), plus documents
+ * without a branch. A new record belongs to the chosen branch, and cannot be
+ * filed in a branch the user may not work in. Jobs and console commands are
+ * not restricted.
  */
 trait BranchScoped
 {
@@ -27,12 +29,17 @@ trait BranchScoped
         });
 
         static::creating(function ($model) {
+            // A document hanging on another one (a payment on its invoice) belongs to that branch.
+            if (empty($model->branch_id) && method_exists($model, 'inheritedBranchId')) {
+                $model->branch_id = $model->inheritedBranchId();
+            }
+
             $user = static::scopedUser();
             if (! $user) {
                 return;
             }
             if (empty($model->branch_id)) {
-                $model->branch_id = $user->defaultBranchId();
+                $model->branch_id = app(ActiveBranch::class)->forWrite();
             }
             if (! $user->canUseBranch($model->branch_id ? (int) $model->branch_id : null)) {
                 throw ValidationException::withMessages(['branch_id' => 'لا تملك صلاحية العمل على هذا الفرع.']);
@@ -41,7 +48,7 @@ trait BranchScoped
     }
 
     /**
-     * The signed-in user whose branches apply, or null outside a user request.
+     * The signed-in user whose branch applies, or null outside a user request.
      */
     protected static function scopedUser(): ?User
     {
@@ -58,6 +65,6 @@ trait BranchScoped
      */
     protected static function restrictedBranchIds(): ?array
     {
-        return static::scopedUser()?->allowedBranchIds();
+        return static::scopedUser() ? app(ActiveBranch::class)->scopeIds() : null;
     }
 }

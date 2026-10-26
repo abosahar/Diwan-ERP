@@ -17,7 +17,9 @@ import {
     BuildingStorefrontIcon,
     CalendarIcon,
     ArrowLeftIcon,
-    PlusIcon
+    PlusIcon,
+    ReceiptPercentIcon,
+    ClockIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -26,6 +28,9 @@ const props = defineProps({
     topProducts: Array,
     salesChart: Object,
     cashOutlook: { type: Object, default: null },
+    yearData: { type: Object, default: null },
+    projects: { type: Array, default: () => [] },
+    activeYearName: { type: String, default: null },
     onboarding: { type: Object, default: null },
 });
 
@@ -43,48 +48,46 @@ const currentDate = computed(() => {
     });
 });
 
-// Chart Options for ApexCharts
-const chartOptions = computed(() => ({
-    chart: {
-        type: 'area',
-        height: 300,
-        fontFamily: 'Cairo, sans-serif',
-        toolbar: { show: false },
-    },
-    colors: ['#4F46E5', '#10B981'],
+const fmt = (n) => Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+const totalRevenue = computed(() => (props.yearData?.revenue || []).reduce((a, b) => a + b, 0));
+const totalExpense = computed(() => (props.yearData?.expense || []).reduce((a, b) => a + b, 0));
+const branchSwitcher = computed(() => page.props.branchSwitcher);
+const branchName = computed(() => {
+    const sw = branchSwitcher.value;
+    if (!sw || sw.items.length < 2) return null;
+    return sw.active === 'all' ? 'كل الفروع' : sw.items.find((b) => b.id === sw.active)?.name;
+});
+
+// Revenue against expenses, month by month of the fiscal year.
+const flowSeries = computed(() => [
+    { name: 'الإيرادات', data: props.yearData?.revenue || [] },
+    { name: 'المصروفات', data: props.yearData?.expense || [] },
+]);
+const flowOptions = computed(() => ({
+    chart: { type: 'area', height: 290, fontFamily: 'Cairo, sans-serif', toolbar: { show: false } },
+    colors: ['#0d9488', '#f43f5e'],
     dataLabels: { enabled: false },
-    stroke: { curve: 'smooth', width: 2.5 },
-    fill: {
-        type: 'gradient',
-        gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.35,
-            opacityTo: 0.05,
-            stops: [0, 90, 100]
-        }
-    },
-    xaxis: {
-        categories: props.salesChart?.months || [],
-        labels: {
-            style: { colors: '#64748B', fontSize: '11px', fontFamily: 'Cairo' }
-        }
-    },
-    yaxis: {
-        labels: {
-            formatter: (val) => `${val.toLocaleString()} ${cur()}`,
-            style: { colors: '#64748B', fontSize: '11px', fontFamily: 'Cairo' }
-        }
-    },
-    tooltip: {
-        theme: 'light',
-        y: { formatter: (val) => `${val.toLocaleString()} ${cur()}` }
-    },
-    legend: {
-        position: 'top',
-        horizontalAlign: 'right',
-        fontFamily: 'Cairo',
-        fontSize: '12px'
-    }
+    stroke: { curve: 'smooth', width: [2.5, 2], dashArray: [0, 5] },
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.02, stops: [0, 90, 100] } },
+    xaxis: { categories: props.yearData?.labels || [], labels: { style: { colors: '#64748B', fontSize: '11px', fontFamily: 'Cairo' } } },
+    yaxis: { labels: { formatter: (v) => `${fmt(v)}`, style: { colors: '#64748B', fontSize: '10px', fontFamily: 'Cairo' } } },
+    grid: { borderColor: '#f1f5f9' },
+    tooltip: { theme: 'light', y: { formatter: (v) => `${fmt(v)} ${cur()}` } },
+    legend: { position: 'top', horizontalAlign: 'right', fontFamily: 'Cairo', fontSize: '12px' },
+}));
+
+// Where the money went: purchases, running expenses and salaries.
+const costSeries = computed(() => [props.yearData?.purchases || 0, props.yearData?.expenses || 0, props.yearData?.payroll || 0]);
+const costTotal = computed(() => costSeries.value.reduce((a, b) => a + b, 0));
+const costOptions = computed(() => ({
+    chart: { type: 'donut', fontFamily: 'Cairo, sans-serif' },
+    labels: ['مشتريات ومواد', 'مصاريف تشغيلية', 'الرواتب والأجور'],
+    colors: ['#0d9488', '#0284c7', '#d97706'],
+    dataLabels: { enabled: false },
+    stroke: { width: 0 },
+    plotOptions: { pie: { donut: { size: '72%' } } },
+    legend: { position: 'bottom', fontFamily: 'Cairo', fontSize: '11px' },
+    tooltip: { y: { formatter: (v) => `${fmt(v)} ${cur()}` } },
 }));
 </script>
 
@@ -108,147 +111,132 @@ const chartOptions = computed(() => ({
             </ul>
         </div>
 
-        <!-- Welcome Banner & Top Header -->
-        <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-2xl font-black text-slate-900 tracking-tight">
-                        مرحباً بك، {{ user?.name }}
-                    </h1>
-                    <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        متصل
-                    </span>
+        <!-- Welcome banner: summary of the day and the quick actions -->
+        <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-navy-850 via-slate-900 to-brand-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden" data-welcome>
+            <div class="relative z-10">
+                <div class="flex items-center gap-2 text-brand-100 text-xs font-semibold mb-2">
+                    <span class="bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">مؤشرات الأداء المالي والتشغيلي</span>
+                    <span>•</span>
+                    <span class="inline-flex items-center gap-1"><CalendarIcon class="w-4 h-4" /> {{ currentDate }}</span>
                 </div>
-                <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-                    <CalendarIcon class="w-4 h-4 text-slate-400" />
-                    <span>{{ currentDate }}</span>
-                    <span class="text-slate-300">•</span>
-                    <span>فرع: الفرع الرئيسي</span>
+                <h1 class="text-2xl font-bold tracking-tight">مرحباً بك، {{ user?.name }}</h1>
+                <p class="text-slate-300 text-sm mt-1 max-w-xl">
+                    <template v-if="yearData?.pending">لديك <span class="text-amber-400 font-bold">{{ yearData.pending }} فاتورة غير مسددة</span><template v-if="yearData.overdue"> منها <span class="text-rose-300 font-bold">{{ yearData.overdue }} متأخرة</span></template>، </template>
+                    ومبيعات الشهر <span class="text-emerald-400 font-bold">{{ kpis.month_sales }} {{ $cur() }}</span>
+                    <template v-if="branchName"> في «{{ branchName }}»</template>.
                 </p>
             </div>
-
-            <!-- Header Action Buttons -->
-            <div class="flex items-center gap-2.5">
-                <Link
-                    v-if="$canRoute('sales.invoices.create')"
-                    :href="route('sales.invoices.create')"
-                    class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm hover:shadow transition active:scale-95"
-                >
-                    <PlusIcon class="w-4 h-4" />
-                    <span>فاتورة جديدة</span>
+            <div class="flex flex-wrap items-center gap-2.5 relative z-10 shrink-0">
+                <Link v-if="$canRoute('accounting.journals.index')" :href="route('accounting.journals.index')"
+                    class="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold transition shadow-md shadow-brand-900/30 inline-flex items-center gap-2">
+                    <PlusIcon class="w-4 h-4" /> قيد يومية
                 </Link>
-                <Link
-                    :href="route('pos.index')"
-                    class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm hover:shadow transition active:scale-95"
-                >
-                    <DeviceTabletIcon class="w-4 h-4" />
-                    <span>نقطة البيع (POS)</span>
+                <Link v-if="$canRoute('sales.invoices.create')" :href="route('sales.invoices.create')"
+                    class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition inline-flex items-center gap-2">
+                    <DocumentTextIcon class="w-4 h-4" /> فاتورة جديدة
+                </Link>
+                <Link v-if="$canRoute('pos.index')" :href="route('pos.index')"
+                    class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition inline-flex items-center gap-2">
+                    <DeviceTabletIcon class="w-4 h-4" /> نقطة البيع
                 </Link>
             </div>
         </div>
 
-        <!-- 1. Quick Actions Row -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
-            <QuickActionButton 
-                v-if="$canRoute('sales.invoices.create')"
-                :href="route('sales.invoices.create')"
-                title="فاتورة مبيعات جديدة"
-                subtitle="إصدار فاتورة إلكترونية معتمدة"
-                color="indigo"
-            >
-                <template #icon>
-                    <DocumentPlusIcon class="w-5 h-5" />
-                </template>
-            </QuickActionButton>
-
-            <QuickActionButton 
-                v-if="$canRoute('sales.clients.create')"
-                :href="route('sales.clients.create')"
-                title="إضافة عميل جديد"
-                subtitle="تسجيل بيانات عميل جديد"
-                color="blue"
-            >
-                <template #icon>
-                    <UserPlusIcon class="w-5 h-5" />
-                </template>
-            </QuickActionButton>
-
-            <QuickActionButton 
-                v-if="$canRoute('inventory.products.create')"
-                :href="route('inventory.products.create')"
-                title="إضافة منتج جديد"
-                subtitle="إدراج صنف وتكلفة ومخزون"
-                color="purple"
-            >
-                <template #icon>
-                    <CubeIcon class="w-5 h-5" />
-                </template>
-            </QuickActionButton>
-
-            <QuickActionButton 
-                :href="route('pos.index')"
-                title="جلسة كاشير POS"
-                subtitle="بدء نقطة البيع السريعة"
-                color="emerald"
-            >
-                <template #icon>
-                    <DeviceTabletIcon class="w-5 h-5" />
-                </template>
-            </QuickActionButton>
+        <!-- 1. KPI cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+            <KpiCard title="إيرادات السنة المالية" :value="fmt(totalRevenue)" :unit="$cur()" color="emerald">
+                <template #icon><BanknotesIcon class="w-5 h-5" /></template>
+            </KpiCard>
+            <KpiCard title="المصروفات والمشتريات" :value="fmt(totalExpense)" :unit="$cur()" color="rose">
+                <template #icon><ReceiptPercentIcon class="w-5 h-5" /></template>
+            </KpiCard>
+            <KpiCard title="مبيعات الشهر الحالي" :value="kpis.month_sales" :unit="$cur()" :trend="kpis.month_sales_trend" trendText="مقارنة بالشهر الماضي" color="blue">
+                <template #icon><ArrowTrendingUpIcon class="w-5 h-5" /></template>
+            </KpiCard>
+            <KpiCard title="المبالغ المستحقة (الآجل)" :value="kpis.receivables" :unit="$cur()" color="amber">
+                <template #icon><ClockIcon class="w-5 h-5" /></template>
+            </KpiCard>
         </div>
 
-        <!-- 2. KPI Summary Cards Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <KpiCard
-                title="مبيعات اليوم"
-                :value="kpis.today_sales"
-                :unit="$cur()"
-                color="indigo"
-            >
-                <template #icon>
-                    <BanknotesIcon class="w-5 h-5" />
-                </template>
-            </KpiCard>
+        <!-- 2. Charts: revenue vs expenses over the fiscal year, and the cost split -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="font-bold text-base text-slate-900">التدفقات ومقارنة الأداء المالي</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">الإيرادات مقابل المصروفات{{ activeYearName ? ' للسنة المالية ' + activeYearName : '' }}</p>
+                    </div>
+                </div>
+                <div class="min-h-[290px]" data-cashflow-chart>
+                    <apexchart type="area" height="290" :options="flowOptions" :series="flowSeries" />
+                </div>
+            </div>
 
-            <KpiCard
-                title="مبيعات الشهر الحالي"
-                :value="kpis.month_sales"
-                :unit="$cur()"
-                :trend="kpis.month_sales_trend"
-                trendText="مقارنة بالشهر الماضي"
-                color="emerald"
-            >
-                <template #icon>
-                    <ArrowTrendingUpIcon class="w-5 h-5" />
-                </template>
-            </KpiCard>
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                <div>
+                    <h2 class="font-bold text-base text-slate-900">توزيع التكاليف</h2>
+                    <p class="text-xs text-slate-400 mt-0.5 mb-3">أين صُرف المال خلال السنة المالية</p>
+                    <div v-if="costTotal > 0" class="min-h-[230px]" data-cost-chart>
+                        <apexchart type="donut" height="230" :options="costOptions" :series="costSeries" />
+                    </div>
+                    <p v-else class="text-xs text-slate-400 py-16 text-center">لا توجد مصروفات مسجلة في هذه السنة بعد.</p>
+                </div>
+            </div>
+        </div>
 
-            <KpiCard
-                title="عدد الفواتير المصدرة"
-                :value="kpis.invoices_count"
-                unit="فاتورة"
-                :trend="kpis.invoices_count_trend"
-                trendText="نمو الفواتير"
-                color="blue"
-            >
-                <template #icon>
-                    <DocumentTextIcon class="w-5 h-5" />
-                </template>
-            </KpiCard>
+        <!-- 3. Contracts and quick actions -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div v-if="projects?.length" class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs" data-projects>
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h2 class="font-bold text-base text-slate-900">متابعة المشاريع والعقود النشطة</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">المفوتر من قيمة العقد</p>
+                    </div>
+                    <Link :href="route('projects.index')" class="text-xs text-brand-600 hover:text-brand-800 font-bold inline-flex items-center gap-1">عرض الكل <ArrowLeftIcon class="w-3.5 h-3.5" /></Link>
+                </div>
+                <div class="space-y-4">
+                    <Link v-for="p in projects" :key="p.id" :href="route('projects.show', p.id)" class="block p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-9 h-9 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-bold text-[10px] shrink-0">{{ p.code }}</div>
+                                <div class="min-w-0">
+                                    <h3 class="font-bold text-sm text-slate-800 truncate">{{ p.name }}</h3>
+                                    <span class="text-[11px] text-slate-500">{{ p.customer || '—' }}</span>
+                                </div>
+                            </div>
+                            <div class="text-end shrink-0 text-xs">
+                                <span class="text-slate-400 block text-[10px]">قيمة العقد</span>
+                                <span class="font-bold text-slate-700">{{ p.value }} {{ $cur() }}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500 font-medium mb-1.5"><span>المفوتر</span><span class="text-brand-700 font-bold">{{ p.billed_percent }}%</span></div>
+                        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden"><div class="bg-brand-600 h-full rounded-full transition-all duration-700" :style="{ width: p.billed_percent + '%' }"></div></div>
+                    </Link>
+                </div>
+            </div>
 
-            <KpiCard
-                title="المبالغ المستحقة (الآجل)"
-                :value="kpis.receivables"
-                :unit="$cur()"
-                :trend="kpis.receivables_trend"
-                trendText="مستحقات التحصيل"
-                color="amber"
-            >
-                <template #icon>
-                    <BanknotesIcon class="w-5 h-5" />
-                </template>
-            </KpiCard>
+            <div :class="projects?.length ? '' : 'lg:col-span-3'" class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+                <h2 class="font-bold text-base text-slate-900 mb-1">إجراءات سريعة</h2>
+                <p class="text-xs text-slate-400 mb-4">إنشاء مستندات مباشرة</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <Link v-if="$canRoute('sales.invoices.create')" :href="route('sales.invoices.create')" class="p-3.5 rounded-xl border border-slate-200 hover:border-brand-500/50 hover:bg-brand-50/50 transition-all group flex flex-col justify-between h-24">
+                        <DocumentPlusIcon class="w-5 h-5 text-brand-600 group-hover:scale-110 transition-transform" />
+                        <div><span class="block text-xs font-bold text-slate-800">فاتورة مبيعات</span><span class="text-[10px] text-slate-400">للفرع الحالي</span></div>
+                    </Link>
+                    <Link v-if="$canRoute('sales.clients.create')" :href="route('sales.clients.create')" class="p-3.5 rounded-xl border border-slate-200 hover:border-brand-500/50 hover:bg-brand-50/50 transition-all group flex flex-col justify-between h-24">
+                        <UserPlusIcon class="w-5 h-5 text-sky-600 group-hover:scale-110 transition-transform" />
+                        <div><span class="block text-xs font-bold text-slate-800">عميل جديد</span><span class="text-[10px] text-slate-400">تسجيل بياناته</span></div>
+                    </Link>
+                    <Link v-if="$canRoute('inventory.products.create')" :href="route('inventory.products.create')" class="p-3.5 rounded-xl border border-slate-200 hover:border-brand-500/50 hover:bg-brand-50/50 transition-all group flex flex-col justify-between h-24">
+                        <CubeIcon class="w-5 h-5 text-amber-600 group-hover:scale-110 transition-transform" />
+                        <div><span class="block text-xs font-bold text-slate-800">صنف جديد</span><span class="text-[10px] text-slate-400">تكلفة ومخزون</span></div>
+                    </Link>
+                    <Link v-if="$canRoute('pos.index')" :href="route('pos.index')" class="p-3.5 rounded-xl border border-slate-200 hover:border-brand-500/50 hover:bg-brand-50/50 transition-all group flex flex-col justify-between h-24">
+                        <DeviceTabletIcon class="w-5 h-5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                        <div><span class="block text-xs font-bold text-slate-800">نقطة البيع</span><span class="text-[10px] text-slate-400">كاشير سريع</span></div>
+                    </Link>
+                </div>
+            </div>
         </div>
 
         <!-- Cash outlook (from the insights dashboards) -->
@@ -258,25 +246,6 @@ const chartOptions = computed(() => ({
             <div><div class="text-slate-500">أدنى رصيد متوقع</div><div class="text-base font-black font-mono mt-1" :class="cashOutlook.lowest < 0 ? 'text-rose-700' : ''">{{ Number(cashOutlook.lowest).toLocaleString('en-US', { maximumFractionDigits: 0 }) }}</div></div>
             <div><div class="text-slate-500">ذمم عملاء متأخرة</div><div class="text-base font-black font-mono mt-1">{{ Number(cashOutlook.overdue).toLocaleString('en-US', { maximumFractionDigits: 0 }) }}</div></div>
         </Link>
-
-        <!-- 3. Performance Chart & Analytics -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900">نظرة عامة على المبيعات والمشتريات</h2>
-                    <p class="text-xs text-slate-500">حركة المبيعات مقارنة بتكاليف الشراء خلال الأشهر الستة الأخيرة</p>
-                </div>
-            </div>
-
-            <div class="min-h-[300px]">
-                <apexchart
-                    type="area"
-                    height="300"
-                    :options="chartOptions"
-                    :series="salesChart?.series || []"
-                />
-            </div>
-        </div>
 
         <!-- 4. Bottom Grid: Recent Invoices & Top Products -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

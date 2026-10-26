@@ -29,7 +29,6 @@ import {
     TagIcon,
 } from '@heroicons/vue/24/outline';
 import CustomerModal from '../Clients/CustomerModal.vue';
-import BranchSelect from '@/Components/BranchSelect.vue';
 
 const props = defineProps({
     customers: Array,
@@ -580,9 +579,6 @@ const importLines = (lines, replace) => {
                                 </div>
                             </div>
 
-                            <div v-if="branches?.length > 1" class="sm:col-span-2">
-                                <BranchSelect v-model="form.branch_id" :branches="branches" :error="form.errors.branch_id" />
-                            </div>
 
                             <!-- Invoice Number -->
                             <div>

@@ -78,8 +78,8 @@ const zakatRows = [
                 <p v-if="fxForm.errors.month" class="text-xs text-rose-600">{{ fxForm.errors.month }}</p>
             </section>
 
-            <!-- Zakat -->
-            <section class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+            <!-- Zakat (Saudi branches) -->
+            <section v-if="$feature('zakat')" class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
                 <div>
                     <h2 class="font-black text-slate-800">مخصص الزكاة الشرعية</h2>
                     <p class="text-3xs text-slate-500 mt-1">طريقة صافي الأصول: الوعاء لا يقل عن صافي الربح المعدل. راجع الحساب مع مستشارك قبل تقديم الإقرار لهيئة الزكاة والضريبة والجمارك.</p>

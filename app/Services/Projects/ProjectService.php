@@ -16,6 +16,7 @@ use App\Models\SubcontractCertificate;
 use App\Models\Supplier;
 use App\Services\Accounting\DocumentPoster;
 use App\Services\Accounting\PostingService;
+use App\Services\ActiveBranch;
 use App\Services\Documents\DocumentNumberService;
 use App\Services\Inventory\DocumentStock;
 use App\Services\Inventory\StockService;
@@ -64,7 +65,7 @@ class ProjectService
             $costCenter = CostCenter::create(['parent_id' => $root->id, 'code' => $code, 'name_ar' => $data['name'], 'is_active' => true]);
 
             $project = Project::create([
-                'branch_id' => $data['branch_id'] ?? auth()->user()?->defaultBranchId(),
+                'branch_id' => $data['branch_id'] ?? app(ActiveBranch::class)->forWrite(),
                 'customer_id' => $data['customer_id'],
                 'cost_center_id' => $costCenter->id,
                 'manager_id' => $data['manager_id'] ?? null,

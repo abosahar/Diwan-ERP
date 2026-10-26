@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\BelongsToCompany;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,9 +11,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PosOrder extends Model
 {
-    use BelongsToCompany, HasFactory;
+    use BelongsToCompany, BranchScoped, HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'cash_amount',
         'card_amount',
         'company_id',
@@ -59,5 +61,11 @@ class PosOrder extends Model
     public function items(): HasMany
     {
         return $this->hasMany(PosOrderItem::class);
+    }
+
+    /** A document that hangs on another (a payment on its invoice...) belongs to that document's branch. */
+    public function inheritedBranchId(): ?int
+    {
+        return PosSession::withoutGlobalScope('branch')->whereKey($this->pos_session_id)->value('branch_id');
     }
 }

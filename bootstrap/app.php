@@ -1,6 +1,8 @@
 <?php
 
+use App\Exceptions\BranchRequiredException;
 use App\Http\Middleware\AuthorizeRoutePermission;
+use App\Http\Middleware\EnsureCountryFeature;
 use App\Http\Middleware\EnsurePlanAccess;
 use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\EnsureTenant;
@@ -70,6 +72,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant' => EnsureTenant::class,
             'erp.authorize' => AuthorizeRoutePermission::class,
             'plan' => EnsurePlanAccess::class,
+            'country.feature' => EnsureCountryFeature::class,
             'tenant.resolve' => ResolveTenant::class,
             'two_factor' => EnsureTwoFactorEnrolled::class,
         ]);
@@ -81,4 +84,13 @@ return Application::configure(basePath: dirname(__DIR__))
             AccountingException::class,
             fn (AccountingException $e) => $e->toValidation(),
         );
+
+        // Creating while the top bar shows "all branches": ask for a branch instead of failing.
+        $exceptions->render(function (BranchRequiredException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $e->getMessage(), 'errors' => ['branch_id' => [$e->getMessage()]]], 422);
+            }
+
+            return redirect()->back(fallback: route('dashboard'))->with('error', $e->getMessage());
+        });
     })->create();

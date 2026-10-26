@@ -88,16 +88,20 @@ class UserBranchesTest extends TestCase
         ];
     }
 
-    public function test_the_owner_chooses_any_branch_and_starts_on_the_main_one(): void
+    public function test_the_owner_works_in_the_branch_chosen_in_the_top_bar(): void
     {
         $this->get(route('sales.invoices.create'))->assertOk()->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Sales/Invoices/Create')
-            ->has('branches', 3)
+            ->has('branches', 1)
             ->where('defaultBranchId', $this->riyadh->id)
-            ->where('branches.0.tax.rate', 15));
+            ->where('branches.0.tax.rate', 15)
+            ->has('branchSwitcher.items', 3)
+            ->where('branchSwitcher.active', $this->riyadh->id)
+            ->where('branchSwitcher.can_all', true));
 
-        $this->post(route('sales.invoices.store'), $this->invoicePayload($this->dammam))->assertSessionHasNoErrors();
-        $this->assertSame($this->dammam->id, Invoice::latest('id')->first()->branch_id);
+        $this->post(route('context.branch'), ['branch_id' => $this->dammam->id])->assertSessionHasNoErrors();
+        $this->post(route('sales.invoices.store'), array_diff_key($this->invoicePayload($this->dammam), ['branch_id' => 1]))->assertSessionHasNoErrors();
+        $this->assertSame($this->dammam->id, Invoice::withoutGlobalScope('branch')->latest('id')->first()->branch_id);
     }
 
     public function test_a_user_works_only_in_their_branches(): void
@@ -109,18 +113,31 @@ class UserBranchesTest extends TestCase
         $this->actingAs($this->clerk([$this->riyadh, $this->jeddah], $this->jeddah));
 
         $this->get(route('sales.invoices.create'))->assertOk()->assertInertia(fn (AssertableInertia $page) => $page
-            ->has('branches', 2)
+            ->has('branchSwitcher.items', 2)
             ->where('defaultBranchId', $this->jeddah->id));
 
-        // Another branch is refused, theirs is accepted.
+        // Another branch cannot be chosen nor filed in; theirs can.
+        $this->post(route('context.branch'), ['branch_id' => $this->dammam->id])->assertSessionHas('error');
         $this->post(route('sales.invoices.store'), $this->invoicePayload($this->dammam))->assertSessionHasErrors('branch_id');
         $this->post(route('sales.invoices.store'), $this->invoicePayload($this->riyadh))->assertSessionHasNoErrors();
-        // Without a branch: their default one.
+        // Without a branch in the form: the one chosen in the top bar.
         $this->post(route('sales.invoices.store'), array_diff_key($this->invoicePayload($this->riyadh), ['branch_id' => 1]))->assertSessionHasNoErrors();
-        $this->assertSame($this->jeddah->id, Invoice::latest('id')->first()->branch_id);
+        $this->assertSame($this->jeddah->id, Invoice::withoutGlobalScope('branch')->latest('id')->first()->branch_id);
 
+        // The list shows the chosen branch; "all branches" shows theirs together, never the others.
+        $this->get(route('sales.invoices.index'))->assertInertia(fn (AssertableInertia $page) => $page->has('invoices.data', 2));
+        $this->post(route('context.branch'), ['branch_id' => 'all'])->assertSessionHasNoErrors();
         $this->get(route('sales.invoices.index'))->assertInertia(fn (AssertableInertia $page) => $page->has('invoices.data', 4));
         $this->assertSame([$this->riyadh->id, $this->jeddah->id], Invoice::pluck('branch_id')->unique()->sort()->values()->all());
+    }
+
+    public function test_nothing_is_created_while_all_branches_are_shown(): void
+    {
+        $this->post(route('context.branch'), ['branch_id' => 'all'])->assertSessionHasNoErrors();
+
+        $this->get(route('sales.invoices.create'))->assertRedirect()->assertSessionHas('error');
+        $this->post(route('sales.invoices.store'), array_diff_key($this->invoicePayload($this->riyadh), ['branch_id' => 1]))->assertSessionHas('error');
+        $this->assertSame(0, Invoice::withoutGlobalScope('branch')->count());
     }
 
     public function test_the_users_page_saves_branches_and_their_default(): void
@@ -168,8 +185,9 @@ class UserBranchesTest extends TestCase
         $this->post(route('branches.store'), ['name_ar' => 'القاهرة', 'code' => 'CAI', 'country_code' => 'EG', 'currency' => 'SAR'])->assertSessionHasNoErrors();
         $cairo = Branch::where('code', 'CAI')->firstOrFail();
 
+        $this->post(route('context.branch'), ['branch_id' => $cairo->id])->assertSessionHasNoErrors();
         $this->get(route('sales.orders.create'))->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('branches.3.tax.rate', 14));
+            ->where('branches.0.tax.rate', 14));
 
         $this->post(route('sales.orders.store'), [
             'customer_id' => $this->customer->id, 'branch_id' => $cairo->id, 'order_date' => '2026-06-15',

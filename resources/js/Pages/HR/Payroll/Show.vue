@@ -37,7 +37,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
                 <button v-if="payroll.status === 'approved' && $can('hr.payroll.approve')" @click="unapprove" class="px-3 py-2 rounded-xl border border-amber-300 text-amber-700 text-xs font-bold">إلغاء الاعتماد</button>
                 <button v-if="payroll.status === 'approved' && $can('hr.payroll.post')" @click="payOpen = true" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">صرف الرواتب</button>
                 <template v-if="$can('hr.payroll.export')">
-                    <a :href="route('hr.payroll.wps', { payroll: payroll.id, format: 'mudad' })" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">ملف مُدد (WPS)</a>
+                    <a v-if="$feature('wps')" :href="route('hr.payroll.wps', { payroll: payroll.id, format: 'mudad' })" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">ملف مُدد (WPS)</a>
                     <a :href="route('hr.payroll.wps', { payroll: payroll.id, format: 'bank' })" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">ملف البنك</a>
                 </template>
             </template>
@@ -72,7 +72,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
                     <tr><td class="px-2 py-2" colspan="2">الإجمالي</td><td class="px-2 py-2 text-end font-mono">{{ money(sum('basic_salary')) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(sum('allowances')) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(sum('overtime')) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(sum('bonuses')) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(sum('absence_deduction')) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(sum('gross_salary')) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(payroll.total_gosi_employee) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(payroll.total_loans) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(sum('other_deductions')) }}</td><td class="px-2 py-2 text-end font-mono">{{ money(payroll.net_total) }}</td><td></td></tr>
                 </tfoot>
             </table>
-            <p class="p-3 text-xs text-slate-500">حصة المنشأة في التأمينات: <b class="font-mono">{{ money(payroll.total_gosi_employer) }}</b> — إجمالي سداد التأمينات: <b class="font-mono">{{ money(Number(payroll.total_gosi_employee) + Number(payroll.total_gosi_employer)) }}</b></p>
+            <p v-if="$feature('gosi')" class="p-3 text-xs text-slate-500">حصة المنشأة في التأمينات: <b class="font-mono">{{ money(payroll.total_gosi_employer) }}</b> — إجمالي سداد التأمينات: <b class="font-mono">{{ money(Number(payroll.total_gosi_employee) + Number(payroll.total_gosi_employer)) }}</b></p>
         </div>
 
         <div class="bg-white border border-slate-200 rounded-2xl p-4 text-xs">

@@ -4,7 +4,11 @@ namespace App\Http\Middleware;
 
 use App\Models\Branch;
 use App\Models\Currency;
+use App\Services\ActiveBranch;
+use App\Services\ActiveFiscalYear;
 use App\Services\Saas\PlanGuard;
+use App\Services\SelfUpdate;
+use App\Services\Tax\CountryFeatures;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
 use App\Support\CurrencyNames;
@@ -77,8 +81,17 @@ class HandleInertiaRequests extends Middleware
                 'status' => $currentTenant->status,
                 'trial_ends_at' => $currentTenant->trial_ends_at?->format('Y-m-d'),
             ] : null,
-            // Tax rules of the user's branch (its country): default rate, allowed rates, currency.
+            // Top bar: the branch being worked in (all = viewing every allowed branch) and the fiscal year.
+            'branchSwitcher' => fn () => $currentTenant && $user && $user->company_id ? app(ActiveBranch::class)->switcher() : null,
+            'fiscalSwitcher' => fn () => $currentTenant && $user && $user->company_id ? app(ActiveFiscalYear::class)->switcher() : null,
+            // Tax rules of the active branch (its country): default rate, allowed rates, currency.
             'tax' => fn () => $currentTenant && $user ? TaxProfile::current()->toArray() : null,
+            // A newer release of a local install, for its owner (banner with an update button).
+            'update' => fn () => $user && $currentTenant && $user->isCompanyOwner() && app(SelfUpdate::class)->enabled()
+                ? ['available' => app(SelfUpdate::class)->available(), 'latest' => app(SelfUpdate::class)->latest(), 'current' => app(SelfUpdate::class)->current(), 'status' => app(SelfUpdate::class)->status()]
+                : null,
+            // Country-specific features on for the active branch (ZATCA, zakat, GOSI...).
+            'features' => fn () => $currentTenant && $user ? CountryFeatures::enabled() : [],
             // Currencies the company uses (forms show a currency picker when > 1).
             'currencies' => fn () => $currentTenant ? Currency::orderByDesc('is_default')->orderBy('code')
                 ->get(['code', 'name_ar', 'symbol_ar', 'exchange_rate'])->toArray() : [],

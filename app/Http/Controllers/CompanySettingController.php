@@ -50,7 +50,7 @@ class CompanySettingController extends Controller
             'countries' => collect(config('countries'))->map(fn ($c, $code) => ['code' => $code, 'name' => $c['name'], 'timezone' => $c['timezone']])->values(),
             'currencies' => RegisteredUserController::currencies(),
             // The company's country can change only before its first invoice (issued documents keep their country's rules).
-            'countryLocked' => Invoice::exists(),
+            'countryLocked' => Invoice::withoutGlobalScope('branch')->exists(),
             // Local install: addresses the office's other devices open the system on.
             'localAccess' => config('app.local_install') ? LocalNetwork::urls(request()) : null,
         ]);
@@ -115,7 +115,7 @@ class CompanySettingController extends Controller
         }
 
         $country = strtoupper((string) ($validated['country_code'] ?? $company->country_code ?: 'SA'));
-        if ($country !== ($company->country_code ?: 'SA') && Invoice::exists()) {
+        if ($country !== ($company->country_code ?: 'SA') && Invoice::withoutGlobalScope('branch')->exists()) {
             throw ValidationException::withMessages(['country_code' => 'لا يمكن تغيير دولة المنشأة بعد إصدار فواتير؛ أضف فرعاً في الدولة الأخرى.']);
         }
 

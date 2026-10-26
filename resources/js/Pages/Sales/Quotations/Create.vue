@@ -13,7 +13,6 @@ import {
     CheckIcon,
     UserPlusIcon,
 } from '@heroicons/vue/24/outline';
-import BranchSelect from '@/Components/BranchSelect.vue';
 
 const props = defineProps({
     customers: Array,
@@ -242,7 +241,6 @@ const importLines = (lines, replace) => {
                             </p>
                         </div>
 
-                        <BranchSelect v-if="branches?.length > 1" v-model="form.branch_id" :branches="branches" :error="form.errors.branch_id" />
                     </div>
 
                     <!-- Quotation Meta Info Card -->
