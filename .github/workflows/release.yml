@@ -1,0 +1,81 @@
+name: Release package
+
+# Builds the ready-to-run package the installers download (deploy/windows,
+# deploy/mac, deploy/linux): the code with its PHP libraries (vendor) and the
+# built interface (public/build), so nobody needs Composer, Node or Git.
+#
+# Publish a release on GitHub (Releases → Draft a new release → tag v1.2.0 →
+# Publish) and this attaches diwan-erp.zip to it. The installers always take
+# the latest one: releases/latest/download/diwan-erp.zip
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to (re)build the package for, e.g. v1.0.0
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: PHP libraries (production)
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
+
+      - name: Interface
+        run: |
+          npm ci
+          npm run build
+
+      - name: Package
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          OUT=dist/diwan-erp
+          mkdir -p "$OUT"
+          # Tracked files only (no .env, tests or CI files), then what the build produced.
+          git archive HEAD | tar -x -C "$OUT"
+          rm -rf "$OUT/tests" "$OUT/.github" "$OUT/node_modules"
+          cp -R vendor "$OUT/vendor"
+          # Libraries installed from source carry their git history: not needed to run.
+          find "$OUT/vendor" -name .git -type d -prune -exec rm -rf {} +
+          mkdir -p "$OUT/public/build"
+          cp -R public/build/. "$OUT/public/build/"
+          echo "$VERSION" > "$OUT/VERSION"
+          (cd dist && zip -qr9 diwan-erp.zip diwan-erp)
+          (cd dist && sha256sum diwan-erp.zip | cut -d' ' -f1 > diwan-erp.zip.sha256)
+          ls -lh dist
+
+      - name: Attach to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The installers themselves, so each guide's one-line command takes the latest release's.
+          cp deploy/windows/Diwan-Setup.bat dist/Diwan-Setup.bat
+          cp deploy/windows/install.ps1 dist/install-windows.ps1
+          cp deploy/mac/install.sh dist/install-mac.sh
+          cp deploy/linux/install.sh dist/install-linux.sh
+          cp deploy/ubuntu/install.sh dist/install-server.sh
+          gh release upload "$TAG" dist/diwan-erp.zip dist/diwan-erp.zip.sha256 \
+            dist/Diwan-Setup.bat dist/install-windows.ps1 dist/install-mac.sh dist/install-linux.sh dist/install-server.sh --clobber
