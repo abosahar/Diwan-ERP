@@ -270,6 +270,8 @@ return [
         // Each result group re-checks its own view permission in SearchController.
         'search' => '@authenticated',
         'context.branch' => '@authenticated',
+        'system.update.status' => '@authenticated',
+        'system.update.apply' => '@authenticated',
         'context.fiscal-year' => '@authenticated',
         'files.show' => '@authenticated',
         'company.logo' => '@authenticated',

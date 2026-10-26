@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import AppSidebar from '../Components/AppSidebar.vue';
 import AppTopBar from '../Components/AppTopBar.vue';
+import UpdateBanner from '../Components/UpdateBanner.vue';
 import ImpersonationBanner from '../Components/ImpersonationBanner.vue';
 import { sidebarCollapsed } from '@/composables/useSidebar';
 import { CheckCircleIcon, ExclamationCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
@@ -132,6 +133,7 @@ watch(() => [flash.value?.success, flash.value?.error, generalError.value, field
 
                 <!-- Page Content Slot -->
                 <main class="flex-1 p-4 sm:p-6 lg:p-8 print:p-0 print:m-0 print:block">
+                    <UpdateBanner v-if="$page.props.update" />
                     <slot />
                 </main>
             </div>

@@ -7,6 +7,7 @@ use App\Models\Currency;
 use App\Services\ActiveBranch;
 use App\Services\ActiveFiscalYear;
 use App\Services\Saas\PlanGuard;
+use App\Services\SelfUpdate;
 use App\Services\Tax\CountryFeatures;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
@@ -85,6 +86,10 @@ class HandleInertiaRequests extends Middleware
             'fiscalSwitcher' => fn () => $currentTenant && $user && $user->company_id ? app(ActiveFiscalYear::class)->switcher() : null,
             // Tax rules of the active branch (its country): default rate, allowed rates, currency.
             'tax' => fn () => $currentTenant && $user ? TaxProfile::current()->toArray() : null,
+            // A newer release of a local install, for its owner (banner with an update button).
+            'update' => fn () => $user && $currentTenant && $user->isCompanyOwner() && app(SelfUpdate::class)->enabled()
+                ? ['available' => app(SelfUpdate::class)->available(), 'latest' => app(SelfUpdate::class)->latest(), 'current' => app(SelfUpdate::class)->current(), 'status' => app(SelfUpdate::class)->status()]
+                : null,
             // Country-specific features on for the active branch (ZATCA, zakat, GOSI...).
             'features' => fn () => $currentTenant && $user ? CountryFeatures::enabled() : [],
             // Currencies the company uses (forms show a currency picker when > 1).

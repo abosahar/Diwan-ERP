@@ -18,12 +18,34 @@ KEEP=3
 
 c_ok=$'\e[32m'; c_err=$'\e[31m'; c_off=$'\e[0m'
 ok()  { echo "${c_ok}✓ $*${c_off}"; }
-die() { echo "${c_err}✗ $*${c_off}" >&2; exit 1; }
+STATUS="$DIR/shared/storage/app/update-status.json"
+# What the dashboard shows the owner (state: running | done | failed | uptodate).
+status() {
+    { printf '{"state":"%s","from":"%s","to":"%s","message":"%s","at":%s}\n' "$1" "${INSTALLED:-}" "${VERSION:-}" "${2:-}" "$(date +%s)" > "$STATUS.tmp" \
+        && mv -f "$STATUS.tmp" "$STATUS" && chmod 644 "$STATUS"; } 2> /dev/null || true
+}
+die() { echo "${c_err}✗ $*${c_off}" >&2; status failed "$*"; exit 1; }
 as_app() { sudo -u "$APP_USER" -H "$@"; }
 
 [[ $EUID -eq 0 ]] || die "Run it with sudo."
 exec 9> /run/diwan-update.lock
 flock -n 9 || die "Another update is already running."
+
+# The dashboard asks for an update by dropping a file in this folder (watched by diwan-update.path).
+rm -f "$DIR"/shared/storage/app/update-queue/* 2> /dev/null || true
+if [[ -d /run/systemd/system && ! -f /etc/systemd/system/diwan-update.path ]]; then
+    cat > /etc/systemd/system/diwan-update.path <<UNIT
+[Unit]
+Description=Diwan ERP update requested from the dashboard
+[Path]
+PathExistsGlob=$DIR/shared/storage/app/update-queue/*
+Unit=diwan-update.service
+[Install]
+WantedBy=multi-user.target
+UNIT
+    mkdir -p "$DIR/shared/storage/app/update-queue" && chown "$APP_USER:$APP_USER" "$DIR/shared/storage/app/update-queue"
+    systemctl daemon-reload && systemctl enable --now diwan-update.path > /dev/null 2>&1 || true
+fi
 
 CURRENT=$(readlink -f "$DIR/current")
 INSTALLED=$(cat "$CURRENT/VERSION" 2> /dev/null || echo 0)
@@ -38,13 +60,16 @@ else
         [[ $(sha256sum "$TMP/diwan-erp.zip" | cut -d' ' -f1) == "$(tr -d '[:space:]' < "$TMP/sha")" ]] || die "The downloaded update is corrupted."
     fi
 fi
+status running "Downloading"
 unzip -q "$TMP/diwan-erp.zip" -d "$TMP"
 VERSION=$(cat "$TMP/diwan-erp/VERSION" 2> /dev/null || echo 0)
 if [[ $VERSION == "$INSTALLED" && ${1:-} != --force ]]; then
     ok "Diwan is up to date (version $INSTALLED)."
+    status uptodate "Up to date"
     exit 0
 fi
 
+status running "Installing"
 NEW="$DIR/releases/$(date +%Y%m%d%H%M%S)-$VERSION"
 mv "$TMP/diwan-erp" "$NEW"
 rm -rf "$NEW/storage"
@@ -54,7 +79,7 @@ ln -sfn ../storage/app/public "$NEW/public/storage"
 chown -R "$APP_USER:$APP_USER" "$NEW"
 
 # Anything failing before the switch leaves the running version untouched.
-trap 'rm -rf "$TMP" "$NEW"; echo "${c_err}✗ Update stopped; Diwan keeps running the previous version, unchanged.${c_off}" >&2' ERR
+trap 'rm -rf "$TMP" "$NEW"; status failed "Update stopped; the previous version keeps running"; echo "${c_err}✗ Update stopped; Diwan keeps running the previous version, unchanged.${c_off}" >&2' ERR
 as_app php "$NEW/artisan" optimize > /dev/null
 if as_app php "$NEW/artisan" migrate:status --pending 2> /dev/null | grep -q Pending; then
     as_app php "$NEW/artisan" erp:backup --tag=preupdate > /dev/null || die "The backup failed, so the update was cancelled."
@@ -87,4 +112,5 @@ fi
 ls -1d "$DIR/releases"/*/ | sed 's#/$##' | sort -r | tail -n +$((KEEP + 1)) | while read -r old; do
     [[ $old == "$(readlink -f "$DIR/current")" ]] || rm -rf "$old"
 done
+status done "Updated"
 ok "Updated from $INSTALLED to $VERSION."

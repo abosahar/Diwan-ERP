@@ -28,6 +28,17 @@ $Keep = 3
 New-Item -ItemType Directory -Force -Path (Join-Path $Root 'logs') | Out-Null
 Start-Transcript -Path (Join-Path $Root 'logs\update.log') -Append | Out-Null
 
+# What the dashboard shows the owner (state: running | done | failed | uptodate); the dashboard
+# asks for an update by dropping a file in update-queue and starting this task.
+$StatusFile = Join-Path $Shared 'storage\app\update-status.json'
+Remove-Item (Join-Path $Shared 'storage\app\update-queue\*') -Force -ErrorAction SilentlyContinue
+function Write-Status($state, $message = '') {
+    try {
+        @{ state = $state; from = "$script:installed"; to = "$script:version"; message = $message; at = [int][double]::Parse((Get-Date -UFormat %s)) } |
+            ConvertTo-Json -Compress | Set-Content -Path $StatusFile -Encoding ASCII
+    } catch { }
+}
+
 function Set-Junction($link, $target) {
     if (Test-Path $link) { cmd /c rmdir "$link" | Out-Null }
     cmd /c mklink /J "$link" "$target" | Out-Null
@@ -63,6 +74,7 @@ try {
     if ($running -is [array]) { $running = $running[0] }
     $installed = (Get-Content (Join-Path $Current 'VERSION') -Raw).Trim()
 
+    Write-Status 'running' 'Downloading'
     Write-Host 'Downloading the latest release...'
     $zip = Join-Path $env:TEMP 'diwan-update.zip'
     if (Test-Path $PackageUrl) { Copy-Item $PackageUrl $zip -Force } else {
@@ -79,10 +91,12 @@ try {
     $version = (Get-Content (Join-Path $unpack 'diwan-erp\VERSION') -Raw).Trim()
     if ($version -eq $installed -and -not $Force) {
         Write-Host "Diwan is up to date (version $installed)." -ForegroundColor Green
+        Write-Status 'uptodate' 'Up to date'
         Stop-Transcript | Out-Null
         exit 0
     }
 
+    Write-Status 'running' 'Installing'
     Write-Host "Preparing version $version (the system keeps running meanwhile)..."
     $new = Join-Path $Releases ((Get-Date -Format 'yyyyMMddHHmmss') + "-$version")
     Move-Item (Join-Path $unpack 'diwan-erp') $new
@@ -115,8 +129,10 @@ try {
     Get-ChildItem $Releases -Directory | Sort-Object Name -Descending | Select-Object -Skip $Keep |
         Where-Object { $_.FullName -ne $new } | ForEach-Object { Remove-Release $_.FullName }
     Write-Host "Updated from $installed to $version." -ForegroundColor Green
+    Write-Status 'done' 'Updated'
 } catch {
     Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Status 'failed' $_.Exception.Message
     if ($new -and -not $switched -and (Test-Path $new)) { Remove-Release $new }
     Stop-Transcript | Out-Null
     exit 1

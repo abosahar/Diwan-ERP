@@ -61,6 +61,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Sales as S;
 use App\Http\Controllers\Sales\RecurringInvoiceController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SelfUpdateController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\SuperAdmin\ImpersonationController;
@@ -181,6 +182,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     // Top bar: working branch and fiscal year.
     Route::post('/context/branch', [ActiveContextController::class, 'branch'])->name('context.branch');
     Route::post('/context/fiscal-year', [ActiveContextController::class, 'fiscalYear'])->name('context.fiscal-year');
+    Route::get('/system/update', [SelfUpdateController::class, 'status'])->name('system.update.status');
+    Route::post('/system/update', [SelfUpdateController::class, 'apply'])->middleware('throttle:6,1')->name('system.update.apply');
 
     // Type-ahead lookups for document forms (bounded results).
     Route::prefix('lookup')->name('lookup.')->group(function () {
