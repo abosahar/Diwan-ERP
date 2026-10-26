@@ -16,6 +16,7 @@ use App\Models\SalesOrderItem;
 use App\Models\StockMovement;
 use App\Services\Accounting\DocumentPoster;
 use App\Services\Accounting\ExchangeRates;
+use App\Services\ActiveBranch;
 use App\Services\Documents\DocumentNumberService;
 use App\Services\Inventory\DocumentStock;
 use App\Services\Inventory\StockService;
@@ -46,7 +47,7 @@ class SalesCycleService
     public function createOrder(array $data, array $lines): SalesOrder
     {
         return DB::transaction(function () use ($data, $lines) {
-            $branchId = $data['branch_id'] ?? auth()->user()?->defaultBranchId();
+            $branchId = $data['branch_id'] ?? app(ActiveBranch::class)->forWrite();
             // Lines follow the tax rules of the order's branch (its country).
             [$items, $subtotal, $tax] = $this->invoices->computeLines($lines, TaxProfile::current($branchId ? (int) $branchId : null), $data['order_date'] ?? null);
 
@@ -95,7 +96,7 @@ class SalesCycleService
             }
 
             $note = DeliveryNote::create([
-                'branch_id' => $order?->branch_id ?? auth()->user()?->defaultBranchId(),
+                'branch_id' => $order?->branch_id ?? app(ActiveBranch::class)->forWrite(),
                 'warehouse_id' => $this->documentStock->warehouse($data['warehouse_id'] ?? $order?->warehouse_id),
                 'customer_id' => $order?->customer_id ?? $data['customer_id'],
                 'sales_order_id' => $order?->id,

@@ -17,6 +17,7 @@ use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Services\Accounting\DocumentPoster;
 use App\Services\Accounting\ExchangeRates;
+use App\Services\ActiveBranch;
 use App\Services\Documents\DocumentNumberService;
 use App\Services\Inventory\DocumentStock;
 use App\Services\Inventory\StockService;
@@ -49,7 +50,7 @@ class PurchaseCycleService
     {
         return DB::transaction(function () use ($data, $lines) {
             $request = PurchaseRequest::create([
-                'branch_id' => $data['branch_id'] ?? auth()->user()?->defaultBranchId(),
+                'branch_id' => $data['branch_id'] ?? app(ActiveBranch::class)->forWrite(),
                 'request_number' => $this->numbers->next('purchase_request', Carbon::parse($data['request_date'])),
                 'request_date' => $data['request_date'],
                 'required_date' => $data['required_date'] ?? null,
@@ -87,7 +88,7 @@ class PurchaseCycleService
                 throw ValidationException::withMessages(['order' => 'لا يمكن تعديل أمر شراء بعد إرساله للاعتماد.']);
             }
 
-            $branchId = $data['branch_id'] ?? auth()->user()?->defaultBranchId();
+            $branchId = $data['branch_id'] ?? app(ActiveBranch::class)->forWrite();
             [$items, $subtotal, $tax, $discount] = $this->computeLines($lines, TaxProfile::current($branchId ? (int) $branchId : null));
 
             $attributes = [
@@ -173,7 +174,7 @@ class PurchaseCycleService
             }
 
             $receipt = GoodsReceipt::create([
-                'branch_id' => $order?->branch_id ?? auth()->user()?->defaultBranchId(),
+                'branch_id' => $order?->branch_id ?? app(ActiveBranch::class)->forWrite(),
                 'warehouse_id' => $this->documentStock->warehouse($data['warehouse_id'] ?? $order?->warehouse_id),
                 'supplier_id' => $order?->supplier_id ?? $data['supplier_id'],
                 'purchase_order_id' => $order?->id,
@@ -342,7 +343,7 @@ class PurchaseCycleService
                 'supplier_id' => $data['supplier_id'],
                 'purchase_order_id' => $data['purchase_order_id'] ?? GoodsReceipt::whereIn('id', array_keys($receiptIds))->value('purchase_order_id'),
                 'warehouse_id' => GoodsReceipt::whereIn('id', array_keys($receiptIds))->value('warehouse_id'),
-                'branch_id' => $data['branch_id'] ?? auth()->user()?->defaultBranchId(),
+                'branch_id' => $data['branch_id'] ?? app(ActiveBranch::class)->forWrite(),
                 'invoice_number' => $this->numbers->next('purchase_invoice', Carbon::parse($data['invoice_date'])),
                 'supplier_invoice_number' => $data['supplier_invoice_number'] ?? null,
                 'invoice_date' => $data['invoice_date'],

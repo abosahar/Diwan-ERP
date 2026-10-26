@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use App\Models\Branch;
 use App\Models\Currency;
+use App\Services\ActiveBranch;
+use App\Services\ActiveFiscalYear;
 use App\Services\Saas\PlanGuard;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
@@ -77,7 +79,10 @@ class HandleInertiaRequests extends Middleware
                 'status' => $currentTenant->status,
                 'trial_ends_at' => $currentTenant->trial_ends_at?->format('Y-m-d'),
             ] : null,
-            // Tax rules of the user's branch (its country): default rate, allowed rates, currency.
+            // Top bar: the branch being worked in (all = viewing every allowed branch) and the fiscal year.
+            'branchSwitcher' => fn () => $currentTenant && $user && $user->company_id ? app(ActiveBranch::class)->switcher() : null,
+            'fiscalSwitcher' => fn () => $currentTenant && $user && $user->company_id ? app(ActiveFiscalYear::class)->switcher() : null,
+            // Tax rules of the active branch (its country): default rate, allowed rates, currency.
             'tax' => fn () => $currentTenant && $user ? TaxProfile::current()->toArray() : null,
             // Currencies the company uses (forms show a currency picker when > 1).
             'currencies' => fn () => $currentTenant ? Currency::orderByDesc('is_default')->orderBy('code')

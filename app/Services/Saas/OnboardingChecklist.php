@@ -23,7 +23,7 @@ class OnboardingChecklist
             ['key' => 'zatca', 'label' => 'الربط مع منصة فاتورة (المرحلة الثانية)', 'done' => ZatcaDevice::where('status', 'active')->exists(), 'route' => 'zatca.index'],
             ['key' => 'opening', 'label' => 'الأرصدة الافتتاحية (حسابات، عملاء، موردون، مخزون)', 'done' => JournalEntry::where('entry_type', 'opening')->exists(), 'route' => 'accounting.journals.index'],
             ['key' => 'users', 'label' => 'إضافة المستخدمين وصلاحياتهم', 'done' => User::where('company_id', $company->id)->count() > 1, 'route' => 'users.index'],
-            ['key' => 'invoice', 'label' => 'إصدار أول فاتورة', 'done' => Invoice::exists(), 'route' => 'sales.invoices.create'],
+            ['key' => 'invoice', 'label' => 'إصدار أول فاتورة', 'done' => Invoice::withoutGlobalScope('branch')->exists(), 'route' => 'sales.invoices.create'],
         ];
 
         return array_map(fn ($s) => $s + ['url' => route($s['route'], [], false)], $steps);

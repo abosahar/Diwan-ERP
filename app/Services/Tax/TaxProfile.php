@@ -4,6 +4,7 @@ namespace App\Services\Tax;
 
 use App\Models\Branch;
 use App\Models\Company;
+use App\Services\ActiveBranch;
 use App\Services\TenantManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -51,7 +52,7 @@ class TaxProfile
     public static function current(?int $branchId = null): self
     {
         $company = app(TenantManager::class)->getCompany();
-        $branchId ??= auth()->user()?->defaultBranchId();
+        $branchId ??= app(ActiveBranch::class)->contextId();
 
         return self::forBranch($branchId ? (int) $branchId : self::mainBranch($company), $company);
     }

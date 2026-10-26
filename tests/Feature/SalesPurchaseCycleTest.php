@@ -406,8 +406,9 @@ class SalesPurchaseCycleTest extends TestCase
         $this->assertSame([$mine->id], Invoice::pluck('id')->all());
         $this->get(route('sales.invoices.show', $other))->assertNotFound();
 
-        // Granting the data scope permission lifts the restriction.
+        // Granting the data scope permission lets them view every branch together (top bar: all branches).
         $clerk->givePermissionTo('admin.data_scope.manage');
+        $this->post(route('context.branch'), ['branch_id' => 'all'])->assertSessionHasNoErrors();
         $this->assertCount(2, Invoice::all());
     }
 }

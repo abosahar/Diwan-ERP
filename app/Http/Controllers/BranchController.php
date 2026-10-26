@@ -33,7 +33,7 @@ class BranchController extends Controller
             return $branch->toArray() + [
                 'users_count' => $branch->users_count,
                 'profile' => $profile->toArray() + ['einvoicing_label' => $registry->for($profile)->label(), 'seller_tax_number' => $profile->sellerTaxNumber()],
-                'locked_country' => Invoice::where('branch_id', $branch->id)->exists(),
+                'locked_country' => Invoice::withoutGlobalScope('branch')->where('branch_id', $branch->id)->exists(),
             ];
         });
 
@@ -65,7 +65,7 @@ class BranchController extends Controller
     {
         $data = $this->validated($request, $branch);
         // Issued documents follow the rules of the country they were issued in.
-        if (($data['country_code'] ?? null) !== ($branch->country_code ?: null) && Invoice::where('branch_id', $branch->id)->exists()) {
+        if (($data['country_code'] ?? null) !== ($branch->country_code ?: null) && Invoice::withoutGlobalScope('branch')->where('branch_id', $branch->id)->exists()) {
             throw ValidationException::withMessages(['country_code' => 'لا يمكن تغيير دولة فرع صدرت منه فواتير؛ أنشئ فرعاً جديداً للدولة الأخرى.']);
         }
         $branch->update($data);

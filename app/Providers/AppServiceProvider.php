@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\Accounting\AccountMap;
+use App\Services\ActiveBranch;
 use App\Services\Saas\PlanGuard;
 use App\Services\TenantManager;
 use Illuminate\Auth\Events\Failed;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(ActiveBranch::class);
         // Per-request caches of account mappings.
         $this->app->scoped(AccountMap::class);
 

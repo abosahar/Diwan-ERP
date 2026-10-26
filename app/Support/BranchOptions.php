@@ -2,14 +2,14 @@
 
 namespace App\Support;
 
-use App\Models\Branch;
 use App\Models\User;
+use App\Services\ActiveBranch;
 use App\Services\Tax\TaxProfile;
 
 /**
- * The branches a document form offers the signed-in user (only those they
- * may work in), each with its tax profile so the form can follow the chosen
- * branch's rate and currency, plus the branch to pre-select.
+ * The branch a new document starts in: the one chosen in the top bar, with
+ * its tax profile so the form follows its rate and currency. Forms no longer
+ * offer a branch choice; the branch is chosen once, in the top bar.
  */
 class BranchOptions
 {
@@ -18,26 +18,24 @@ class BranchOptions
      */
     public static function forUser(?User $user = null): array
     {
-        $user ??= auth()->user();
-        $allowed = $user?->allowedBranchIds();
+        $active = app(ActiveBranch::class);
+        // Creating needs a specific branch: with "all branches" shown, ask for one.
+        $id = $active->forWrite();
 
-        $branches = Branch::where('is_active', true)
-            ->when($allowed !== null, fn ($q) => $q->whereIn('id', $allowed))
-            ->orderByDesc('is_main')->orderBy('id')
-            ->get()
-            ->map(fn (Branch $b) => [
-                'id' => $b->id,
-                'name_ar' => $b->name_ar,
-                'name_en' => $b->name_en,
-                'country_code' => $b->country_code,
-                'tax' => TaxProfile::forBranch($b)->toArray(),
-            ])->values();
-
-        $default = $user?->defaultBranchId();
-        if (! $branches->contains('id', $default)) {
-            $default = $branches->first()['id'] ?? null;
+        $branch = $active->branches()->firstWhere('id', $id);
+        if (! $branch) {
+            return ['branches' => [], 'defaultBranchId' => $id];
         }
 
-        return ['branches' => $branches->all(), 'defaultBranchId' => $default];
+        return [
+            'branches' => [[
+                'id' => $branch->id,
+                'name_ar' => $branch->name_ar,
+                'name_en' => $branch->name_en,
+                'country_code' => $branch->country_code,
+                'tax' => TaxProfile::forBranch($branch)->toArray(),
+            ]],
+            'defaultBranchId' => $branch->id,
+        ];
     }
 }

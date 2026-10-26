@@ -5,6 +5,7 @@ use App\Http\Controllers\Accounting as A;
 use App\Http\Controllers\Accounting\GeneralLedgerController;
 use App\Http\Controllers\Accounting\JournalEntryController;
 use App\Http\Controllers\Accounting\TrialBalanceController;
+use App\Http\Controllers\ActiveContextController;
 use App\Http\Controllers\ApprovalRuleController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\AuditLogController;
@@ -176,6 +177,10 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'erp.auth
     // 1. Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/search', SearchController::class)->name('search');
+
+    // Top bar: working branch and fiscal year.
+    Route::post('/context/branch', [ActiveContextController::class, 'branch'])->name('context.branch');
+    Route::post('/context/fiscal-year', [ActiveContextController::class, 'fiscalYear'])->name('context.fiscal-year');
 
     // Type-ahead lookups for document forms (bounded results).
     Route::prefix('lookup')->name('lookup.')->group(function () {
