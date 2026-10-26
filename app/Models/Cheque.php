@@ -4,14 +4,16 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use App\Traits\BelongsToCompany;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Cheque extends Model
 {
-    use Auditable, BelongsToCompany;
+    use Auditable, BelongsToCompany, BranchScoped;
 
     protected $fillable = [
+        'branch_id',
         'company_id', 'direction', 'cheque_number', 'bank_name', 'bank_account_id', 'party_type', 'party_id', 'party_name',
         'amount', 'issue_date', 'due_date', 'status', 'notes', 'history', 'created_by', 'source_type', 'source_id', 'invoice_id', 'purchase_invoice_id',
     ];

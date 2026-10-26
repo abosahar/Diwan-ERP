@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use App\Traits\BelongsToCompany;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,9 +12,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CreditNote extends Model
 {
-    use Auditable, BelongsToCompany, HasFactory;
+    use Auditable, BelongsToCompany, BranchScoped, HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'currency_code',
         'exchange_rate',
         'warehouse_id',
@@ -53,5 +55,11 @@ class CreditNote extends Model
     public function items(): HasMany
     {
         return $this->hasMany(CreditNoteItem::class);
+    }
+
+    /** A document that hangs on another (a payment on its invoice...) belongs to that document's branch. */
+    public function inheritedBranchId(): ?int
+    {
+        return Invoice::withoutGlobalScope('branch')->whereKey($this->invoice_id)->value('branch_id');
     }
 }

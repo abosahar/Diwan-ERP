@@ -4,15 +4,17 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use App\Traits\BelongsToCompany;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SupplierPayment extends Model
 {
-    use Auditable, BelongsToCompany, HasFactory;
+    use Auditable, BelongsToCompany, BranchScoped, HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'status',
         'cancelled_at',
         'cancelled_by',
@@ -49,5 +51,11 @@ class SupplierPayment extends Model
     public function bankAccount(): BelongsTo
     {
         return $this->belongsTo(BankAccount::class);
+    }
+
+    /** A document that hangs on another (a payment on its invoice...) belongs to that document's branch. */
+    public function inheritedBranchId(): ?int
+    {
+        return PurchaseInvoice::withoutGlobalScope('branch')->whereKey($this->purchase_invoice_id)->value('branch_id');
     }
 }

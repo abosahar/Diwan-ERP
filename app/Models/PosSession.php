@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use App\Traits\BelongsToCompany;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,9 +12,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PosSession extends Model
 {
-    use Auditable, BelongsToCompany, HasFactory;
+    use Auditable, BelongsToCompany, BranchScoped, HasFactory;
 
     protected $fillable = [
+        'branch_id',
         'company_id',
         'user_id',
         'pos_register_id',
@@ -49,5 +51,11 @@ class PosSession extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(PosOrder::class);
+    }
+
+    /** A document that hangs on another (a payment on its invoice...) belongs to that document's branch. */
+    public function inheritedBranchId(): ?int
+    {
+        return PosRegister::withoutGlobalScope('branch')->whereKey($this->pos_register_id)->value('branch_id');
     }
 }

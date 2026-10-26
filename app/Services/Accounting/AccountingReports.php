@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\Customer;
 use App\Models\JournalEntry;
 use App\Models\Supplier;
+use App\Services\ActiveBranch;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
 use Illuminate\Support\Carbon;
@@ -29,6 +30,29 @@ class AccountingReports
         protected TenantManager $tenantManager,
         protected AccountMap $map,
     ) {}
+
+    /** @var array<int, array<int>> every branch id of a company, per company (memo) */
+    protected array $companyBranchIds = [];
+
+    /**
+     * Branches the reports cover: the one chosen in the top bar (or all the
+     * user's branches while "all" is shown). Null: the whole company, which
+     * keeps the fast path through account_balances (also when the selection
+     * is every branch, so entries without a branch stay in).
+     *
+     * @return array<int>|null
+     */
+    protected function branchIds(): ?array
+    {
+        $ids = app(ActiveBranch::class)->scopeIds();
+        if ($ids === null) {
+            return null;
+        }
+        $companyId = $this->companyId();
+        $this->companyBranchIds[$companyId] ??= Branch::withoutGlobalScopes()->where('company_id', $companyId)->whereNull('deleted_at')->pluck('id')->map(fn ($id) => (int) $id)->all();
+
+        return array_diff($this->companyBranchIds[$companyId], $ids) === [] ? null : $ids;
+    }
 
     protected function companyId(): int
     {
@@ -63,8 +87,8 @@ class AccountingReports
             }
         };
 
-        // Cost center reports must read lines (balances are not split by cost center).
-        if ($costCenterId) {
+        // Cost center and branch reports must read lines (balances are not split by either).
+        if ($costCenterId || $this->branchIds() !== null) {
             $add($this->lineTotals($from, $to, $accountIds, $costCenterId));
 
             return $totals;
@@ -111,6 +135,7 @@ class AccountingReports
             ->join('journal_entries as e', 'e.id', '=', 'l.journal_entry_id')
             ->where('l.company_id', $this->companyId())
             ->whereIn('e.status', self::STATUSES)
+            ->when($this->branchIds(), fn ($q, $ids) => $q->whereIn('e.branch_id', $ids))
             ->where(fn ($q) => $q->whereIn('e.id', $closingIds)->orWhereIn('e.reversal_of_id', $closingIds))
             ->when($from, fn ($q) => $q->where('l.date', '>=', $from->toDateString()))
             ->where('l.date', '<=', $to->toDateString().' 23:59:59')
@@ -127,6 +152,7 @@ class AccountingReports
             ->join('journal_entries as e', 'e.id', '=', 'l.journal_entry_id')
             ->where('l.company_id', $this->companyId())
             ->whereIn('e.status', self::STATUSES)
+            ->when($this->branchIds(), fn ($q, $ids) => $q->whereIn('e.branch_id', $ids))
             ->when($from, fn ($q) => $q->where('l.date', '>=', $from->toDateString()))
             ->where('l.date', '<=', $to->toDateString().' 23:59:59')
             ->when($accountIds, fn ($q) => $q->whereIn('l.account_id', $accountIds))
@@ -215,6 +241,7 @@ class AccountingReports
             ->where('l.company_id', $this->companyId())
             ->where('l.account_id', $account->id)
             ->whereIn('e.status', self::STATUSES)
+            ->when($this->branchIds(), fn ($q, $ids) => $q->whereIn('e.branch_id', $ids))
             ->whereBetween('l.date', [$from->toDateString(), $to->toDateString().' 23:59:59'])
             ->when($partyType, fn ($q) => $q->where('l.party_type', $partyType)->where('l.party_id', $partyId))
             ->when($costCenterId, fn ($q) => $q->where('l.cost_center_id', $costCenterId));
@@ -266,6 +293,7 @@ class AccountingReports
             ->where('l.company_id', $this->companyId())
             ->where('l.account_id', $accountId)
             ->whereIn('e.status', self::STATUSES)
+            ->when($this->branchIds(), fn ($q, $ids) => $q->whereIn('e.branch_id', $ids))
             ->where('l.date', '<', $from->toDateString())
             ->when($partyType, fn ($q) => $q->where('l.party_type', $partyType)->where('l.party_id', $partyId))
             ->when($costCenterId, fn ($q) => $q->where('l.cost_center_id', $costCenterId))
@@ -368,6 +396,7 @@ class AccountingReports
             ->join('journal_entries as e', 'e.id', '=', 'l.journal_entry_id')
             ->where('l.company_id', $this->companyId())
             ->whereIn('e.status', self::STATUSES)
+            ->when($this->branchIds(), fn ($q, $ids) => $q->whereIn('e.branch_id', $ids))
             ->whereBetween('l.date', [$from->toDateString(), $to->toDateString().' 23:59:59'])
             ->whereIn('l.journal_entry_id', function ($q) use ($cashIds, $from, $to) {
                 $q->select('journal_entry_id')->from('journal_entry_lines')
@@ -449,6 +478,7 @@ class AccountingReports
             ->join('journal_entries as e', 'e.id', '=', 'l.journal_entry_id')
             ->where('l.company_id', $this->companyId())
             ->whereIn('e.status', self::STATUSES)
+            ->when($this->branchIds(), fn ($q, $ids) => $q->whereIn('e.branch_id', $ids))
             ->whereBetween('l.date', [$from->toDateString(), $to->toDateString().' 23:59:59'])
             ->where(fn ($q) => $q->whereNull('e.entry_type')->orWhereNotIn('e.entry_type', ['opening', 'closing']))
             ->when($closingIds->isNotEmpty(), fn ($q) => $q->where(fn ($q) => $q->whereNull('e.reversal_of_id')->orWhereNotIn('e.reversal_of_id', $closingIds)))
@@ -532,6 +562,7 @@ class AccountingReports
             ->join('journal_entries as e', 'e.id', '=', 'l.journal_entry_id')
             ->where('e.company_id', $this->companyId())
             ->whereIn('e.status', [JournalEntry::STATUS_POSTED, JournalEntry::STATUS_REVERSED])
+            ->when($this->branchIds(), fn ($q, $ids) => $q->whereIn('e.branch_id', $ids))
             ->where('e.date', '<=', $asOf->toDateString().' 23:59:59')
             ->where('l.account_id', $accountId)
             ->groupBy('l.party_type', 'l.party_id')

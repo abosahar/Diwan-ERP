@@ -29,6 +29,11 @@ trait BranchScoped
         });
 
         static::creating(function ($model) {
+            // A document hanging on another one (a payment on its invoice) belongs to that branch.
+            if (empty($model->branch_id) && method_exists($model, 'inheritedBranchId')) {
+                $model->branch_id = $model->inheritedBranchId();
+            }
+
             $user = static::scopedUser();
             if (! $user) {
                 return;

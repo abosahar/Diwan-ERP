@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use App\Traits\BelongsToCompany;
+use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,9 +13,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BankAccount extends Model
 {
-    use Auditable, BelongsToCompany, HasFactory, SoftDeletes;
+    use Auditable, BelongsToCompany, BranchScoped, HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'branch_id',
         'company_id',
         'account_id',
         'name',
