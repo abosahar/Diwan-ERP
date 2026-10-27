@@ -20,7 +20,7 @@ test('platform admin is forced to enrol, then signs in with a code', async ({ pa
 
     const section = page.locator('#two-factor');
     await section.locator('input[type=password]').fill('admin123456');
-    await section.getByRole('button', { name: 'تفعيل التحقق الثنائي' }).click();
+    await section.locator('[data-2fa-start]').click();
     const secret = (await section.locator('code').innerText()).replace(/\s+/g, '');
     await expect(section.locator('img')).toBeVisible();
     await section.getByPlaceholder('123456').fill(totp(secret));
