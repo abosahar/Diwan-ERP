@@ -42,7 +42,7 @@ const save = () => form.transform((d) => ({ ...d, lines: selected.value.map(({ g
         <Head title="فاتورة مورد من الاستلامات" />
         <PageHeader title="فاتورة مورد مقابل الاستلامات" subtitle="مطابقة ثلاثية: أمر الشراء ↔ الاستلام ↔ فاتورة المورد" :crumbs="[{ label: 'المشتريات' }, { label: 'فواتير المشتريات', href: route('purchases.invoices.index') }, { label: 'من الاستلامات' }]" />
         <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="المورد" class="md:col-span-2"><PartyPicker :model-value="form.supplier_id" route-name="lookup.suppliers" :initial="supplier" @update:model-value="pickSupplier" /></Field>
                 <Field label="رقم فاتورة المورد" :error="form.errors.supplier_invoice_number"><input v-model="form.supplier_invoice_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="تاريخ الفاتورة"><input v-model="form.invoice_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>

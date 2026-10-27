@@ -38,7 +38,12 @@ const submit = () => {
 
             <!-- Open Session Form -->
             <form @submit.prevent="submit" class="space-y-4 text-start">
-                <div>
+                <div v-if="!registers?.length" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-center text-xs text-amber-800 space-y-2">
+                    <p class="font-bold">لا توجد أجهزة كاشير بعد.</p>
+                    <Link v-if="$can('pos.registers.create')" :href="route('pos.registers.create')" class="inline-block px-4 py-2 rounded-lg bg-amber-500 text-white font-bold">إضافة جهاز كاشير</Link>
+                    <p v-else>اطلب من مدير المنشأة إضافة جهاز من «نقاط البيع ← أجهزة الكاشير».</p>
+                </div>
+                <div v-else>
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5 text-center">
                         جهاز نقاط البيع
                     </label>
@@ -57,7 +62,7 @@ const submit = () => {
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5 text-center">العهدة الافتتاحية في الدرج ({{ $cur() }})</label>
                     <input v-model.number="form.opening_cash" type="number" step="0.01" min="0" class="w-full text-center text-sm rounded-xl border border-slate-200 px-4 py-2.5 font-mono" />
                 </div>
-                <div v-if="form.opening_cash > 0">
+                <div v-if="registers?.length && form.opening_cash > 0">
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5 text-center">صُرفت العهدة من (اختياري)</label>
                     <select v-model="form.float_bank_account_id" class="w-full text-xs rounded-xl border border-slate-200 px-4 py-2.5 text-center">
                         <option value="">لم تُصرف الآن (موجودة بالدرج)</option>

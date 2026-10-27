@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate, taxLabel } from '@/utils/tax';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
 import { ref, computed, watch } from 'vue';
@@ -160,23 +161,9 @@ const importLines = (lines, replace) => {
 
         <div class="space-y-6 w-full pb-12">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                    <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                        <HomeIcon class="w-4 h-4" />
-                    </Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <span class="text-slate-500">المبيعات</span>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <Link :href="route('sales.quotations.index')" class="text-slate-500 hover:text-indigo-600 transition-colors">
-                        عروض الأسعار
-                    </Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <span class="text-indigo-600 font-bold">إنشاء عرض سعر</span>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <Link 
+            <PageHeader title="إنشاء عرض سعر" :crumbs="[{ label: 'المبيعات' }, { label: 'عروض الأسعار' }, { label: 'إنشاء عرض سعر' }]">
+<template #actions>
+<Link 
                         :href="route('sales.quotations.index')"
                         class="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold transition-colors"
                     >
@@ -190,8 +177,8 @@ const importLines = (lines, replace) => {
                         <CheckIcon class="w-4 h-4 stroke-2" />
                         <span>حفظ عرض السعر</span>
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Form Body -->
             <form @submit.prevent="submit" class="space-y-6">

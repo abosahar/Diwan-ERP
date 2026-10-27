@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -25,49 +26,8 @@ const props = defineProps({
 });
 
 const isFilterOpen = ref(false);
-const isAddModalOpen = ref(false);
 const search = ref(props.filters?.search || '');
 const selectedCategory = ref(props.filters?.category || '');
-
-const form = useForm({
-    title: '',
-    category: 'إيرادات عامة',
-    account_id: props.revenueAccounts?.[0]?.id || '',
-    bank_account_id: props.bankAccounts?.[0]?.id || '',
-    amount: '',
-    tax_amount: '',
-    taxable: false,
-    revenue_date: new Date().toISOString().split('T')[0],
-    payment_method: 'bank_transfer',
-    reference_number: '',
-    customer_name: '',
-    notes: '',
-});
-
-const onAmountChange = () => {
-    if (form.amount && form.taxable) {
-        form.tax_amount = (parseFloat(form.amount) * taxRate() / 100).toFixed(2);
-    } else {
-        form.tax_amount = '0.00';
-    }
-};
-
-const openAddModal = () => {
-    form.reset();
-    form.account_id = props.revenueAccounts?.[0]?.id || '';
-    form.bank_account_id = props.bankAccounts?.[0]?.id || '';
-    form.revenue_date = new Date().toISOString().split('T')[0];
-    isAddModalOpen.value = true;
-};
-
-const submitRevenue = () => {
-    form.post(route('finance.revenues.store'), {
-        onSuccess: () => {
-            isAddModalOpen.value = false;
-            form.reset();
-        }
-    });
-};
 
 const deleteRevenue = (id, number) => {
     if (confirm(`هل أنت متأكد من حذف سند الإيراد رقم "${number}"؟`)) {
@@ -96,32 +56,16 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs Ribbon -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-slate-500">المالية</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">الإيرادات</span>
-                    </div>
-
-                    <!-- Refresh Button -->
-                    <button 
+            <PageHeader title="الإيرادات" :crumbs="[{ label: 'المالية' }, { label: 'الإيرادات' }]">
+<template #actions>
+<button 
                         @click="handleSearch"
                         title="تحديث البيانات"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xs transition-all"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <!-- Primary Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <button 
+<button 
                         @click.stop="isFilterOpen = !isFilterOpen"
                         :class="[
                             'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-150 shadow-xs border',
@@ -134,15 +78,12 @@ const formatCurrency = (val) => {
                         <span>البحث والتصفية</span>
                     </button>
 
-                    <button 
-                        @click="openAddModal"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150"
-                    >
+                    <Link v-if="$can('finance.revenues.create')" :href="route('finance.revenues.create')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150">
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>تسجيل إيراد جديد</span>
-                    </button>
-                </div>
-            </div>
+                    </Link>
+</template>
+</PageHeader>
 
             <!-- Collapsible Search & Filter Panel -->
             <transition
@@ -333,167 +274,6 @@ const formatCurrency = (val) => {
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Add Revenue Modal -->
-            <div 
-                v-if="isAddModalOpen" 
-                class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-            >
-                <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-slate-100">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <BanknotesIcon class="w-5 h-5 text-emerald-600" />
-                            <span>تسجيل سند إيراد جديد</span>
-                        </h2>
-                        <button @click="isAddModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                            <XMarkIcon class="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    <form @submit.prevent="submitRevenue" class="space-y-4 text-xs">
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">بيان / مصدر الإيراد <span class="text-rose-500">*</span></label>
-                            <input 
-                                v-model="form.title" 
-                                type="text" 
-                                required 
-                                placeholder="مثال: تقديم استشارات وتطوير برمجيات"
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500" 
-                            />
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">التصنيف <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.category" 
-                                    type="text" 
-                                    required 
-                                    placeholder="استشارات، خدمات، عوائد..."
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500" 
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">تاريخ القبض <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.revenue_date" 
-                                    type="date" 
-                                    required 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500" 
-                                />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">المبلغ (غير شامل الضريبة) <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.amount" 
-                                    @input="onAmountChange"
-                                    type="number" 
-                                    step="0.01" 
-                                    required 
-                                    placeholder="0.00"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-emerald-500 focus:border-emerald-500 text-end" 
-                                />
-                            </div>
-                            <div>
-                                <label class="flex items-center gap-2 font-medium text-slate-700 mb-1"><input v-model="form.taxable" type="checkbox" @change="onAmountChange" class="rounded border-slate-300" /> خاضع لـ{{ $taxLabel() }}</label>
-                                <input 
-                                    v-model="form.tax_amount" 
-                                    :disabled="!form.taxable"
-                                    type="number" 
-                                    step="0.01" 
-                                    placeholder="0.00"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-emerald-500 focus:border-emerald-500 text-end" 
-                                />
-                            </div>
-                        </div>
-
-                        <div class="p-3 bg-emerald-50/50 rounded-xl flex items-center justify-between text-xs border border-emerald-100">
-                            <span class="font-bold text-emerald-900">المجموع الإجمالي شامل الضريبة:</span>
-                            <span class="font-mono font-black text-sm text-emerald-600">
-                                {{ formatCurrency((parseFloat(form.amount || 0) + parseFloat(form.tax_amount || 0))) }} ﷼
-                            </span>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">إيداع في (الخزينة أو البنك)</label>
-                                <select 
-                                    v-model="form.bank_account_id" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
-                                >
-                                    <option v-for="bank in bankAccounts" :key="bank.id" :value="bank.id">
-                                        {{ bank.name }} (الرصيد: {{ formatCurrency(bank.current_balance) }} ﷼)
-                                    </option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">حساب الإيراد في الدليل</label>
-                                <select 
-                                    v-model="form.account_id" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
-                                >
-                                    <option v-for="acc in revenueAccounts" :key="acc.id" :value="acc.id">
-                                        {{ acc.code }} - {{ acc.name_ar }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">العميل / الجهة الدافعة</label>
-                                <input 
-                                    v-model="form.customer_name" 
-                                    type="text" 
-                                    placeholder="اسم الشركة أو العميل"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500" 
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">طريقة التحصيل</label>
-                                <select 
-                                    v-model="form.payment_method" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
-                                >
-                                    <option value="bank_transfer">تحويل بنكي</option>
-                                    <option value="cash">نقداً</option>
-                                    <option value="card">بطاقة مدى / شبكة</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">ملاحظات أو تفاصيل</label>
-                            <textarea 
-                                v-model="form.notes" 
-                                rows="2" 
-                                placeholder="أي تفاصيل إضافية عن الإيراد..."
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
-                            ></textarea>
-                        </div>
-
-                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                            <button 
-                                type="button" 
-                                @click="isAddModalOpen = false"
-                                class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-medium"
-                            >
-                                إلغاء
-                            </button>
-                            <button 
-                                type="submit" 
-                                :disabled="form.processing"
-                                class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-xs hover:shadow-emerald-500/20 disabled:opacity-50"
-                            >
-                                حفظ الإيراد
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>

@@ -57,6 +57,16 @@ class SupplierController extends Controller
     /**
      * Store a newly created supplier.
      */
+    public function create()
+    {
+        return Inertia::render('Purchases/Suppliers/Form');
+    }
+
+    public function edit(Supplier $supplier)
+    {
+        return Inertia::render('Purchases/Suppliers/Form', ['supplier' => $supplier]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

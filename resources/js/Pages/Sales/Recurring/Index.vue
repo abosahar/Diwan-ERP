@@ -107,7 +107,7 @@ onMounted(() => { if (props.prefill) create(props.prefill); });
 
         <Dialog :show="open" :title="editing ? 'تعديل فاتورة دورية' : 'فاتورة دورية جديدة'" size="xl" @close="open = false">
             <div class="space-y-4 text-xs">
-                <div class="grid md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <Field label="اسم العقد" :error="form.errors.name" class="md:col-span-2"><input v-model="form.name" placeholder="مثال: صيانة شهرية — مبنى الإدارة" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="العميل" :error="form.errors.customer_id" class="md:col-span-2"><PartyPicker v-model="form.customer_id" :initial="customer" /></Field>
                     <Field label="التكرار" :error="form.errors.frequency">
@@ -131,7 +131,7 @@ onMounted(() => { if (props.prefill) create(props.prefill); });
                     <p class="mt-2 text-slate-600">الإجمالي لكل إصدار (شامل الضريبة): <b class="font-mono">{{ money(perIssue) }} {{ form.currency_code || $cur() }}</b></p>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <label class="flex items-center gap-2 font-bold text-slate-700"><input v-model="form.auto_send" type="checkbox" class="rounded border-slate-300 text-indigo-600" /> إرسال الفاتورة للعميل بالبريد عند إصدارها</label>
                     <Field v-if="form.auto_send" label="بريد الإرسال" :error="form.errors.send_to" hint="فارغ = بريد العميل"><input v-model="form.send_to" type="email" dir="ltr" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="ملاحظات تظهر في الفاتورة" class="md:col-span-2"><input v-model="form.notes" class="w-full rounded-xl border-slate-200 text-xs" /></Field>

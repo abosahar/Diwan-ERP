@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -23,61 +24,6 @@ const props = defineProps({
     stats: Object,
 });
 
-const isModalOpen = ref(false);
-const editingWarehouse = ref(null);
-
-const form = useForm({
-    branch_id: '',
-    name_ar: '',
-    name_en: '',
-    code: '',
-    phone: '',
-    address: '',
-    is_main: false,
-});
-
-const openAddModal = () => {
-    editingWarehouse.value = null;
-    form.reset();
-    form.branch_id = props.branches?.[0]?.id || '';
-    isModalOpen.value = true;
-};
-
-const openEditModal = (wh) => {
-    editingWarehouse.value = wh;
-    form.branch_id = wh.branch_id || '';
-    form.name_ar = wh.name_ar;
-    form.name_en = wh.name_en || '';
-    form.code = wh.code;
-    form.phone = wh.phone || '';
-    form.address = wh.address || '';
-    form.is_main = !!wh.is_main;
-    isModalOpen.value = true;
-};
-
-const submitWarehouse = () => {
-    if (editingWarehouse.value) {
-        form.put(route('inventory.warehouses.update', editingWarehouse.value.id), {
-            onSuccess: () => {
-                isModalOpen.value = false;
-                form.reset();
-            }
-        });
-    } else {
-        form.post(route('inventory.warehouses.store'), {
-            onSuccess: () => {
-                isModalOpen.value = false;
-                form.reset();
-            }
-        });
-    }
-};
-
-const deleteWarehouse = (id, name) => {
-    if (confirm(`هل أنت متأكد من حذف المستودع "${name}"؟`)) {
-        router.delete(route('inventory.warehouses.destroy', id));
-    }
-};
 </script>
 
 <template>
@@ -86,40 +32,21 @@ const deleteWarehouse = (id, name) => {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <!-- Breadcrumbs & Refresh -->
-                <div class="flex items-center gap-2">
-                    <Link 
+            <PageHeader title="المستودعات" :crumbs="[{ label: 'المخزون' }, { label: 'المستودعات' }]">
+<template #actions>
+<Link 
                         :href="route('inventory.warehouses.index')"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-colors shadow-xs"
                         title="تحديث البيانات"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </Link>
-
-                    <nav class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="hover:text-indigo-600 flex items-center transition-colors">
-                            <HomeIcon class="w-4 h-4 ml-1.5 text-slate-400" />
-                            <span>الرئيسية</span>
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 mx-2 text-slate-400 rtl:rotate-180" />
-                        <span class="text-slate-500">المخزون</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 mx-2 text-slate-400 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">المستودعات</span>
-                    </nav>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <button 
-                        @click="openAddModal"
-                        class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-indigo-500/20 transition-all flex items-center gap-1.5"
-                    >
+<Link v-if="$can('inventory.warehouses.create')" :href="route('inventory.warehouses.create')" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-indigo-500/20 transition-all flex items-center gap-1.5">
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة مستودع جديد</span>
-                    </button>
-                </div>
-            </div>
+                    </Link>
+</template>
+</PageHeader>
 
             <!-- Stats Overview -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -211,13 +138,9 @@ const deleteWarehouse = (id, name) => {
                     </div>
 
                     <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                        <button 
-                            @click="openEditModal(wh)"
-                            class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                            title="تعديل"
-                        >
+                        <Link v-if="$can('inventory.warehouses.edit')" :href="route('inventory.warehouses.edit', wh.id)" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="تعديل">
                             <PencilSquareIcon class="w-4 h-4" />
-                        </button>
+                        </Link>
                         <button 
                             v-if="!wh.is_main"
                             @click="deleteWarehouse(wh.id, wh.name_ar)"
@@ -243,117 +166,6 @@ const deleteWarehouse = (id, name) => {
                         إضافة مستودع
                     </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Add/Edit Warehouse Modal -->
-        <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-            <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <h3 class="font-black text-slate-900 text-sm">
-                        {{ editingWarehouse ? 'تعديل بيانات المستودع' : 'إضافة مستودع جديد' }}
-                    </h3>
-                    <button @click="isModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                        <XMarkIcon class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <form @submit.prevent="submitWarehouse" class="p-6 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2">
-                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم المستودع (بالعربي) *</label>
-                            <input 
-                                v-model="form.name_ar" 
-                                type="text" 
-                                required
-                                placeholder="مثال: مستودع الرياض المركزي"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                            />
-                            <p v-if="form.errors.name_ar" class="text-[11px] text-rose-600 mt-1">{{ form.errors.name_ar }}</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">الاسم (بالإنجليزي)</label>
-                            <input 
-                                v-model="form.name_en" 
-                                type="text" 
-                                placeholder="Warehouse Name"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                            />
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">كود المستودع *</label>
-                            <input 
-                                v-model="form.code" 
-                                type="text" 
-                                required
-                                placeholder="WH-01"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 uppercase font-mono"
-                            />
-                            <p v-if="form.errors.code" class="text-[11px] text-rose-600 mt-1">{{ form.errors.code }}</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">الفرع المرتبط</label>
-                            <select 
-                                v-model="form.branch_id"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                            >
-                                <option value="">-- اختياري --</option>
-                                <option v-for="b in branches" :key="b.id" :value="b.id">{{ b.name_ar }}</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">هاتف المستودع / المسؤول</label>
-                            <input 
-                                v-model="form.phone" 
-                                type="text" 
-                                placeholder="0500000000"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono"
-                            />
-                        </div>
-
-                        <div class="col-span-2">
-                            <label class="block text-xs font-bold text-slate-700 mb-1">العنوان أو الموقع</label>
-                            <input 
-                                v-model="form.address" 
-                                type="text" 
-                                placeholder="المنطقة الصناعية الثانية، الرياض"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                            />
-                        </div>
-
-                        <div class="col-span-2 pt-2">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input 
-                                    v-model="form.is_main" 
-                                    type="checkbox" 
-                                    class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
-                                />
-                                <span class="text-xs font-bold text-slate-700">تعيين كمستودع رئيسي للمنشأة</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-                        <button 
-                            type="button" 
-                            @click="isModalOpen = false"
-                            class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition"
-                        >
-                            إلغاء
-                        </button>
-                        <button 
-                            type="submit" 
-                            :disabled="form.processing"
-                            class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition disabled:opacity-50"
-                        >
-                            {{ editingWarehouse ? 'حفظ التعديلات' : 'إضافة المستودع' }}
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </AppLayout>

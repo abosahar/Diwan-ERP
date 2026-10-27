@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import CancelDocument from '@/Components/CancelDocument.vue';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { ref } from 'vue';
@@ -62,19 +63,9 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Breadcrumbs Ribbon -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-slate-500">المبيعات</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">المدفوعات</span>
-                    </div>
-
-                    <button
+            <PageHeader title="المدفوعات" :crumbs="[{ label: 'المبيعات' }, { label: 'المدفوعات' }]">
+<template #actions>
+<button
                         v-if="$canRoute('sales.payments.store')"
                         @click="showForm = true"
                         class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold"
@@ -89,8 +80,8 @@ const formatCurrency = (val) => {
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- KPI Mini Summary Bar -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import ImportButton from '@/Components/UI/ImportButton.vue';
 import { notify } from '@/composables/useDialog';
 import { ref, computed, watch } from 'vue';
@@ -33,37 +34,8 @@ const props = defineProps({
     filters: Object,
 });
 
-// State for Modals
-const isAddModalOpen = ref(false);
-const isEditModalOpen = ref(false);
 const search = ref(props.filters?.search || '');
 const selectedType = ref(props.filters?.type || '');
-
-// Form for Adding
-const form = useForm({
-    code: '',
-    name_ar: '',
-    name_en: '',
-    parent_id: '',
-    type: 'asset',
-    nature: 'debit',
-    is_parent: false,
-    balance: '0.00',
-});
-
-// Form for Editing
-const editForm = useForm({
-    id: null,
-    code: '',
-    name_ar: '',
-    name_en: '',
-    parent_id: '',
-    type: 'asset',
-    nature: 'debit',
-    is_parent: false,
-    balance: '0.00',
-    is_active: true,
-});
 
 // Tree Expansion State
 // Default: expand all parent accounts initially
@@ -180,75 +152,6 @@ const suggestChildCode = (parentId) => {
     return `${parent.code}${siblings.length + 1}`;
 };
 
-// Add Root Account
-const openAddModal = () => {
-    form.reset();
-    form.parent_id = '';
-    form.type = 'asset';
-    form.nature = 'debit';
-    form.is_parent = false;
-    isAddModalOpen.value = true;
-};
-
-// Add Sub-Account under a specific parent
-const openAddSubAccountModal = (parentAcc) => {
-    form.reset();
-    form.parent_id = parentAcc.id;
-    form.type = parentAcc.type;
-    form.nature = parentAcc.nature;
-    form.is_parent = false;
-    form.code = suggestChildCode(parentAcc.id);
-    
-    // Ensure parent is expanded so the newly added child will be visible
-    expandedNodes.value.add(parentAcc.id);
-    isAddModalOpen.value = true;
-};
-
-const onParentChange = () => {
-    if (form.parent_id) {
-        const parent = parentMap.value[form.parent_id];
-        if (parent) {
-            form.type = parent.type;
-            form.nature = parent.nature;
-            if (!form.code) {
-                form.code = suggestChildCode(parent.id);
-            }
-        }
-    }
-};
-
-const submitAccount = () => {
-    form.post(route('accounting.accounts.store'), {
-        onSuccess: () => {
-            isAddModalOpen.value = false;
-            form.reset();
-        }
-    });
-};
-
-// Edit Modal Handlers
-const openEditModal = (acc) => {
-    editForm.id = acc.id;
-    editForm.code = acc.code;
-    editForm.name_ar = acc.name_ar;
-    editForm.name_en = acc.name_en || '';
-    editForm.parent_id = acc.parent_id || '';
-    editForm.type = acc.type;
-    editForm.nature = acc.nature;
-    editForm.is_parent = Boolean(acc.is_parent);
-    editForm.balance = acc.balance;
-    editForm.is_active = Boolean(acc.is_active);
-    isEditModalOpen.value = true;
-};
-
-const submitEditAccount = () => {
-    editForm.put(route('accounting.accounts.update', editForm.id), {
-        onSuccess: () => {
-            isEditModalOpen.value = false;
-        }
-    });
-};
-
 // Delete Handler
 const deleteAccount = (acc) => {
     if (acc.children_count > 0) {
@@ -309,10 +212,9 @@ const typeBadgeColors = {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <!-- Breadcrumb & Refresh -->
-                <div class="flex items-center gap-2">
-                    <ImportButton v-if="$can('accounting.accounts.create')" type="accounts" title="استيراد دليل الحسابات من Excel" hint="الحساب الجديد يُنشأ تحت أبيه (parent_code) ويرث نوعه. الحساب الموجود يُحدّث اسمه فقط." />
+            <PageHeader title="دليل الحسابات" :crumbs="[{ label: 'المحاسبة' }, { label: 'دليل الحسابات' }]">
+<template #actions>
+<ImportButton v-if="$can('accounting.accounts.create')" type="accounts" title="استيراد دليل الحسابات من Excel" hint="الحساب الجديد يُنشأ تحت أبيه (parent_code) ويرث نوعه. الحساب الموجود يُحدّث اسمه فقط." />
                     <button 
                         @click="handleSearch"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-colors shadow-xs"
@@ -320,22 +222,7 @@ const typeBadgeColors = {
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-
-                    <nav class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="hover:text-indigo-600 flex items-center transition-colors">
-                            <HomeIcon class="w-4 h-4 ml-1.5 text-slate-400" />
-                            <span>الرئيسية</span>
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 mx-2 text-slate-400 rtl:rotate-180" />
-                        <span class="text-slate-500">المحاسبة</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 mx-2 text-slate-400 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">دليل الحسابات</span>
-                    </nav>
-                </div>
-
-                <!-- Action Buttons & Tree Controls -->
-                <div class="flex items-center gap-2">
-                    <button 
+<button 
                         @click="expandAll"
                         class="px-3.5 py-2.5 bg-white border border-slate-200/80 text-slate-700 hover:text-indigo-600 hover:bg-slate-50 rounded-xl text-xs font-semibold shadow-xs transition flex items-center gap-1.5"
                         title="توسيع كافة فروع شجرة الحسابات"
@@ -353,15 +240,12 @@ const typeBadgeColors = {
                         <span>طي الكل</span>
                     </button>
 
-                    <button 
-                        @click="openAddModal"
-                        class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-indigo-500/20 transition-all flex items-center gap-1.5"
-                    >
+                    <Link v-if="$can('accounting.accounts.create')" :href="route('accounting.accounts.create')" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-indigo-500/20 transition-all flex items-center gap-1.5">
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة حساب رئيسي جديد</span>
-                    </button>
-                </div>
-            </div>
+                    </Link>
+</template>
+</PageHeader>
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
@@ -546,14 +430,10 @@ const typeBadgeColors = {
                                     <td class="py-2.5 px-4 text-center whitespace-nowrap">
                                         <div class="flex items-center justify-center gap-1">
                                             <!-- 1. زر إضافة حساب فرعي (Add Sub-Account) -->
-                                            <button 
-                                                @click.stop="openAddSubAccountModal(acc)"
-                                                class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-3xs font-bold transition flex items-center gap-1 border border-indigo-200/60 shadow-2xs"
-                                                title="إضافة حساب فرعي متفرع من هذا الحساب"
-                                            >
+                                            <Link v-if="$can('accounting.accounts.create')" :href="route('accounting.accounts.create', { parent_id: acc.id })" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-3xs font-bold transition flex items-center gap-1 border border-indigo-200/60 shadow-2xs" title="إضافة حساب فرعي متفرع من هذا الحساب">
                                                 <PlusCircleIcon class="w-3.5 h-3.5" />
                                                 <span>فرعي</span>
-                                            </button>
+                                            </Link>
 
                                             <!-- 2. زر كشف الحساب للحسابات الفرعية (Statement of Account) -->
                                             <Link 
@@ -567,13 +447,9 @@ const typeBadgeColors = {
                                             </Link>
 
                                             <!-- 3. زر تعديل الحساب (Edit) -->
-                                            <button 
-                                                @click.stop="openEditModal(acc)"
-                                                class="p-1 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition"
-                                                title="تعديل بيانات الحساب"
-                                            >
+                                            <Link v-if="$can('accounting.accounts.edit')" :href="route('accounting.accounts.edit', acc.id)" class="p-1 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition" title="تعديل بيانات الحساب">
                                                 <PencilSquareIcon class="w-4 h-4" />
-                                            </button>
+                                            </Link>
 
                                             <!-- 4. زر حذف الحساب (Delete) -->
                                             <button 
@@ -604,285 +480,6 @@ const typeBadgeColors = {
                             </tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Modal: Add New Account / Sub-Account -->
-            <div 
-                v-if="isAddModalOpen" 
-                class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-            >
-                <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-slate-100">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <BookOpenIcon class="w-5 h-5 text-indigo-600" />
-                            <span>{{ form.parent_id ? 'إضافة حساب فرعي جديد' : 'إضافة حساب في شجرة الحسابات' }}</span>
-                        </h2>
-                        <button @click="isAddModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                            <XMarkIcon class="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    <form @submit.prevent="submitAccount" class="space-y-4 text-xs">
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">الحساب الأب / التابع له</label>
-                            <select 
-                                v-model="form.parent_id" 
-                                @change="onParentChange"
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                            >
-                                <option value="">حساب رئيسي مستوى أول (بدون حساب أب)</option>
-                                <option v-for="p in parentAccounts" :key="p.id" :value="p.id">
-                                    {{ p.code }} - {{ p.name_ar }} ({{ typeLabels[p.type] }})
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">رمز الحساب (الكود) <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.code" 
-                                    type="text" 
-                                    required 
-                                    placeholder="مثال: 110101 أو 527"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500" 
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">طبيعة الحساب <span class="text-rose-500">*</span></label>
-                                <select 
-                                    v-model="form.nature" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="debit">مدين (Debit)</option>
-                                    <option value="credit">دائن (Credit)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">اسم الحساب بالعربية <span class="text-rose-500">*</span></label>
-                            <input 
-                                v-model="form.name_ar" 
-                                type="text" 
-                                required 
-                                placeholder="مثال: بنك الإنماء - الحساب الجاري"
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                            />
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">اسم الحساب بالإنجليزية (اختياري)</label>
-                            <input 
-                                v-model="form.name_en" 
-                                type="text" 
-                                placeholder="مثال: Alinma Bank - Current Account"
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                            />
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">نوع الحساب <span class="text-rose-500">*</span></label>
-                                <select 
-                                    v-model="form.type" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="asset">أصول</option>
-                                    <option value="liability">خصوم والتزامات</option>
-                                    <option value="equity">حقوق ملكية</option>
-                                    <option value="revenue">إيرادات</option>
-                                    <option value="expense">مصروفات</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">الرصيد الافتتاحي (﷼)</label>
-                                <input 
-                                    v-model="form.balance" 
-                                    type="number" 
-                                    step="0.01" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500 text-end" 
-                                />
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2 pt-2">
-                            <input 
-                                v-model="form.is_parent" 
-                                id="is_parent" 
-                                type="checkbox" 
-                                class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                            />
-                            <label for="is_parent" class="font-medium text-slate-700 cursor-pointer">
-                                حساب رئيسي يتفرع منه حسابات أخرى (مجلد)
-                            </label>
-                        </div>
-
-                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                            <button 
-                                type="button" 
-                                @click="isAddModalOpen = false"
-                                class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-medium"
-                            >
-                                إلغاء
-                            </button>
-                            <button 
-                                type="submit" 
-                                :disabled="form.processing"
-                                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-xs hover:shadow-indigo-500/20 disabled:opacity-50"
-                            >
-                                حفظ الحساب
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Modal: Edit Account -->
-            <div 
-                v-if="isEditModalOpen" 
-                class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-            >
-                <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-slate-100">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <PencilSquareIcon class="w-5 h-5 text-indigo-600" />
-                            <span>تعديل بيانات الحساب المحاسبي</span>
-                        </h2>
-                        <button @click="isEditModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                            <XMarkIcon class="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    <form @submit.prevent="submitEditAccount" class="space-y-4 text-xs">
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">الحساب الأب / التابع له</label>
-                            <select 
-                                v-model="editForm.parent_id" 
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                            >
-                                <option value="">حساب رئيسي مستوى أول (بدون حساب أب)</option>
-                                <option 
-                                    v-for="p in parentAccounts" 
-                                    :key="p.id" 
-                                    :value="p.id"
-                                    :disabled="p.id === editForm.id"
-                                >
-                                    {{ p.code }} - {{ p.name_ar }} ({{ typeLabels[p.type] }})
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">رمز الحساب (الكود) <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="editForm.code" 
-                                    type="text" 
-                                    required 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500" 
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">طبيعة الحساب <span class="text-rose-500">*</span></label>
-                                <select 
-                                    v-model="editForm.nature" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="debit">مدين (Debit)</option>
-                                    <option value="credit">دائن (Credit)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">اسم الحساب بالعربية <span class="text-rose-500">*</span></label>
-                            <input 
-                                v-model="editForm.name_ar" 
-                                type="text" 
-                                required 
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                            />
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">اسم الحساب بالإنجليزية</label>
-                            <input 
-                                v-model="editForm.name_en" 
-                                type="text" 
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                            />
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">نوع الحساب <span class="text-rose-500">*</span></label>
-                                <select 
-                                    v-model="editForm.type" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="asset">أصول</option>
-                                    <option value="liability">خصوم والتزامات</option>
-                                    <option value="equity">حقوق ملكية</option>
-                                    <option value="revenue">إيرادات</option>
-                                    <option value="expense">مصروفات</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">الرصيد الحسابي (﷼)</label>
-                                <input 
-                                    v-model="editForm.balance" 
-                                    type="number" 
-                                    step="0.01" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500 text-end" 
-                                />
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-6 pt-2">
-                            <div class="flex items-center gap-2">
-                                <input 
-                                    v-model="editForm.is_parent" 
-                                    id="edit_is_parent" 
-                                    type="checkbox" 
-                                    class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <label for="edit_is_parent" class="font-medium text-slate-700 cursor-pointer">
-                                    حساب رئيسي (مجلد)
-                                </label>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <input 
-                                    v-model="editForm.is_active" 
-                                    id="edit_is_active" 
-                                    type="checkbox" 
-                                    class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                                />
-                                <label for="edit_is_active" class="font-medium text-slate-700 cursor-pointer">
-                                    نشط ومتاح للعمليات
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                            <button 
-                                type="button" 
-                                @click="isEditModalOpen = false"
-                                class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-medium"
-                            >
-                                إلغاء
-                            </button>
-                            <button 
-                                type="submit" 
-                                :disabled="editForm.processing"
-                                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-xs hover:shadow-indigo-500/20 disabled:opacity-50"
-                            >
-                                حفظ التعديلات
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>

@@ -31,7 +31,7 @@ const save = (submit) => {
         <Head :title="o ? `تعديل ${o.order_number}` : 'أمر شراء جديد'" />
         <PageHeader :title="o ? `تعديل أمر الشراء ${o.order_number}` : 'أمر شراء جديد'" :subtitle="o ? '' : `الرقم المتوقع: ${suggestedNumber}`" :crumbs="[{ label: 'المشتريات' }, { label: 'أوامر الشراء', href: route('purchases.orders.index') }, { label: o ? o.order_number : 'جديد' }]" />
         <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="المورد" :error="form.errors.supplier_id" class="md:col-span-2"><PartyPicker v-model="form.supplier_id" route-name="lookup.suppliers" :initial="o?.supplier" /></Field>
                 <Field label="تاريخ الأمر"><input v-model="form.order_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="التوريد المتوقع"><input v-model="form.expected_delivery_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>

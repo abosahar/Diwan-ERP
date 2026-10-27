@@ -39,6 +39,24 @@ class InventoryOperationController extends Controller
         ]);
     }
 
+    public function transferForm(): Response
+    {
+        return Inertia::render('Inventory/Operations/TransferForm', $this->lookups());
+    }
+
+    public function adjustForm(Request $request): Response
+    {
+        return Inertia::render('Inventory/Operations/AdjustForm', $this->lookups() + ['preset' => $request->only(['product_id', 'warehouse_id'])]);
+    }
+
+    protected function lookups(): array
+    {
+        return [
+            'products' => Product::where('is_active', true)->get(['id', 'name_ar', 'name_en', 'sku']),
+            'warehouses' => Warehouse::where('is_active', true)->get(['id', 'name_ar', 'name_en', 'code']),
+        ];
+    }
+
     /**
      * Immediate transfer between warehouses (same site). For transfers that
      * travel, use stock transfer documents (send / receive).

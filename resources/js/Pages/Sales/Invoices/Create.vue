@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
 import CurrencyPicker from '@/Components/Documents/CurrencyPicker.vue';
@@ -448,23 +449,9 @@ const importLines = (lines, replace) => {
 
         <div class="space-y-6 w-full pb-12">
             <!-- Header Ribbon & Action Bar -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <Link :href="route('sales.invoices.index')" class="text-slate-500 hover:text-indigo-600 transition-colors">الفواتير</Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">إنشاء فاتورة</span>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-3">
-                    <Link 
+            <PageHeader title="إنشاء فاتورة" :crumbs="[{ label: 'إنشاء فاتورة' }]">
+<template #actions>
+<Link 
                         :href="route('sales.invoices.index')"
                         class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium text-xs sm:text-sm transition-all"
                     >
@@ -478,8 +465,8 @@ const importLines = (lines, replace) => {
                         <CheckIcon class="w-4 h-4 stroke-2" />
                         <span>{{ form.processing ? 'جاري الإصدار...' : 'حفظ وإصدار الفاتورة' }}</span>
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Validation Errors Alert -->
             <div v-if="Object.keys(form.errors).length > 0" class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold">

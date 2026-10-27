@@ -10,9 +10,9 @@ class BomItem extends Model
 {
     use BelongsToCompany;
 
-    protected $fillable = ['company_id', 'bom_id', 'component_id', 'quantity'];
+    protected $fillable = ['company_id', 'bom_id', 'component_id', 'quantity', 'scrap_percent'];
 
-    protected $casts = ['quantity' => 'decimal:4'];
+    protected $casts = ['quantity' => 'decimal:4', 'scrap_percent' => 'decimal:2'];
 
     public function component(): BelongsTo
     {

@@ -24,7 +24,7 @@ const printPage = () => window.print();
             {{ report.is_balanced ? '✓ الميزانية متوازنة: الأصول = الخصوم + حقوق الملكية' : '✗ الميزانية غير متوازنة — راجع القيود' }}
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-5xl">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <div class="bg-white border border-slate-200 rounded-2xl p-5">
                 <StatementSection title="الأصول" :rows="report.assets.rows" :total="report.total_assets" :ledger-query="ledgerQuery" />
             </div>

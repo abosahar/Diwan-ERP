@@ -20,7 +20,7 @@ const ageHours = computed(() => (lastOk.value ? Math.round((Date.now() - new Dat
             <div v-if="flash.success" class="rounded-xl bg-emerald-50 border border-emerald-200 p-3 font-bold text-emerald-800">{{ flash.success }}</div>
             <div v-if="flash.error" class="rounded-xl bg-rose-50 border border-rose-200 p-3 font-bold text-rose-800">{{ flash.error }}</div>
 
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div class="bg-white border rounded-2xl p-4">
                     <div class="text-slate-500">آخر نسخة ناجحة</div>
                     <div class="text-base font-black mt-1" :class="ageHours === null || ageHours > 26 ? 'text-rose-600' : 'text-slate-800'">{{ lastOk ? time(lastOk.created_at) : 'لا توجد' }}</div>
@@ -46,7 +46,7 @@ const ageHours = computed(() => (lastOk.value ? Math.round((Date.now() - new Dat
                 <button @click="run(true)" class="px-4 py-2 rounded-xl border border-slate-300 bg-white font-bold">اختبار استعادة آخر نسخة</button>
             </div>
 
-            <div class="grid lg:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white rounded-2xl border overflow-hidden">
                     <h3 class="px-4 py-3 font-black border-b">سجل العمليات</h3>
                     <table class="w-full">

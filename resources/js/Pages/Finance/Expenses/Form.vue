@@ -1,0 +1,187 @@
+<script setup>
+import { taxRate } from '@/utils/tax';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+
+const props = defineProps({ expenseAccounts: Array, bankAccounts: Array });
+
+const form = useForm({
+    title: '',
+    category: 'مصروفات عامة',
+    account_id: props.expenseAccounts?.[0]?.id || '',
+    bank_account_id: props.bankAccounts?.[0]?.id || '',
+    amount: '',
+    tax_amount: '',
+    taxable: false,
+    vendor_tax_number: '',
+    expense_date: new Date().toISOString().split('T')[0],
+    payment_method: 'bank_transfer',
+    reference_number: '',
+    vendor_name: '',
+    notes: '',
+});
+
+const onAmountChange = () => {
+    if (form.amount && form.taxable) {
+        form.tax_amount = (parseFloat(form.amount) * taxRate() / 100).toFixed(2);
+    } else {
+        form.tax_amount = '0.00';
+    }
+};
+
+const formatCurrency = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const submitExpense = () => form.post(route('finance.expenses.store'));
+</script>
+
+<template>
+    <AppLayout>
+        <Head title="سند مصروف جديد" />
+        <PageHeader title="سند مصروف جديد" :crumbs="[{ label: 'المالية' }, { label: 'المصروفات', href: route('finance.expenses.index') }, { label: 'جديد' }]" />
+
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6">
+            <form @submit.prevent="submitExpense" class="form-grid text-xs">
+                            <div>
+                                <label class="block font-medium text-slate-700 mb-1">بيان / عنوان المصروف <span class="text-rose-500">*</span></label>
+                                <input 
+                                    v-model="form.title" 
+                                    type="text" 
+                                    required 
+                                    placeholder="مثال: سداد فاتورة الكهرباء لشهر سبتمبر"
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500" 
+                                />
+                            </div>
+            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">التصنيف <span class="text-rose-500">*</span></label>
+                                    <input 
+                                        v-model="form.category" 
+                                        type="text" 
+                                        required 
+                                        placeholder="إيجار، رواتب، فواتير..."
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500" 
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">تاريخ الصرف <span class="text-rose-500">*</span></label>
+                                    <input 
+                                        v-model="form.expense_date" 
+                                        type="date" 
+                                        required 
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500" 
+                                    />
+                                </div>
+                            </div>
+            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">المبلغ (غير شامل الضريبة) <span class="text-rose-500">*</span></label>
+                                    <input 
+                                        v-model="form.amount" 
+                                        @input="onAmountChange"
+                                        type="number" 
+                                        step="0.01" 
+                                        required 
+                                        placeholder="0.00"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-rose-500 focus:border-rose-500 text-end" 
+                                    />
+                                </div>
+                                <div>
+                                    <label class="flex items-center gap-2 font-medium text-slate-700 mb-1"><input v-model="form.taxable" type="checkbox" @change="onAmountChange" class="rounded border-slate-300" /> خاضع لـ{{ $taxLabel() }}</label>
+                                    <input 
+                                        v-model="form.tax_amount" 
+                                        :disabled="!form.taxable"
+                                        type="number" 
+                                        step="0.01" 
+                                        placeholder="0.00"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-rose-500 focus:border-rose-500 text-end" 
+                                    />
+                                </div>
+                            </div>
+            
+                            <div class="p-3 bg-rose-50/50 rounded-xl flex items-center justify-between text-xs border border-rose-100">
+                                <span class="font-bold text-rose-900">المجموع الإجمالي شامل الضريبة:</span>
+                                <span class="font-mono font-black text-sm text-rose-600">
+                                    {{ formatCurrency((parseFloat(form.amount || 0) + parseFloat(form.tax_amount || 0))) }} ﷼
+                                </span>
+                            </div>
+            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">مدفوع من (الخزينة أو البنك)</label>
+                                    <select 
+                                        v-model="form.bank_account_id" 
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500"
+                                    >
+                                        <option v-for="bank in bankAccounts" :key="bank.id" :value="bank.id">
+                                            {{ bank.name }} (الرصيد: {{ formatCurrency(bank.current_balance) }} ﷼)
+                                        </option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">حساب المصروف في الدليل</label>
+                                    <select 
+                                        v-model="form.account_id" 
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500"
+                                    >
+                                        <option v-for="acc in expenseAccounts" :key="acc.id" :value="acc.id">
+                                            {{ acc.code }} - {{ acc.name_ar }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">الجهة المستفيدة / المدفوع له</label>
+                                    <input 
+                                        v-model="form.vendor_name" 
+                                        type="text" 
+                                        placeholder="اسم الشركة أو الشخص"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500" 
+                                    />
+                                    <template v-if="form.taxable">
+                                        <label class="block font-medium text-slate-700 mt-2 mb-1" for="vendor-vat">الرقم الضريبي للمورد</label>
+                                        <input id="vendor-vat" v-model="form.vendor_tax_number" dir="ltr" maxlength="15" placeholder="3xxxxxxxxxxxxx3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono" />
+                                        <p v-if="form.errors.vendor_tax_number" class="text-rose-600 text-3xs mt-1">{{ form.errors.vendor_tax_number }}</p>
+                                    </template>
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">طريقة الدفع</label>
+                                    <select 
+                                        v-model="form.payment_method" 
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500"
+                                    >
+                                        <option value="bank_transfer">تحويل بنكي</option>
+                                        <option value="cash">نقداً</option>
+                                        <option value="card">بطاقة مدى / ائتمان</option>
+                                    </select>
+                                </div>
+                            </div>
+            
+                            <div>
+                                <label class="block font-medium text-slate-700 mb-1">ملاحظات أو تفاصيل</label>
+                                <textarea 
+                                    v-model="form.notes" 
+                                    rows="2" 
+                                    placeholder="أي تفاصيل إضافية عن السند..."
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500"
+                                ></textarea>
+                            </div>
+            
+                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                                <Link :href="route('finance.expenses.index')" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-medium">إلغاء</Link>
+                                <button 
+                                    type="submit" 
+                                    :disabled="form.processing"
+                                    class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold shadow-xs hover:shadow-rose-500/20 disabled:opacity-50"
+                                >
+                                    حفظ السند
+                                </button>
+                            </div>
+                        </form>
+        </div>
+    </AppLayout>
+</template>

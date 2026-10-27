@@ -16,7 +16,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
     <AppLayout>
         <Head title="الهيكل التنظيمي" />
         <PageHeader title="الهيكل التنظيمي والورديات" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'الهيكل التنظيمي' }]" />
-        <div class="grid lg:grid-cols-3 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
             <div class="bg-white border border-slate-200 rounded-2xl p-4">
                 <h3 class="font-black text-slate-700 mb-2">الإدارات والأقسام</h3>
                 <div v-for="d in departments" :key="d.id" class="flex justify-between py-1 border-b border-slate-50"><span>{{ d.parent ? d.parent.name + ' / ' : '' }}<b>{{ d.name }}</b> <span class="text-slate-400">{{ d.cost_center?.code }}</span></span><span>{{ d.employees_count }}</span></div>

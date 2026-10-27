@@ -18,7 +18,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
         <PageHeader title="الربط البرمجي" subtitle="رموز API لأنظمتك الأخرى، وإشعارات Webhooks عند الأحداث" :crumbs="[{ label: 'الإعدادات' }, { label: 'الربط البرمجي' }]" />
         <div v-if="newToken" class="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs"><b>الرمز الجديد (لن يظهر مرة أخرى):</b><p class="font-mono break-all mt-1" dir="ltr">{{ newToken }}</p></div>
         <div v-if="newSecret" class="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs"><b>مفتاح توقيع الويب هوك (لن يظهر مرة أخرى):</b><p class="font-mono break-all mt-1" dir="ltr">{{ newSecret }}</p></div>
-        <div class="grid lg:grid-cols-2 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
             <div class="bg-white border border-slate-200 rounded-2xl p-4">
                 <h3 class="font-black text-slate-700">رموز الوصول (API)</h3>
                 <p class="text-slate-500 mb-3" dir="ltr">Base URL: <span class="font-mono">{{ apiBase }}</span> — Header: <span class="font-mono">Authorization: Bearer &lt;token&gt;</span></p>

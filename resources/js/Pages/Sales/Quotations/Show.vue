@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
@@ -52,6 +53,8 @@ const formatDateArabic = (dateStr) => {
 <template>
     <AppLayout>
         <Head :title="`عرض سعر رقم ${quotation.quotation_number}`" />
+
+        <PageHeader :title="`عرض سعر رقم ${quotation.quotation_number}`" :crumbs="[{ label: 'المبيعات' }, { label: 'عروض الأسعار', href: route('sales.quotations.index') }, { label: quotation.quotation_number }]" />
 
         <div class="space-y-6 w-full pb-12">
             <!-- Top Action Ribbon (Hidden on Print) -->

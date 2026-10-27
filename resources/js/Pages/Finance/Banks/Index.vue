@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
@@ -21,34 +22,6 @@ const props = defineProps({
     chartAccounts: Array,
 });
 
-const isAddModalOpen = ref(false);
-
-const form = useForm({
-    name: '',
-    type: 'bank',
-    bank_name: '',
-    account_number: '',
-    iban: '',
-    currency: usePage().props.tenant?.currency || 'SAR',
-    opening_balance: '0.00',
-    account_id: props.chartAccounts?.[0]?.id || '',
-});
-
-const openAddModal = () => {
-    form.reset();
-    form.account_id = props.chartAccounts?.[0]?.id || '';
-    isAddModalOpen.value = true;
-};
-
-const submitAccount = () => {
-    form.post(route('finance.banks.store'), {
-        onSuccess: () => {
-            isAddModalOpen.value = false;
-            form.reset();
-        }
-    });
-};
-
 const deleteAccount = (id, name) => {
     if (confirm(`هل أنت متأكد من حذف الحساب "${name}"؟`)) {
         router.delete(route('finance.banks.destroy', id));
@@ -69,40 +42,21 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <!-- Breadcrumb & Refresh -->
-                <div class="flex items-center gap-2">
-                    <Link 
+            <PageHeader title="الخزائن والبنوك" :crumbs="[{ label: 'المالية' }, { label: 'الخزائن والبنوك' }]">
+<template #actions>
+<Link 
                         :href="route('finance.banks.index')"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-colors shadow-xs"
                         title="تحديث البيانات"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </Link>
-
-                    <nav class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="hover:text-indigo-600 flex items-center transition-colors">
-                            <HomeIcon class="w-4 h-4 ml-1.5 text-slate-400" />
-                            <span>الرئيسية</span>
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 mx-2 text-slate-400 rtl:rotate-180" />
-                        <span class="text-slate-500">المالية</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 mx-2 text-slate-400 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">الخزائن والبنوك</span>
-                    </nav>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <button 
-                        @click="openAddModal"
-                        class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-indigo-500/20 transition-all flex items-center gap-1.5"
-                    >
+<Link v-if="$can('finance.banks.create')" :href="route('finance.banks.create')" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-indigo-500/20 transition-all flex items-center gap-1.5">
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة حساب بنكي / خزينة</span>
-                    </button>
-                </div>
-            </div>
+                    </Link>
+</template>
+</PageHeader>
 
             <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -203,123 +157,6 @@ const formatCurrency = (val) => {
                             {{ formatCurrency(acc.current_balance) }} <span class="text-xs font-normal">﷼</span>
                         </span>
                     </div>
-                </div>
-            </div>
-
-            <!-- Add Bank Modal -->
-            <div 
-                v-if="isAddModalOpen" 
-                class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-            >
-                <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-slate-100">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <BuildingLibraryIcon class="w-5 h-5 text-indigo-600" />
-                            <span>إضافة حساب بنكي أو خزينة جديدة</span>
-                        </h2>
-                        <button @click="isAddModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                            <XMarkIcon class="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    <form @submit.prevent="submitAccount" class="space-y-4 text-xs">
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">اسم الحساب / الخزينة <span class="text-rose-500">*</span></label>
-                            <input 
-                                v-model="form.name" 
-                                type="text" 
-                                required 
-                                placeholder="مثال: حساب مصرف الراجحي الرئيسي أو خزينة الرياض"
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                            />
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">النوع <span class="text-rose-500">*</span></label>
-                                <select 
-                                    v-model="form.type" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="bank">حساب بنكي</option>
-                                    <option value="cash">خزينة نقدية (درج كاش)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">الرصيد الافتتاحي (﷼) <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.opening_balance" 
-                                    type="number" 
-                                    step="0.01" 
-                                    required 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500 text-end" 
-                                />
-                            </div>
-                        </div>
-
-                        <!-- If Bank -->
-                        <div v-if="form.type === 'bank'" class="space-y-3 p-3 bg-sky-50/50 rounded-xl border border-sky-100">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">اسم البنك</label>
-                                <input 
-                                    v-model="form.bank_name" 
-                                    type="text" 
-                                    placeholder="مثال: مصرف الراجحي، بنك الرياض، الأهلي..."
-                                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                                />
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block font-medium text-slate-700 mb-1">رقم الحساب</label>
-                                    <input 
-                                        v-model="form.account_number" 
-                                        type="text" 
-                                        placeholder="رقم الحساب المصرفي"
-                                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500" 
-                                    />
-                                </div>
-                                <div>
-                                    <label class="block font-medium text-slate-700 mb-1">رقم الآيبان (IBAN)</label>
-                                    <input 
-                                        v-model="form.iban" 
-                                        type="text" 
-                                        placeholder="SA......................"
-                                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500" 
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">ربط مع حساب بدليل الحسابات (اختياري)</label>
-                            <select 
-                                v-model="form.account_id" 
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                            >
-                                <option value="">بدون ربط مباشر</option>
-                                <option v-for="acc in chartAccounts" :key="acc.id" :value="acc.id">
-                                    {{ acc.code }} - {{ acc.name_ar }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                            <button 
-                                type="button" 
-                                @click="isAddModalOpen = false"
-                                class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-medium"
-                            >
-                                إلغاء
-                            </button>
-                            <button 
-                                type="submit" 
-                                :disabled="form.processing"
-                                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-xs hover:shadow-indigo-500/20 disabled:opacity-50"
-                            >
-                                إضافة الحساب
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>

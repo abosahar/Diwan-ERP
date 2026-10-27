@@ -25,7 +25,7 @@ const decide = async (loan, approve) => {
     <AppLayout>
         <Head title="السلف" />
         <PageHeader title="سلف الموظفين" subtitle="تُصرف عند الاعتماد وتُستقطع أقساطها من المسير (بحد أقصى نصف الأجر)" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'السلف' }]" />
-        <div class="grid lg:grid-cols-3 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
             <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <div class="p-3 border-b border-slate-100 flex items-center gap-2">صرف من: <select v-model="bank" class="rounded-xl border-slate-200 text-xs"><option value="">الحساب الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></div>
                 <table class="w-full">

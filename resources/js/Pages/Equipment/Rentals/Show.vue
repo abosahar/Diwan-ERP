@@ -57,7 +57,7 @@ const close = () => closeForm.post(route('equipment.rentals.close', r.id), { pre
         </div>
         <p v-if="r.site || r.notes" class="mb-4 text-xs text-slate-500"><template v-if="r.site">الموقع: {{ r.site }}. </template>{{ r.notes }}</p>
 
-        <div class="grid lg:grid-cols-2 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
             <section>
                 <h3 class="font-black text-slate-700 mb-2">الفترات المفوترة</h3>
                 <div class="bg-white border border-slate-200 rounded-2xl overflow-x-auto">

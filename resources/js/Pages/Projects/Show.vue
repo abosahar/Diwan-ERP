@@ -85,7 +85,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
         </div>
 
         <!-- Overview -->
-        <div v-if="tab === 'overview'" class="grid md:grid-cols-3 gap-4 text-xs">
+        <div v-if="tab === 'overview'" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-1.5">
                 <h3 class="font-black text-slate-700 mb-2">العقد</h3>
                 <div class="flex justify-between"><span>أوامر التغيير المعتمدة</span><b class="font-mono">{{ money(summary.approved_variations) }}</b></div>
@@ -225,7 +225,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
         </div>
 
         <!-- Daily reports -->
-        <div v-if="tab === 'daily'" class="grid md:grid-cols-3 gap-4">
+        <div v-if="tab === 'daily'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div v-if="$can('projects.daily_reports.create')" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
                 <Field label="التاريخ"><input v-model="dailyForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <div class="grid grid-cols-2 gap-2">

@@ -43,6 +43,13 @@ class TransferController extends Controller
         ]);
     }
 
+    public function create(): Response
+    {
+        return Inertia::render('Finance/Transfers/Form', [
+            'accounts' => BankAccount::withLedgerBalances(BankAccount::where('is_active', true)->get()),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $tenantManager = app(TenantManager::class);

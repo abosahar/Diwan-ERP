@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ask } from '@/composables/useDialog';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
@@ -42,7 +43,9 @@ const deleteDraft = () => {
     <AppLayout>
         <Head :title="`سند قيد يومية ${entry.entry_number}`" />
 
-        <div class="max-w-4xl mx-auto space-y-4">
+        <PageHeader :title="`سند قيد ${entry.entry_number}`" :crumbs="[{ label: 'المحاسبة' }, { label: 'القيود اليومية', href: route('accounting.journals.index') }, { label: entry.entry_number }]" />
+
+        <div class="max-w-5xl mx-auto space-y-4">
             <!-- Action Bar (Hidden when printing) -->
             <div class="flex items-center justify-between no-print">
                 <Link 

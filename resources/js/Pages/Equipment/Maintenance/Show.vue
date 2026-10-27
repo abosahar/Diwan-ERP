@@ -60,7 +60,7 @@ const remove = () => confirm('حذف أمر الصيانة؟') && router.delete(
 
         <p v-if="o.technician || o.notes" class="mb-4 text-xs text-slate-600"><template v-if="o.technician"><b>الفني:</b> {{ o.technician }}. </template>{{ o.notes }}</p>
 
-        <div class="grid lg:grid-cols-2 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
             <!-- Parts issued -->
             <section class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
                 <div class="flex items-center justify-between"><h3 class="font-black text-slate-800">قطع الغيار المصروفة</h3><span class="font-mono font-bold">{{ money(o.parts_cost) }}</span></div>

@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Create/edit pages: fields in two columns on wide screens; actions, errors and long fields span both. */
+.form-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem 1.5rem; align-items: start; }
+@media (min-width: 1024px) {
+    .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.form-grid > :is([class*="justify-end"], [class*="border-t"], [class*="bg-amber"], [class*="bg-rose"], [class*="bg-emerald"], [class*="bg-slate-50"], table, .span-all),
+.form-grid > :has(> textarea, > table) { grid-column: 1 / -1; }

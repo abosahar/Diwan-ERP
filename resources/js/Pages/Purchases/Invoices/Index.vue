@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
@@ -67,33 +68,16 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5" @click="activeMenu = null">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs Ribbon -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-slate-500">المشتريات</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">فواتير الشراء</span>
-                    </div>
-
-                    <!-- Refresh Button -->
-                    <button 
+            <PageHeader title="فواتير الشراء" :crumbs="[{ label: 'المشتريات' }, { label: 'فواتير الشراء' }]">
+<template #actions>
+<button 
                         @click="router.reload()"
                         title="تحديث البيانات"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xs transition-all"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <!-- Primary Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <!-- Search & Filter Toggle -->
-                    <button 
+<button 
                         @click.stop="isFilterOpen = !isFilterOpen"
                         :class="[
                             'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-150 shadow-xs border',
@@ -106,7 +90,7 @@ const formatCurrency = (val) => {
                         <span>البحث والتصفية</span>
                     </button>
 
-                    <!-- Add Invoice Button -->
+                    
                     <Link 
                         v-if="$canRoute('purchases.invoices.create')"
                         :href="route('purchases.invoices.create')"
@@ -115,8 +99,8 @@ const formatCurrency = (val) => {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة</span>
                     </Link>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Collapsible Search & Filter Panel -->
             <transition

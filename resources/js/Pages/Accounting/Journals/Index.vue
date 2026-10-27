@@ -1,7 +1,7 @@
 <script setup>
-import ImportLines from '@/Components/Documents/ImportLines.vue';
-import { ref, computed } from 'vue';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+import { ref } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 import {
     PlusIcon,
@@ -10,34 +10,14 @@ import {
     HomeIcon,
     ChevronRightIcon,
     ChevronLeftIcon,
-    BookOpenIcon,
-    XMarkIcon,
-    TrashIcon,
     EyeIcon,
-    CheckCircleIcon,
-    ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     entries: Object,
     stats: Object,
-    accounts: Array,
-    costCenters: Array,
-    customers: { type: Array, default: () => [] },
-    suppliers: { type: Array, default: () => [] },
-    partyAccounts: { type: Object, default: () => ({}) },
     filters: Object,
 });
-
-// Receivable / payable lines name their customer or supplier.
-const partyType = (line) => props.partyAccounts?.[String(line.account_id)] || null;
-const syncParty = (line) => {
-    const type = partyType(line);
-    if (line.party_type !== type) {
-        line.party_type = type || '';
-        line.party_id = '';
-    }
-};
 
 const statusBadge = {
     draft: ['مسودة', 'bg-amber-50 text-amber-700 border-amber-200'],
@@ -47,73 +27,7 @@ const statusBadge = {
 const typeLabels = { manual: 'يدوي', system: 'آلي', opening: 'افتتاحي', closing: 'إقفال', adjustment: 'تسوية', recurring: 'متكرر', reversal: 'عكسي' };
 
 const isFilterOpen = ref(false);
-const isAddModalOpen = ref(false);
 const search = ref(props.filters?.search || '');
-
-const form = useForm({
-    date: new Date().toISOString().split('T')[0],
-    reference: '',
-    description: '',
-    entry_type: 'manual',
-    save_as: 'posted',
-    lines: [
-        { account_id: props.accounts?.[0]?.id || '', cost_center_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 },
-        { account_id: props.accounts?.[1]?.id || '', cost_center_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 },
-    ],
-});
-
-const addLine = () => {
-    form.lines.push({
-        account_id: props.accounts?.[0]?.id || '',
-        cost_center_id: '',
-        party_type: '',
-        party_id: '',
-        description: '',
-        debit: 0,
-        credit: 0,
-    });
-};
-
-const removeLine = (index) => {
-    if (form.lines.length > 2) {
-        form.lines.splice(index, 1);
-    }
-};
-
-const totalDebit = computed(() => {
-    return form.lines.reduce((acc, l) => acc + (parseFloat(l.debit) || 0), 0);
-});
-
-const totalCredit = computed(() => {
-    return form.lines.reduce((acc, l) => acc + (parseFloat(l.credit) || 0), 0);
-});
-
-const isBalanced = computed(() => {
-    return Math.abs(totalDebit.value - totalCredit.value) < 0.01 && totalDebit.value > 0;
-});
-
-const openAddModal = () => {
-    form.reset();
-    form.date = new Date().toISOString().split('T')[0];
-    form.lines = [
-        { account_id: props.accounts?.[0]?.id || '', cost_center_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 },
-        { account_id: props.accounts?.[1]?.id || '', cost_center_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 },
-    ];
-    isAddModalOpen.value = true;
-};
-
-const submitEntry = (saveAs = 'posted') => {
-    form.lines.forEach(syncParty);
-    if (!isBalanced.value) return;
-    form.save_as = saveAs;
-
-    form.post(route('accounting.journals.store'), {
-        onSuccess: () => {
-            isAddModalOpen.value = false;
-            form.reset();
-        }
-    });
-};
 
 const handleSearch = () => {
     router.get(route('accounting.journals.index'), {
@@ -128,10 +42,6 @@ const formatCurrency = (val) => {
     });
 };
 
-const importLines = (lines, replace) => {
-    const rows = lines.map((l) => ({ account_id: l.account_id, cost_center_id: l.cost_center_id || '', party_type: '', party_id: '', description: l.description || '', debit: l.debit, credit: l.credit }));
-    form.lines = replace ? rows : [...form.lines.filter((l) => Number(l.debit) || Number(l.credit)), ...rows];
-};
 </script>
 
 <template>
@@ -140,32 +50,16 @@ const importLines = (lines, replace) => {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs Ribbon -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-slate-500">المحاسبة</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">القيود اليومية</span>
-                    </div>
-
-                    <!-- Refresh Button -->
-                    <button 
+            <PageHeader title="القيود اليومية" :crumbs="[{ label: 'المحاسبة' }, { label: 'القيود اليومية' }]">
+<template #actions>
+<button 
                         @click="handleSearch"
                         title="تحديث البيانات"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xs transition-all"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <!-- Primary Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <button 
+<button 
                         @click.stop="isFilterOpen = !isFilterOpen"
                         :class="[
                             'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-150 shadow-xs border',
@@ -178,15 +72,15 @@ const importLines = (lines, replace) => {
                         <span>البحث والتصفية</span>
                     </button>
 
-                    <button 
-                        @click="openAddModal"
+                    <Link v-if="$can('accounting.journals.create')"
+                        :href="route('accounting.journals.create')"
                         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150"
                     >
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إنشاء قيد يومية</span>
-                    </button>
-                </div>
-            </div>
+                    </Link>
+</template>
+</PageHeader>
 
             <!-- Collapsible Search & Filter Panel -->
             <transition
@@ -355,215 +249,6 @@ const importLines = (lines, replace) => {
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Create Journal Entry Modal -->
-            <div 
-                v-if="isAddModalOpen" 
-                class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-            >
-                <div class="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-4 shadow-xl border border-slate-100 max-h-[90vh] flex flex-col">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-shrink-0">
-                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <BookOpenIcon class="w-5 h-5 text-indigo-600" />
-                            <span>إنشاء قيد يومية محاسبي جديد (Journal Entry)</span>
-                        </h2>
-                        <button @click="isAddModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                            <XMarkIcon class="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    <form @submit.prevent="submitEntry('posted')" class="space-y-4 text-xs flex-1 overflow-y-auto pe-1">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">تاريخ القيد <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.date" 
-                                    type="date" 
-                                    required 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-medium text-slate-700 mb-1">الرقم المرجعي (اختياري)</label>
-                                <input 
-                                    v-model="form.reference" 
-                                    type="text" 
-                                    placeholder="رقم شيك، إشعار، عقد..."
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">نوع القيد</label>
-                            <select v-model="form.entry_type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
-                                <option value="manual">قيد يومية عادي</option>
-                                <option value="opening">قيد أرصدة افتتاحية</option>
-                                <option value="adjustment">قيد تسوية</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">بيان القيد العام <span class="text-rose-500">*</span></label>
-                            <input 
-                                v-model="form.description" 
-                                type="text" 
-                                required 
-                                placeholder="شرح القيد المحاسبي..."
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
-                            />
-                        </div>
-
-                        <!-- Lines Table -->
-                        <div class="border border-slate-200 rounded-xl overflow-hidden">
-                            <table class="w-full text-3xs">
-                                <thead>
-                                    <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
-                                        <th class="py-2.5 px-3 text-start">الحساب المحاسبي</th>
-                                        <th class="py-2.5 px-3 text-start">مركز التكلفة</th>
-                                        <th class="py-2.5 px-3 text-start">شرح البند</th>
-                                        <th class="py-2.5 px-3 text-end w-28">مدين (Debit)</th>
-                                        <th class="py-2.5 px-3 text-end w-28">دائن (Credit)</th>
-                                        <th class="py-2.5 px-2 text-center w-10"></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    <tr v-for="(line, idx) in form.lines" :key="idx" class="bg-white">
-                                        <td class="p-2">
-                                            <select 
-                                                v-model="line.account_id" 
-                                                required 
-                                                @change="syncParty(line)"
-                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs"
-                                            >
-                                                <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                    {{ acc.code }} - {{ acc.name_ar }}
-                                                </option>
-                                            </select>
-                                            <select v-if="partyType(line)" v-model="line.party_id" required
-                                                class="mt-1 w-full py-1 px-2 bg-amber-50 border border-amber-200 rounded-lg text-3xs">
-                                                <option value="">{{ partyType(line) === 'customer' ? '— اختر العميل —' : '— اختر المورد —' }}</option>
-                                                <option v-for="p in (partyType(line) === 'customer' ? customers : suppliers)" :key="p.id" :value="p.id">{{ p.name }}</option>
-                                            </select>
-                                        </td>
-                                        <td class="p-2">
-                                            <select v-model="line.cost_center_id" class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs">
-                                                <option value="">—</option>
-                                                <option v-for="cc in costCenters" :key="cc.id" :value="cc.id">{{ cc.code }} - {{ cc.name_ar }}</option>
-                                            </select>
-                                        </td>
-                                        <td class="p-2">
-                                            <input 
-                                                v-model="line.description" 
-                                                type="text" 
-                                                placeholder="بيان تفصيلي"
-                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs"
-                                            />
-                                        </td>
-                                        <td class="p-2">
-                                            <input 
-                                                v-model="line.debit" 
-                                                type="number" 
-                                                step="0.01" 
-                                                min="0"
-                                                @focus="line.credit = 0"
-                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs font-mono text-end font-bold"
-                                            />
-                                        </td>
-                                        <td class="p-2">
-                                            <input 
-                                                v-model="line.credit" 
-                                                type="number" 
-                                                step="0.01" 
-                                                min="0"
-                                                @focus="line.debit = 0"
-                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs font-mono text-end font-bold"
-                                            />
-                                        </td>
-                                        <td class="p-2 text-center">
-                                            <button 
-                                                type="button" 
-                                                @click="removeLine(idx)" 
-                                                :disabled="form.lines.length <= 2"
-                                                class="p-1 text-slate-300 hover:text-rose-600 disabled:opacity-20"
-                                            >
-                                                <TrashIcon class="w-3.5 h-3.5" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr class="bg-slate-50 font-bold border-t border-slate-200">
-                                        <td colspan="3" class="p-2 text-start">
-                                            <ImportLines kind="journal" label="استيراد الأطراف من Excel" @imported="importLines" />
-                                            <button 
-                                                type="button" 
-                                                @click="addLine" 
-                                                class="text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1"
-                                            >
-                                                <PlusIcon class="w-3.5 h-3.5" />
-                                                <span>إضافة طرف قيد</span>
-                                            </button>
-                                        </td>
-                                        <td class="p-2 text-end font-mono font-black text-xs text-slate-900">
-                                            {{ formatCurrency(totalDebit) }} ﷼
-                                        </td>
-                                        <td class="p-2 text-end font-mono font-black text-xs text-slate-900">
-                                            {{ formatCurrency(totalCredit) }} ﷼
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-
-                        <div v-if="Object.keys(form.errors).length" class="p-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs space-y-1">
-                            <p v-for="(msg, key) in form.errors" :key="key">{{ msg }}</p>
-                        </div>
-
-                        <!-- Balance Verification Status -->
-                        <div 
-                            :class="[
-                                isBalanced ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-800',
-                                'p-3 rounded-xl border flex items-center justify-between text-xs'
-                            ]"
-                        >
-                            <div class="flex items-center gap-2">
-                                <CheckCircleIcon v-if="isBalanced" class="w-5 h-5 text-emerald-600" />
-                                <ExclamationTriangleIcon v-else class="w-5 h-5 text-amber-600" />
-                                <span v-if="isBalanced" class="font-bold">القيد متوازن وجاهز للترحيل مباشرة.</span>
-                                <span v-else class="font-bold">القيد غير متوازن! الفرق بين المدين والدائن: {{ formatCurrency(Math.abs(totalDebit - totalCredit)) }} ﷼</span>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                            <button 
-                                type="button" 
-                                @click="isAddModalOpen = false"
-                                class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-medium"
-                            >
-                                إلغاء
-                            </button>
-                            <button
-                                type="button"
-                                @click="submitEntry('draft')"
-                                :disabled="!isBalanced || form.processing"
-                                class="px-4 py-2 border border-amber-300 text-amber-700 rounded-xl font-bold disabled:opacity-50"
-                            >
-                                حفظ كمسودة
-                            </button>
-                            <button 
-                                v-if="$can('accounting.journals.post')"
-                                type="submit" 
-                                :disabled="!isBalanced || form.processing"
-                                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-xs hover:shadow-indigo-500/20 disabled:opacity-50"
-                            >
-                                ترحيل القيد اليومي
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>

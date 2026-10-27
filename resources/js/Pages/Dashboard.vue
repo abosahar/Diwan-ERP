@@ -1,6 +1,6 @@
 <script setup>
 import { cur } from '@/utils/tax';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import KpiCard from '@/Components/KpiCard.vue';
@@ -21,6 +21,9 @@ import {
     ReceiptPercentIcon,
     ClockIcon
 } from '@heroicons/vue/24/outline';
+
+// Open while setup is under way; folded away once most steps are done.
+const checklistOpen = ref(true);
 
 const props = defineProps({
     kpis: Object,
@@ -95,22 +98,6 @@ const costOptions = computed(() => ({
     <AppLayout>
         <Head title="لوحة التحكم الرئيسية" />
 
-        <!-- First-run setup checklist (owner) -->
-        <div v-if="onboarding" class="mb-6 bg-white border border-indigo-100 rounded-2xl p-5">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="font-black text-slate-800 text-sm">إعداد منشأتك للبدء ({{ onboarding.done }} من {{ onboarding.total }})</h2>
-                <div class="w-40 h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-indigo-600" :style="{ width: (onboarding.done / onboarding.total * 100) + '%' }"></div></div>
-            </div>
-            <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
-                <li v-for="s in onboarding.steps" :key="s.key">
-                    <Link :href="s.url" class="flex items-center gap-2 p-2 rounded-xl border" :class="s.done ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 hover:border-indigo-300 text-slate-700'">
-                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-3xs font-black" :class="s.done ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'">{{ s.done ? '✓' : '' }}</span>
-                        <span :class="s.done ? 'line-through' : 'font-bold'">{{ s.label }}</span>
-                    </Link>
-                </li>
-            </ul>
-        </div>
-
         <!-- Welcome banner: summary of the day and the quick actions -->
         <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-navy-850 via-slate-900 to-brand-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden" data-welcome>
             <div class="relative z-10">
@@ -156,6 +143,25 @@ const costOptions = computed(() => ({
             <KpiCard title="المبالغ المستحقة (الآجل)" :value="kpis.receivables" :unit="$cur()" color="amber">
                 <template #icon><ClockIcon class="w-5 h-5" /></template>
             </KpiCard>
+        </div>
+
+        <!-- First-run setup checklist (owner): below the day's figures, collapsible -->
+        <div v-if="onboarding" class="mb-6 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs" data-onboarding>
+            <button type="button" class="w-full flex items-center justify-between gap-4" @click="checklistOpen = !checklistOpen">
+                <h2 class="font-black text-slate-800 text-sm">إعداد منشأتك للبدء ({{ onboarding.done }} من {{ onboarding.total }})</h2>
+                <span class="flex items-center gap-3">
+                    <span class="w-40 h-2 bg-slate-100 rounded-full overflow-hidden hidden sm:block"><span class="block h-full bg-brand-600" :style="{ width: (onboarding.done / onboarding.total * 100) + '%' }"></span></span>
+                    <span class="text-xs text-slate-400">{{ checklistOpen ? 'إخفاء' : 'عرض' }}</span>
+                </span>
+            </button>
+            <ul v-show="checklistOpen" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs mt-3">
+                <li v-for="s in onboarding.steps" :key="s.key">
+                    <Link :href="s.url" class="flex items-center gap-2 p-2 rounded-xl border" :class="s.done ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 hover:border-brand-300 text-slate-700'">
+                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-3xs font-black" :class="s.done ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'">{{ s.done ? '✓' : '' }}</span>
+                        <span :class="s.done ? 'line-through' : 'font-bold'">{{ s.label }}</span>
+                    </Link>
+                </li>
+            </ul>
         </div>
 
         <!-- 2. Charts: revenue vs expenses over the fiscal year, and the cost split -->

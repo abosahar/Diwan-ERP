@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
@@ -37,21 +38,11 @@ const formatCurrency = (val) => {
     <AppLayout>
         <Head :title="'فاتورة شراء ' + invoice.invoice_number" />
 
-        <div class="space-y-6 max-w-4xl mx-auto">
+        <div class="space-y-6 max-w-5xl mx-auto">
             <!-- Header Ribbon & Actions (Hidden on Print) -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
-                <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs font-medium text-slate-600 shadow-2xs">
-                    <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                        <HomeIcon class="w-4 h-4" />
-                    </Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <Link :href="route('purchases.invoices.index')" class="text-slate-500 hover:text-indigo-600 transition-colors">فواتير الشراء</Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <span class="text-indigo-600 font-bold font-mono">{{ invoice.invoice_number }}</span>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <button 
+            <PageHeader :title="`فاتورة شراء ${invoice.invoice_number}`" :crumbs="[{ label: 'فواتير الشراء' }, { label: invoice.invoice_number }]">
+<template #actions>
+<button 
                         @click="printInvoice"
                         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-indigo-500/20 transition-all flex items-center gap-1.5"
                     >
@@ -64,8 +55,8 @@ const formatCurrency = (val) => {
                     >
                         عودة
                     </Link>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Printable Purchase Invoice Sheet -->
             <div id="invoice-sheet" class="bg-white rounded-3xl border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-8 text-slate-800 print:border-none print:shadow-none print:p-0">

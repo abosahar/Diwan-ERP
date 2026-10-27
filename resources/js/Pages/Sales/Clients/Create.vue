@@ -1,6 +1,7 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import CustomerModal from './CustomerModal.vue';
 
 const props = defineProps({
@@ -23,9 +24,12 @@ const handleSaved = () => {
     <AppLayout>
         <Head title="إضافة عميل جديد" />
 
-        <div class="max-w-5xl mx-auto py-4">
+        <PageHeader title="إضافة عميل" :crumbs="[{ label: 'المبيعات' }, { label: 'العملاء', href: route('sales.clients.index') }, { label: 'جديد' }]" />
+
+        <div>
             <CustomerModal
                 :show="true"
+                page
                 :nextCode="nextCode"
                 @close="handleClose"
                 @saved="handleSaved"

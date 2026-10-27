@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -55,13 +56,7 @@ const format = (value) => (typeof value === 'object' && value !== null ? JSON.st
         <Head title="سجل التدقيق" />
 
         <div class="space-y-5">
-            <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                    <HomeIcon class="w-4 h-4" />
-                </Link>
-                <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                <span class="text-indigo-600 font-bold">{{ $t('nav.audit_log') }}</span>
-            </div>
+            <PageHeader :title="$t('nav.audit_log')" :crumbs="[{ label: $t('nav.audit_log') }]" />
 
             <!-- Filters -->
             <form @submit.prevent="apply" class="bg-white border border-slate-200 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs">

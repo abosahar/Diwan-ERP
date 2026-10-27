@@ -42,7 +42,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
             <span>تعديل هذه القيم يغيّر احتساب الرواتب والتأمينات ونهاية الخدمة للمسيرات الجديدة فقط. تأكد من مطابقتها لتعاميم التأمينات الاجتماعية ونظام العمل وعقود موظفيك.</span>
         </div>
 
-        <div class="grid lg:grid-cols-2 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
             <!-- GOSI (Saudi branches) -->
             <div v-if="$feature('gosi')" class="bg-white border border-slate-200 rounded-2xl p-4 lg:row-span-2">
                 <div class="flex justify-between mb-3"><h3 class="font-black text-slate-700">التأمينات الاجتماعية</h3><span v-if="groups['hr.gosi'].overridden" class="text-indigo-600 font-bold">معدّلة للمنشأة</span></div>
@@ -160,7 +160,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
             <div v-if="$feature('wps')" class="bg-white border border-slate-200 rounded-2xl p-4 lg:col-span-2">
                 <h3 class="font-black text-slate-700 mb-1">حماية الأجور (مُدد) وملف البنك</h3>
                 <p class="text-slate-400 mb-3">تُطبع على ملف مُدد وملف رواتب البنك. صيغة البنك مبنية على النماذج الشائعة؛ طابق الملف مع بنكك عند أول رفع.</p>
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <label class="block">رقم المنشأة في وزارة الموارد البشرية<input v-model="forms['hr.wps'].mol_establishment_id" :class="inp" dir="ltr" placeholder="1-1234567" /><span v-if="err('mol_establishment_id')" class="text-rose-600">{{ err('mol_establishment_id')[0] }}</span></label>
                     <label class="block">رقم المنشأة في التأمينات<input v-model="forms['hr.wps'].gosi_establishment_id" :class="inp" dir="ltr" /><span v-if="err('gosi_establishment_id')" class="text-rose-600">{{ err('gosi_establishment_id')[0] }}</span></label>
                     <label class="block">آيبان حساب الرواتب<input v-model="forms['hr.wps'].company_iban" :class="inp" dir="ltr" placeholder="SA..." /><span v-if="err('company_iban')" class="text-rose-600">{{ err('company_iban')[0] }}</span></label>

@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { cur } from '@/utils/tax';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
@@ -412,6 +413,8 @@ const resolveTag = (tag) => {
 <template>
     <AppLayout>
         <Head :title="`فاتورة رقم ${invoice.invoice_number}`" />
+
+        <PageHeader :title="`فاتورة رقم ${invoice.invoice_number}`" :crumbs="[{ label: 'المبيعات' }, { label: 'الفواتير', href: route('sales.invoices.index') }, { label: invoice.invoice_number }]" />
 
         <div class="space-y-5 max-w-5xl mx-auto print:space-y-0 print:max-w-none print:w-full print:m-0 print:p-0">
             

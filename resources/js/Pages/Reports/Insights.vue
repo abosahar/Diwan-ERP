@@ -93,7 +93,7 @@ const varianceClass = (v) => (v < 0 ? 'text-rose-700' : 'text-emerald-700');
                 </div>
             </div>
 
-            <div class="grid lg:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white border border-slate-200 rounded-2xl p-4">
                     <h3 class="font-black text-slate-700 mb-1">الرصيد النقدي المتوقع أسبوعياً</h3>
                     <apexchart type="line" height="260" :options="balanceChart.options" :series="balanceChart.series" />
@@ -122,7 +122,7 @@ const varianceClass = (v) => (v < 0 ? 'text-rose-700' : 'text-emerald-700');
         </section>
 
         <!-- Aging -->
-        <section v-show="tab === 'aging'" class="grid lg:grid-cols-2 gap-4 text-xs">
+        <section v-show="tab === 'aging'" class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
             <div v-for="(label, kind) in { receivables: 'أعمار ذمم العملاء', payables: 'أعمار مستحقات الموردين' }" :key="kind" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <h3 class="px-4 py-3 font-black border-b border-slate-100">{{ label }}</h3>
                 <table class="w-full">
@@ -193,7 +193,7 @@ const varianceClass = (v) => (v < 0 ? 'text-rose-700' : 'text-emerald-700');
                 لا توجد موازنة معتمدة للسنة المالية الحالية. أنشئها واعتمدها من المحاسبة ← الموازنات.
             </div>
             <template v-else>
-                <div class="grid sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div v-for="(label, k) in { revenue: 'الإيرادات حتى تاريخه', expense: 'المصروفات حتى تاريخه' }" :key="k" class="bg-white border border-slate-200 rounded-2xl p-4">
                         <div class="text-slate-500">{{ label }} — {{ budget.budget.name }}</div>
                         <div class="text-xl font-black mt-1 font-mono">{{ money(budget.totals[k].actual) }} <span class="text-sm text-slate-400">/ {{ money(budget.totals[k].planned) }}</span></div>

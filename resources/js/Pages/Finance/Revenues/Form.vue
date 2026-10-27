@@ -1,0 +1,181 @@
+<script setup>
+import { taxRate } from '@/utils/tax';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+
+const props = defineProps({ revenueAccounts: Array, bankAccounts: Array });
+
+const form = useForm({
+    title: '',
+    category: 'إيرادات عامة',
+    account_id: props.revenueAccounts?.[0]?.id || '',
+    bank_account_id: props.bankAccounts?.[0]?.id || '',
+    amount: '',
+    tax_amount: '',
+    taxable: false,
+    revenue_date: new Date().toISOString().split('T')[0],
+    payment_method: 'bank_transfer',
+    reference_number: '',
+    customer_name: '',
+    notes: '',
+});
+
+const onAmountChange = () => {
+    if (form.amount && form.taxable) {
+        form.tax_amount = (parseFloat(form.amount) * taxRate() / 100).toFixed(2);
+    } else {
+        form.tax_amount = '0.00';
+    }
+};
+
+const formatCurrency = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const submitRevenue = () => form.post(route('finance.revenues.store'));
+</script>
+
+<template>
+    <AppLayout>
+        <Head title="سند إيراد جديد" />
+        <PageHeader title="سند إيراد جديد" :crumbs="[{ label: 'المالية' }, { label: 'الإيرادات', href: route('finance.revenues.index') }, { label: 'جديد' }]" />
+
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6">
+            <form @submit.prevent="submitRevenue" class="form-grid text-xs">
+                            <div>
+                                <label class="block font-medium text-slate-700 mb-1">بيان / مصدر الإيراد <span class="text-rose-500">*</span></label>
+                                <input 
+                                    v-model="form.title" 
+                                    type="text" 
+                                    required 
+                                    placeholder="مثال: تقديم استشارات وتطوير برمجيات"
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500" 
+                                />
+                            </div>
+            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">التصنيف <span class="text-rose-500">*</span></label>
+                                    <input 
+                                        v-model="form.category" 
+                                        type="text" 
+                                        required 
+                                        placeholder="استشارات، خدمات، عوائد..."
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500" 
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">تاريخ القبض <span class="text-rose-500">*</span></label>
+                                    <input 
+                                        v-model="form.revenue_date" 
+                                        type="date" 
+                                        required 
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500" 
+                                    />
+                                </div>
+                            </div>
+            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">المبلغ (غير شامل الضريبة) <span class="text-rose-500">*</span></label>
+                                    <input 
+                                        v-model="form.amount" 
+                                        @input="onAmountChange"
+                                        type="number" 
+                                        step="0.01" 
+                                        required 
+                                        placeholder="0.00"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-emerald-500 focus:border-emerald-500 text-end" 
+                                    />
+                                </div>
+                                <div>
+                                    <label class="flex items-center gap-2 font-medium text-slate-700 mb-1"><input v-model="form.taxable" type="checkbox" @change="onAmountChange" class="rounded border-slate-300" /> خاضع لـ{{ $taxLabel() }}</label>
+                                    <input 
+                                        v-model="form.tax_amount" 
+                                        :disabled="!form.taxable"
+                                        type="number" 
+                                        step="0.01" 
+                                        placeholder="0.00"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-emerald-500 focus:border-emerald-500 text-end" 
+                                    />
+                                </div>
+                            </div>
+            
+                            <div class="p-3 bg-emerald-50/50 rounded-xl flex items-center justify-between text-xs border border-emerald-100">
+                                <span class="font-bold text-emerald-900">المجموع الإجمالي شامل الضريبة:</span>
+                                <span class="font-mono font-black text-sm text-emerald-600">
+                                    {{ formatCurrency((parseFloat(form.amount || 0) + parseFloat(form.tax_amount || 0))) }} ﷼
+                                </span>
+                            </div>
+            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">إيداع في (الخزينة أو البنك)</label>
+                                    <select 
+                                        v-model="form.bank_account_id" 
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
+                                    >
+                                        <option v-for="bank in bankAccounts" :key="bank.id" :value="bank.id">
+                                            {{ bank.name }} (الرصيد: {{ formatCurrency(bank.current_balance) }} ﷼)
+                                        </option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">حساب الإيراد في الدليل</label>
+                                    <select 
+                                        v-model="form.account_id" 
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
+                                    >
+                                        <option v-for="acc in revenueAccounts" :key="acc.id" :value="acc.id">
+                                            {{ acc.code }} - {{ acc.name_ar }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">العميل / الجهة الدافعة</label>
+                                    <input 
+                                        v-model="form.customer_name" 
+                                        type="text" 
+                                        placeholder="اسم الشركة أو العميل"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500" 
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-slate-700 mb-1">طريقة التحصيل</label>
+                                    <select 
+                                        v-model="form.payment_method" 
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
+                                    >
+                                        <option value="bank_transfer">تحويل بنكي</option>
+                                        <option value="cash">نقداً</option>
+                                        <option value="card">بطاقة مدى / شبكة</option>
+                                    </select>
+                                </div>
+                            </div>
+            
+                            <div>
+                                <label class="block font-medium text-slate-700 mb-1">ملاحظات أو تفاصيل</label>
+                                <textarea 
+                                    v-model="form.notes" 
+                                    rows="2" 
+                                    placeholder="أي تفاصيل إضافية عن الإيراد..."
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
+                                ></textarea>
+                            </div>
+            
+                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                                <Link :href="route('finance.revenues.index')" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-medium">إلغاء</Link>
+                                <button 
+                                    type="submit" 
+                                    :disabled="form.processing"
+                                    class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-xs hover:shadow-emerald-500/20 disabled:opacity-50"
+                                >
+                                    حفظ الإيراد
+                                </button>
+                            </div>
+                        </form>
+        </div>
+    </AppLayout>
+</template>

@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import ImportButton from '@/Components/UI/ImportButton.vue';
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -27,65 +28,9 @@ const props = defineProps({
 });
 
 const isFilterOpen = ref(false);
-const isAddModalOpen = ref(false);
-const editingSupplier = ref(null);
 const search = ref(props.filters?.search || '');
 const status = ref(props.filters?.status || '');
 const activeMenu = ref(null);
-
-const form = useForm({
-    name: '',
-    company_name: '',
-    phone: '',
-    email: '',
-    tax_number: '',
-    commercial_register: '',
-    address: '',
-    bank_name: '',
-    iban: '',
-    opening_balance: 0,
-    status: 'active',
-});
-
-const openAddModal = () => {
-    editingSupplier.value = null;
-    form.reset();
-    isAddModalOpen.value = true;
-};
-
-const openEditModal = (supplier) => {
-    editingSupplier.value = supplier;
-    form.name = supplier.name;
-    form.company_name = supplier.company_name;
-    form.phone = supplier.phone;
-    form.email = supplier.email;
-    form.tax_number = supplier.tax_number;
-    form.commercial_register = supplier.commercial_register;
-    form.address = supplier.address;
-    form.bank_name = supplier.bank_name;
-    form.iban = supplier.iban;
-    form.opening_balance = supplier.opening_balance;
-    form.status = supplier.status;
-    isAddModalOpen.value = true;
-};
-
-const submitSupplier = () => {
-    if (editingSupplier.value) {
-        form.put(route('purchases.suppliers.update', editingSupplier.value.id), {
-            onSuccess: () => {
-                isAddModalOpen.value = false;
-                form.reset();
-            }
-        });
-    } else {
-        form.post(route('purchases.suppliers.store'), {
-            onSuccess: () => {
-                isAddModalOpen.value = false;
-                form.reset();
-            }
-        });
-    }
-};
 
 const deleteSupplier = (supplier) => {
     if (confirm(`هل أنت متأكد من حذف المورد "${supplier.name}"؟`)) {
@@ -120,19 +65,9 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5" @click="activeMenu = null">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs Ribbon -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-slate-500">المشتريات</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">الموردين</span>
-                    </div>
-                    <ImportButton v-if="$can('purchases.suppliers.create')" type="suppliers" title="استيراد الموردين من Excel" hint="عمود opening_balance اختياري: الرصيد الدائن الافتتاحي (للموردين الجدد فقط)." />
+            <PageHeader title="الموردين" :crumbs="[{ label: 'المشتريات' }, { label: 'الموردين' }]">
+<template #actions>
+<ImportButton v-if="$can('purchases.suppliers.create')" type="suppliers" title="استيراد الموردين من Excel" hint="عمود opening_balance اختياري: الرصيد الدائن الافتتاحي (للموردين الجدد فقط)." />
                     <button 
                         @click="handleSearch"
                         title="تحديث البيانات"
@@ -140,11 +75,7 @@ const formatCurrency = (val) => {
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <button 
+<button 
                         @click.stop="isFilterOpen = !isFilterOpen"
                         :class="[
                             'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-150 shadow-xs border',
@@ -156,15 +87,12 @@ const formatCurrency = (val) => {
                         <MagnifyingGlassIcon class="w-4 h-4 text-indigo-600" />
                         <span>البحث والتصفية</span>
                     </button>
-                    <button 
-                        @click="openAddModal"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150"
-                    >
+                    <Link v-if="$can('purchases.suppliers.create')" :href="route('purchases.suppliers.create')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150">
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة مورد</span>
-                    </button>
-                </div>
-            </div>
+                    </Link>
+</template>
+</PageHeader>
 
             <!-- Collapsible Filter Panel -->
             <transition
@@ -295,13 +223,9 @@ const formatCurrency = (val) => {
                                 </td>
                                 <td class="py-4 px-6 text-center">
                                     <div class="flex items-center justify-center gap-1.5">
-                                        <button 
-                                            @click="openEditModal(supplier)"
-                                            class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-                                            title="تعديل"
-                                        >
+                                        <Link v-if="$can('purchases.suppliers.edit')" :href="route('purchases.suppliers.edit', supplier.id)" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="تعديل">
                                             <PencilSquareIcon class="w-4 h-4" />
-                                        </button>
+                                        </Link>
                                         <button 
                                             @click="deleteSupplier(supplier)"
                                             class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
@@ -372,130 +296,6 @@ const formatCurrency = (val) => {
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Add / Edit Supplier Modal -->
-            <div 
-                v-if="isAddModalOpen" 
-                class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
-            >
-                <div class="bg-white rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-xl border border-slate-100">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <TruckIcon class="w-5 h-5 text-indigo-600" />
-                            <span>{{ editingSupplier ? 'تعديل بيانات المورد' : 'إضافة مورد جديد' }}</span>
-                        </h2>
-                        <button @click="isAddModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                            <XMarkIcon class="w-5 h-5" />
-                        </button>
-                    </div>
-
-                    <form @submit.prevent="submitSupplier" class="space-y-4 text-xs">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">اسم المورد <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.name" 
-                                    type="text" 
-                                    required 
-                                    placeholder="اسم المورد أو الشركة" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">الاسم التجاري / الشركة</label>
-                                <input 
-                                    v-model="form.company_name" 
-                                    type="text" 
-                                    placeholder="الاسم التجاري" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">الرقم الضريبي (15 رقم)</label>
-                                <input 
-                                    v-model="form.tax_number" 
-                                    type="text" 
-                                    maxlength="15" 
-                                    placeholder="300000000000003" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-mono focus:border-indigo-500"
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">رقم السجل التجاري</label>
-                                <input 
-                                    v-model="form.commercial_register" 
-                                    type="text" 
-                                    placeholder="1010XXXXXX" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-mono focus:border-indigo-500"
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">رقم الهاتف</label>
-                                <input 
-                                    v-model="form.phone" 
-                                    type="text" 
-                                    placeholder="05XXXXXXXX" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-mono focus:border-indigo-500"
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">البريد الإلكتروني</label>
-                                <input 
-                                    v-model="form.email" 
-                                    type="email" 
-                                    placeholder="vendor@company.com" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">اسم البنك</label>
-                                <input 
-                                    v-model="form.bank_name" 
-                                    type="text" 
-                                    placeholder="مصرف الراجحي / البنك الأهلي" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
-                            </div>
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">رقم الآيبان (IBAN)</label>
-                                <input 
-                                    v-model="form.iban" 
-                                    type="text" 
-                                    placeholder="SA0000000000000000000000" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-mono focus:border-indigo-500"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">العنوان الوطني / المقر</label>
-                            <input 
-                                v-model="form.address" 
-                                type="text" 
-                                placeholder="المدينة، الحي، اسم الشارع..." 
-                                class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                            />
-                        </div>
-
-                        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-                            <button 
-                                type="button" 
-                                @click="isAddModalOpen = false" 
-                                class="px-4 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-600 font-semibold"
-                            >
-                                إلغاء
-                            </button>
-                            <button 
-                                type="submit" 
-                                :disabled="form.processing" 
-                                class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-xs hover:shadow-indigo-500/20 disabled:opacity-50"
-                            >
-                                {{ editingSupplier ? 'تحديث البيانات' : 'حفظ المورد' }}
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>

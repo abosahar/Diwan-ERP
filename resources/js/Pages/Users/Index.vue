@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { computed, ref, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -42,68 +43,7 @@ const savePermissions = () => {
     });
 };
 
-const isModalOpen = ref(false);
-const editingUser = ref(null);
-
-const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
-    branch_id: '',
-    branch_ids: [],
-    role: 'sales',
-    status: 'active',
-});
-
-const openAddModal = () => {
-    editingUser.value = null;
-    form.reset();
-    form.branch_id = props.branches?.[0]?.id || '';
-    form.branch_ids = form.branch_id ? [form.branch_id] : [];
-    form.role = props.roles?.[0]?.name || 'sales';
-    form.status = 'active';
-    isModalOpen.value = true;
-};
-
-const openEditModal = (u) => {
-    editingUser.value = u;
-    form.name = u.name;
-    form.email = u.email;
-    form.password = '';
-    form.phone = u.phone || '';
-    form.branch_id = u.branch_id || '';
-    form.branch_ids = u.branches?.length ? u.branches.map((b) => b.id) : (u.branch_id ? [u.branch_id] : []);
-    form.role = u.roles?.[0]?.name || 'sales';
-    form.status = u.status || 'active';
-    isModalOpen.value = true;
-};
-
-// The owner role works in every branch; other users work in the ticked ones.
-const isOwnerRole = computed(() => !!props.roles?.find((r) => r.name === form.role)?.is_owner);
-const allowedBranches = computed(() => (props.branches || []).filter((b) => form.branch_ids.includes(b.id)));
-watch(() => [...form.branch_ids], (ids) => {
-    if (!ids.includes(form.branch_id)) form.branch_id = ids[0] || '';
-});
 const userIsOwner = (u) => !!props.roles?.find((r) => r.name === u.roles?.[0]?.name)?.is_owner;
-
-const submitUser = () => {
-    if (editingUser.value) {
-        form.put(route('users.update', editingUser.value.id), {
-            onSuccess: () => {
-                isModalOpen.value = false;
-                form.reset();
-            }
-        });
-    } else {
-        form.post(route('users.store'), {
-            onSuccess: () => {
-                isModalOpen.value = false;
-                form.reset();
-            }
-        });
-    }
-};
 
 const deleteUser = (id, name) => {
     if (confirm(`هل أنت متأكد من حذف المستخدم "${name}"؟`)) {
@@ -134,43 +74,28 @@ const getRoleBadge = (roleName) => {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">المستخدمين</span>
-                    </div>
-                    <Link 
+            <PageHeader title="المستخدمين" :crumbs="[{ label: 'المستخدمين' }]">
+<template #actions>
+<Link 
                         :href="route('users.index')"
                         title="تحديث البيانات"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xs transition-all"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </Link>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <Link
+<Link
                         :href="route('roles.index')"
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm shadow-xs transition-all"
                     >
                         <ShieldCheckIcon class="w-4 h-4 text-indigo-600" />
                         <span>الأدوار والصلاحيات</span>
                     </Link>
-                    <button 
-                        @click="openAddModal"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150"
-                    >
+                    <Link v-if="$can('admin.users.create')" :href="route('users.create')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150">
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة مستخدم</span>
-                    </button>
-                </div>
-            </div>
+                    </Link>
+</template>
+</PageHeader>
 
             <!-- Stats Overview -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -251,14 +176,9 @@ const getRoleBadge = (roleName) => {
                                         >
                                             <KeyIcon class="w-4 h-4" />
                                         </button>
-                                        <button 
-                                            v-if="$can('admin.users.edit')"
-                                            @click="openEditModal(u)"
-                                            class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
-                                            title="تعديل"
-                                        >
+                                        <Link v-if="$can('admin.users.edit')" :href="route('users.edit', u.id)" class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="تعديل">
                                             <PencilSquareIcon class="w-4 h-4" />
-                                        </button>
+                                        </Link>
                                         <button 
                                             v-if="$can('admin.users.delete')"
                                             @click="deleteUser(u.id, u.name)"
@@ -331,141 +251,6 @@ const getRoleBadge = (roleName) => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Add/Edit User Modal -->
-        <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-            <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <h3 class="font-black text-slate-900 text-sm">
-                        {{ editingUser ? 'تعديل بيانات المستخدم' : 'إضافة مستخدم جديد' }}
-                    </h3>
-                    <button @click="isModalOpen = false" class="text-slate-400 hover:text-slate-600">
-                        <XMarkIcon class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <form @submit.prevent="submitUser" class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">الاسم الكامل *</label>
-                        <input 
-                            v-model="form.name" 
-                            type="text" 
-                            required
-                            placeholder="مثال: أحمد محمد السعيد"
-                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                        />
-                        <p v-if="form.errors.name" class="text-[11px] text-rose-600 mt-1">{{ form.errors.name }}</p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني *</label>
-                            <input 
-                                v-model="form.email" 
-                                type="email" 
-                                required
-                                placeholder="name@company.com"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono"
-                                dir="ltr"
-                            />
-                            <p v-if="form.errors.email" class="text-[11px] text-rose-600 mt-1">{{ form.errors.email }}</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف</label>
-                            <input 
-                                v-model="form.phone" 
-                                type="text" 
-                                placeholder="0500000000"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono"
-                                dir="ltr"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">
-                            {{ editingUser ? 'كلمة المرور (اتركها فارغة إذا لم ترغب بالتغيير)' : 'كلمة المرور *' }}
-                        </label>
-                        <input 
-                            v-model="form.password" 
-                            type="password" 
-                            :required="!editingUser"
-                            placeholder="********"
-                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono"
-                            dir="ltr"
-                        />
-                        <p v-if="form.errors.password" class="text-[11px] text-rose-600 mt-1">{{ form.errors.password }}</p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">الدور الوظيفي *</label>
-                            <select 
-                                v-model="form.role"
-                                required
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-bold"
-                            >
-                                <option v-for="r in roles" :key="r.id" :value="r.name">{{ r.label }}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Branches the user works in -->
-                    <div class="rounded-xl border border-slate-200 p-3 space-y-3">
-                        <p v-if="isOwnerRole" class="text-xs text-slate-600">مدير المنشأة يعمل على <b>كل الفروع</b> ويرى مستنداتها جميعاً.</p>
-                        <template v-else>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">الفروع المسموح بها *</label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <label v-for="b in branches" :key="b.id" class="flex items-center gap-2 text-xs rounded-lg border border-slate-100 px-2 py-1.5 cursor-pointer hover:bg-slate-50">
-                                        <input type="checkbox" :value="b.id" v-model="form.branch_ids" class="rounded border-slate-300 text-indigo-600" data-branch-option />
-                                        <span>{{ b.name_ar }}</span>
-                                    </label>
-                                </div>
-                                <p class="text-[11px] text-slate-500 mt-1">ينشئ المستندات ويرى مستندات وتقارير هذه الفروع فقط. لرؤية كل الفروع امنحه صلاحية «الوصول لكل الفروع».</p>
-                                <p v-if="form.errors.branch_ids" class="text-[11px] text-rose-600 mt-1">{{ form.errors.branch_ids }}</p>
-                            </div>
-                            <div v-if="allowedBranches.length > 1">
-                                <label class="block text-xs font-bold text-slate-700 mb-1">الفرع الافتراضي للمستندات الجديدة</label>
-                                <select v-model="form.branch_id" class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600">
-                                    <option v-for="b in allowedBranches" :key="b.id" :value="b.id">{{ b.name_ar }}</option>
-                                </select>
-                            </div>
-                            <p v-if="form.errors.branch_id" class="text-[11px] text-rose-600">{{ form.errors.branch_id }}</p>
-                        </template>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">حالة الحساب *</label>
-                        <select 
-                            v-model="form.status"
-                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-bold"
-                        >
-                            <option value="active">نشط (يمكنه تسجيل الدخول)</option>
-                            <option value="inactive">معطل (موقوف مؤقتاً)</option>
-                        </select>
-                    </div>
-
-                    <div class="mt-6 flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-                        <button 
-                            type="button" 
-                            @click="isModalOpen = false"
-                            class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition"
-                        >
-                            إلغاء
-                        </button>
-                        <button 
-                            type="submit" 
-                            :disabled="form.processing"
-                            class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition disabled:opacity-50"
-                        >
-                            {{ editingUser ? 'حفظ التعديلات' : 'إنشاء المستخدم' }}
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
         <!-- Extra permissions modal -->

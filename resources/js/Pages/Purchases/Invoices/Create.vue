@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
 import CurrencyPicker from '@/Components/Documents/CurrencyPicker.vue';
@@ -472,19 +473,9 @@ const importLines = (lines, replace) => {
 
         <div class="space-y-6 w-full">
             <!-- Header Ribbon -->
-            <div class="flex items-center justify-between">
-                <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs font-medium text-slate-600 shadow-2xs">
-                    <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                        <HomeIcon class="w-4 h-4" />
-                    </Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <Link :href="route('purchases.invoices.index')" class="text-slate-500 hover:text-indigo-600 transition-colors">فواتير الشراء</Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <span class="text-indigo-600 font-bold">إنشاء فاتورة شراء</span>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <Link 
+            <PageHeader title="إنشاء فاتورة شراء" :crumbs="[{ label: 'فواتير الشراء' }, { label: 'إنشاء فاتورة شراء' }]">
+<template #actions>
+<Link 
                         :href="route('purchases.invoices.index')"
                         class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 bg-white hover:bg-slate-50"
                     >
@@ -498,8 +489,8 @@ const importLines = (lines, replace) => {
                         <CheckIcon class="w-4 h-4 stroke-2" />
                         <span>حفظ الفاتورة وتحديث المخزون</span>
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Main Form Layout -->
             <form @submit.prevent="submit" class="grid grid-cols-1 lg:grid-cols-3 gap-6">

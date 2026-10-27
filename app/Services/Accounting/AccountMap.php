@@ -25,6 +25,7 @@ class AccountMap
         'supplier_advances' => ['دفعات مقدمة للموردين', 'asset'],
         'inventory' => ['المخزون', 'asset'],
         'goods_in_transit' => ['بضاعة في الطريق', 'asset'],
+        'wip' => ['إنتاج تحت التشغيل', 'asset'],
         'vat_input' => ['ضريبة المدخلات', 'asset'],
         'prepaid_expenses' => ['مصروفات مدفوعة مقدماً', 'asset'],
         'fixed_assets' => ['الأصول الثابتة (افتراضي)', 'asset'],
@@ -77,6 +78,10 @@ class AccountMap
         'fx_difference' => ['أرباح وخسائر فروق العملة', 'expense'],
         'zakat_expense' => ['مصروف الزكاة', 'expense'],
         'equipment_recovery' => ['تكاليف معدات محمّلة على المشاريع', 'expense'],
+        'applied_labour' => ['أجور تصنيع محمّلة', 'expense'],
+        'applied_overhead' => ['مصروفات تصنيع غير مباشرة محمّلة', 'expense'],
+        'production_variance' => ['فروقات التصنيع', 'expense'],
+        'scrap_loss' => ['هالك التصنيع غير الطبيعي', 'expense'],
     ];
 
     protected array $cache = [];

@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
@@ -53,25 +54,16 @@ const formatCurrency = (val) => {
     <AppLayout title="سجل فواتير نقاط البيع">
         <div class="space-y-6">
             <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
-                <div>
-                    <h1 class="text-xl font-black text-slate-800 flex items-center gap-2">
-                        <ShoppingBagIcon class="w-6 h-6 text-indigo-600" />
-                        <span>سجل عمليات نقاط البيع (POS Orders)</span>
-                    </h1>
-                    <p class="text-xs text-slate-500 mt-1">
-                        استعراض وإعادة طباعة فواتير مبيعات نقاط البيع وإيصالات الزكاة والضريبة المبسطة
-                    </p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <Link
+            <PageHeader title="سجل عمليات نقاط البيع" subtitle="استعراض وإعادة طباعة فواتير مبيعات نقاط البيع" :crumbs="[{ label: 'نقاط البيع' }, { label: 'سجل المبيعات' }]">
+<template #actions>
+<Link
                         :href="route('pos.index')"
                         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5"
                     >
                         <span>الذهاب إلى نقطة البيع</span>
                     </Link>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Orders Table Card -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">

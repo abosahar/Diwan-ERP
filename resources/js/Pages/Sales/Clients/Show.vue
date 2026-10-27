@@ -1,49 +1,22 @@
 <script setup>
-import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import CustomerViewModal from './CustomerViewModal.vue';
-import CustomerModal from './CustomerModal.vue';
 
 const props = defineProps({
     client: Object,
 });
 
-const isEditModalOpen = ref(false);
-
-const handleClose = () => {
-    router.visit(route('sales.clients.index'));
-};
-
-const handleEdit = () => {
-    isEditModalOpen.value = true;
-};
-
-const handleSaved = () => {
-    isEditModalOpen.value = false;
-    router.reload({ only: ['client'] });
-};
+const handleClose = () => router.visit(route('sales.clients.index'));
+const handleEdit = () => router.visit(route('sales.clients.edit', props.client.id));
 </script>
 
 <template>
     <AppLayout>
         <Head :title="`عرض عميل - ${client.name}`" />
+        <PageHeader :title="client.name" :crumbs="[{ label: 'المبيعات' }, { label: 'العملاء', href: route('sales.clients.index') }, { label: 'عرض' }]" />
 
-        <div class="max-w-5xl mx-auto py-4">
-            <CustomerViewModal
-                :show="true"
-                :customer="client"
-                @close="handleClose"
-                @edit="handleEdit"
-            />
-
-            <!-- Edit Modal when triggered -->
-            <CustomerModal
-                :show="isEditModalOpen"
-                :customer="client"
-                @close="isEditModalOpen = false"
-                @saved="handleSaved"
-            />
-        </div>
+        <CustomerViewModal :show="true" page :customer="client" @close="handleClose" @edit="handleEdit" />
     </AppLayout>
 </template>

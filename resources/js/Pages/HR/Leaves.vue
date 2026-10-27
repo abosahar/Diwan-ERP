@@ -25,7 +25,7 @@ const pay = { full: 'مدفوعة', sick_tiers: 'حسب شرائح المرضي�
     <AppLayout>
         <Head title="الإجازات" />
         <PageHeader title="الإجازات" subtitle="وفق نظام العمل: سنوية 21/30 يوماً، مرضية بشرائح، وضع، زواج، وفاة، حج" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'الإجازات' }]" />
-        <div class="grid lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <div class="flex gap-2 p-3 border-b border-slate-100 text-xs">
                     <button v-for="s in ['pending', 'approved', 'rejected', 'all']" :key="s" @click="filter(s)" :class="status === s ? 'bg-slate-800 text-white' : 'bg-slate-50'" class="px-3 py-1 rounded-lg font-bold">{{ { pending: 'قيد الانتظار', approved: 'معتمدة', rejected: 'مرفوضة', all: 'الكل' }[s] }}</button>

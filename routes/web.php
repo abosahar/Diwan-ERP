@@ -46,8 +46,10 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LineImportController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LookupController;
+use App\Http\Controllers\Manufacturing as Mfg;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\PosRegisterController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Projects as PR;
@@ -291,6 +293,12 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
             ->middleware('throttle:pos-orders');
         Route::get('/history', [PosController::class, 'history'])->name('history');
         Route::get('/products/search', [PosController::class, 'productSearch'])->name('products.search');
+        Route::get('/registers', [PosRegisterController::class, 'index'])->name('registers.index');
+        Route::get('/registers/create', [PosRegisterController::class, 'create'])->name('registers.create');
+        Route::post('/registers', [PosRegisterController::class, 'store'])->name('registers.store');
+        Route::get('/registers/{register}/edit', [PosRegisterController::class, 'edit'])->name('registers.edit');
+        Route::put('/registers/{register}', [PosRegisterController::class, 'update'])->name('registers.update');
+        Route::delete('/registers/{register}', [PosRegisterController::class, 'destroy'])->name('registers.destroy');
     });
 
     // 6. Inventory Module
@@ -330,9 +338,13 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
         Route::get('/operations', [InventoryOperationController::class, 'index'])->name('operations.index');
+        Route::get('/operations/transfer', [InventoryOperationController::class, 'transferForm'])->name('operations.transfer.create');
+        Route::get('/operations/adjust', [InventoryOperationController::class, 'adjustForm'])->name('operations.adjust.create');
         Route::post('/operations/transfer', [InventoryOperationController::class, 'transfer'])->name('operations.transfer');
         Route::post('/operations/adjust', [InventoryOperationController::class, 'adjust'])->name('operations.adjust');
         Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
+        Route::get('/warehouses/create', [WarehouseController::class, 'create'])->name('warehouses.create');
+        Route::get('/warehouses/{warehouse}/edit', [WarehouseController::class, 'edit'])->name('warehouses.edit');
         Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');
         Route::put('/warehouses/{warehouse}', [WarehouseController::class, 'update'])->name('warehouses.update');
         Route::delete('/warehouses/{warehouse}', [WarehouseController::class, 'destroy'])->name('warehouses.destroy');
@@ -348,6 +360,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::prefix('purchases')->name('purchases.')->group(function () {
         // Suppliers
         Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
+        Route::get('/suppliers/create', [SupplierController::class, 'create'])->name('suppliers.create');
+        Route::get('/suppliers/{supplier}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
         Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
         Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
         Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
@@ -396,6 +410,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
 
         // Supplier Payments
         Route::get('/payments', [SupplierPaymentController::class, 'index'])->name('payments.index');
+        Route::get('/payments/create', [SupplierPaymentController::class, 'create'])->name('payments.create');
         Route::post('/payments', [SupplierPaymentController::class, 'store'])->name('payments.store');
         Route::post('/payments/{payment}/cancel', [DocumentCancellationController::class, 'supplierPayment'])->name('payments.cancel');
     });
@@ -467,20 +482,24 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::prefix('finance')->name('finance.')->group(function () {
         // Expenses
         Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+        Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
         Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 
         // Revenues
         Route::get('/revenues', [RevenueController::class, 'index'])->name('revenues.index');
+        Route::get('/revenues/create', [RevenueController::class, 'create'])->name('revenues.create');
         Route::post('/revenues', [RevenueController::class, 'store'])->name('revenues.store');
         Route::delete('/revenues/{revenue}', [RevenueController::class, 'destroy'])->name('revenues.destroy');
 
         // Banks & Treasuries
         Route::get('/banks', [BankAccountController::class, 'index'])->name('banks.index');
+        Route::get('/banks/create', [BankAccountController::class, 'create'])->name('banks.create');
         Route::post('/banks', [BankAccountController::class, 'store'])->name('banks.store');
         Route::delete('/banks/{bank}', [BankAccountController::class, 'destroy'])->name('banks.destroy');
 
         Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
+        Route::get('/transfers/create', [TransferController::class, 'create'])->name('transfers.create');
         Route::post('/transfers', [TransferController::class, 'store'])->name('transfers.store');
         Route::post('/transfers/{entry}/cancel', [DocumentCancellationController::class, 'transfer'])->name('transfers.cancel');
     });
@@ -489,6 +508,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::prefix('accounting')->name('accounting.')->group(function () {
         // Chart of Accounts
         Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
+        Route::get('/accounts/create', [AccountController::class, 'create'])->name('accounts.create');
+        Route::get('/accounts/{account}/edit', [AccountController::class, 'edit'])->name('accounts.edit');
         Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
         Route::put('/accounts/{account}', [AccountController::class, 'update'])->name('accounts.update');
         Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('accounts.destroy');
@@ -496,6 +517,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         // Journal Entries
         Route::get('/journals', [JournalEntryController::class, 'index'])->name('journals.index');
         Route::post('/journals', [JournalEntryController::class, 'store'])->name('journals.store');
+        Route::get('/journals/create', [JournalEntryController::class, 'create'])->name('journals.create');
         Route::get('/journals/{entry}', [JournalEntryController::class, 'show'])->name('journals.show');
         Route::post('/journals/{entry}/post', [JournalEntryController::class, 'post'])->name('journals.post');
         Route::post('/journals/{entry}/reverse', [JournalEntryController::class, 'reverse'])->name('journals.reverse');
@@ -580,6 +602,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
 
     // 11. Users & Roles
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::put('/users/{user}/permissions', [UserController::class, 'updatePermissions'])->name('users.permissions');
@@ -673,6 +697,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::delete('/branches/{branch}', [BranchController::class, 'destroy'])->name('branches.destroy');
 
     Route::get('/templates', [TemplateController::class, 'index'])->name('templates.index');
+    Route::get('/templates/create', [TemplateController::class, 'create'])->name('templates.create');
     Route::post('/templates', [TemplateController::class, 'store'])->name('templates.store');
     Route::get('/templates/{template}/designer', [TemplateController::class, 'designer'])->name('templates.designer');
     Route::put('/templates/{template}', [TemplateController::class, 'update'])->name('templates.update');
@@ -731,6 +756,93 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/leads/{lead}/move', [Crm\LeadController::class, 'move'])->name('leads.move');
         Route::post('/leads/{lead}/activities', [Crm\LeadController::class, 'storeActivity'])->name('leads.activities.store');
         Route::post('/leads/{lead}/convert', [Crm\LeadController::class, 'convert'])->name('leads.convert');
+    });
+
+    // Manufacturing: work centres, BOMs, routings, production orders, process costing, MRP, quality, subcontracting
+    Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
+        Route::get('/', [Mfg\DashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/work-centers', [Mfg\WorkCenterController::class, 'index'])->name('work-centers.index');
+        Route::get('/work-centers/create', [Mfg\WorkCenterController::class, 'create'])->name('work-centers.create');
+        Route::post('/work-centers', [Mfg\WorkCenterController::class, 'store'])->name('work-centers.store');
+        Route::get('/work-centers/{workCenter}/edit', [Mfg\WorkCenterController::class, 'edit'])->name('work-centers.edit');
+        Route::put('/work-centers/{workCenter}', [Mfg\WorkCenterController::class, 'update'])->name('work-centers.update');
+        Route::delete('/work-centers/{workCenter}', [Mfg\WorkCenterController::class, 'destroy'])->name('work-centers.destroy');
+
+        Route::get('/boms', [Mfg\BomController::class, 'index'])->name('boms.index');
+        Route::get('/boms/create', [Mfg\BomController::class, 'create'])->name('boms.create');
+        Route::post('/boms', [Mfg\BomController::class, 'store'])->name('boms.store');
+        Route::get('/boms/{bom}/edit', [Mfg\BomController::class, 'edit'])->name('boms.edit');
+        Route::put('/boms/{bom}', [Mfg\BomController::class, 'update'])->name('boms.update');
+        Route::delete('/boms/{bom}', [Mfg\BomController::class, 'destroy'])->name('boms.destroy');
+
+        Route::get('/routings', [Mfg\RoutingController::class, 'index'])->name('routings.index');
+        Route::get('/routings/create', [Mfg\RoutingController::class, 'create'])->name('routings.create');
+        Route::post('/routings', [Mfg\RoutingController::class, 'store'])->name('routings.store');
+        Route::get('/routings/{routing}/edit', [Mfg\RoutingController::class, 'edit'])->name('routings.edit');
+        Route::put('/routings/{routing}', [Mfg\RoutingController::class, 'update'])->name('routings.update');
+        Route::delete('/routings/{routing}', [Mfg\RoutingController::class, 'destroy'])->name('routings.destroy');
+
+        Route::get('/orders', [Mfg\ProductionOrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/create', [Mfg\ProductionOrderController::class, 'create'])->name('orders.create');
+        Route::post('/orders', [Mfg\ProductionOrderController::class, 'store'])->name('orders.store');
+        Route::get('/orders/{order}', [Mfg\ProductionOrderController::class, 'show'])->name('orders.show');
+        Route::get('/orders/{order}/print', [Mfg\ProductionOrderController::class, 'print'])->name('orders.print');
+        Route::post('/orders/{order}/release', [Mfg\ProductionOrderController::class, 'release'])->name('orders.release');
+        Route::post('/orders/{order}/issue', [Mfg\ProductionOrderController::class, 'issue'])->name('orders.issue');
+        Route::post('/orders/{order}/issue-all', [Mfg\ProductionOrderController::class, 'issueAll'])->name('orders.issue-all');
+        Route::post('/orders/{order}/return', [Mfg\ProductionOrderController::class, 'return'])->name('orders.return');
+        Route::post('/orders/{order}/time', [Mfg\ProductionOrderController::class, 'time'])->name('orders.time');
+        Route::post('/orders/{order}/receive', [Mfg\ProductionOrderController::class, 'receive'])->name('orders.receive');
+        Route::post('/orders/{order}/close', [Mfg\ProductionOrderController::class, 'close'])->name('orders.close');
+        Route::post('/orders/{order}/cancel', [Mfg\ProductionOrderController::class, 'cancel'])->name('orders.cancel');
+        Route::delete('/orders/{order}', [Mfg\ProductionOrderController::class, 'destroy'])->name('orders.destroy');
+
+        Route::get('/shop-floor', [Mfg\ShopFloorController::class, 'index'])->name('shop-floor.index');
+        Route::post('/shop-floor/log', [Mfg\ShopFloorController::class, 'log'])->name('shop-floor.log');
+
+        Route::get('/process/stages', [Mfg\ProcessStageController::class, 'index'])->name('stages.index');
+        Route::get('/process/stages/create', [Mfg\ProcessStageController::class, 'create'])->name('stages.create');
+        Route::post('/process/stages', [Mfg\ProcessStageController::class, 'store'])->name('stages.store');
+        Route::get('/process/stages/{stage}/edit', [Mfg\ProcessStageController::class, 'edit'])->name('stages.edit');
+        Route::put('/process/stages/{stage}', [Mfg\ProcessStageController::class, 'update'])->name('stages.update');
+        Route::delete('/process/stages/{stage}', [Mfg\ProcessStageController::class, 'destroy'])->name('stages.destroy');
+        Route::get('/process/periods', [Mfg\ProcessPeriodController::class, 'index'])->name('periods.index');
+        Route::get('/process/periods/create', [Mfg\ProcessPeriodController::class, 'create'])->name('periods.create');
+        Route::post('/process/periods', [Mfg\ProcessPeriodController::class, 'store'])->name('periods.store');
+        Route::get('/process/periods/{period}', [Mfg\ProcessPeriodController::class, 'show'])->name('periods.show');
+        Route::post('/process/periods/{period}/issue', [Mfg\ProcessPeriodController::class, 'issue'])->name('periods.issue');
+        Route::post('/process/periods/{period}/conversion', [Mfg\ProcessPeriodController::class, 'conversion'])->name('periods.conversion');
+        Route::post('/process/periods/{period}/close', [Mfg\ProcessPeriodController::class, 'close'])->name('periods.close');
+
+        Route::get('/mrp', [Mfg\MrpController::class, 'index'])->name('mrp.index');
+        Route::post('/mrp/run', [Mfg\MrpController::class, 'run'])->name('mrp.run');
+        Route::post('/mrp/convert-purchase', [Mfg\MrpController::class, 'convertPurchase'])->name('mrp.convert-purchase');
+        Route::post('/mrp/{suggestion}/convert-production', [Mfg\MrpController::class, 'convertProduction'])->name('mrp.convert-production');
+        Route::post('/mrp/{suggestion}/dismiss', [Mfg\MrpController::class, 'dismiss'])->name('mrp.dismiss');
+        Route::get('/capacity', [Mfg\MrpController::class, 'capacity'])->name('capacity.index');
+
+        Route::get('/quality/plans', [Mfg\QcPlanController::class, 'index'])->name('plans.index');
+        Route::get('/quality/plans/create', [Mfg\QcPlanController::class, 'create'])->name('plans.create');
+        Route::post('/quality/plans', [Mfg\QcPlanController::class, 'store'])->name('plans.store');
+        Route::get('/quality/plans/{plan}/edit', [Mfg\QcPlanController::class, 'edit'])->name('plans.edit');
+        Route::put('/quality/plans/{plan}', [Mfg\QcPlanController::class, 'update'])->name('plans.update');
+        Route::delete('/quality/plans/{plan}', [Mfg\QcPlanController::class, 'destroy'])->name('plans.destroy');
+        Route::get('/quality/inspections', [Mfg\QcInspectionController::class, 'index'])->name('inspections.index');
+        Route::get('/quality/inspections/create', [Mfg\QcInspectionController::class, 'create'])->name('inspections.create');
+        Route::post('/quality/inspections', [Mfg\QcInspectionController::class, 'store'])->name('inspections.store');
+        Route::get('/quality/inspections/{inspection}', [Mfg\QcInspectionController::class, 'show'])->name('inspections.show');
+        Route::post('/quality/inspections/{inspection}/complete', [Mfg\QcInspectionController::class, 'complete'])->name('inspections.complete');
+
+        Route::get('/subcontracts', [Mfg\SubcontractController::class, 'index'])->name('subcontracts.index');
+        Route::get('/subcontracts/create', [Mfg\SubcontractController::class, 'create'])->name('subcontracts.create');
+        Route::post('/subcontracts', [Mfg\SubcontractController::class, 'store'])->name('subcontracts.store');
+        Route::get('/subcontracts/{order}', [Mfg\SubcontractController::class, 'show'])->name('subcontracts.show');
+        Route::post('/subcontracts/{order}/send', [Mfg\SubcontractController::class, 'send'])->name('subcontracts.send');
+        Route::post('/subcontracts/{order}/receive', [Mfg\SubcontractController::class, 'receive'])->name('subcontracts.receive');
+        Route::post('/subcontracts/{order}/cancel', [Mfg\SubcontractController::class, 'cancel'])->name('subcontracts.cancel');
+
+        Route::get('/reports', [Mfg\ReportController::class, 'index'])->name('reports.index');
     });
 
     // E-invoicing (ZATCA phase 2)

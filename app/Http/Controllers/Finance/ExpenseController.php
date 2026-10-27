@@ -55,6 +55,14 @@ class ExpenseController extends Controller
         ]);
     }
 
+    public function create(): Response
+    {
+        return Inertia::render('Finance/Expenses/Form', [
+            'expenseAccounts' => Account::where('type', 'expense')->where('is_parent', false)->get(['id', 'code', 'name_ar']),
+            'bankAccounts' => BankAccount::withLedgerBalances(BankAccount::where('is_active', true)->get(['id', 'name', 'type', 'account_id', 'current_balance'])),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
