@@ -1,11 +1,13 @@
 <script setup>
-import { computed, useId } from 'vue';
+import { computed, onMounted, useId } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 
 /**
  * Document currency + exchange rate. Hidden unless the company defines more
- * than one currency. An empty rate means "the rate on the document date"
- * (resolved by the server from the dated rates).
+ * than one currency. A new document starts in the active branch's currency
+ * (a Saudi branch of a Yemeni company issues in SAR); the other currencies are
+ * one pick away. An empty code means the company's base currency; an empty rate
+ * means "the rate on the document date" (resolved by the server).
  */
 const code = defineModel('code', { default: '' });
 const rate = defineModel('rate', { default: '' });
@@ -13,25 +15,40 @@ defineProps({ errors: { type: Object, default: () => ({}) } });
 
 const page = usePage();
 const base = computed(() => page.props.tenant?.currency || 'SAR');
+const branchCurrency = computed(() => page.props.tax?.currency || base.value);
 const currencies = computed(() => page.props.currencies || []);
-const selected = computed(() => currencies.value.find((c) => c.code === code.value));
+const selected = computed(() => currencies.value.find((c) => c.code === (code.value || base.value)));
 const foreign = computed(() => code.value && code.value !== base.value);
+const noRate = computed(() => foreign.value && !(Number(selected.value?.exchange_rate) > 0));
 const id = useId();
+
+const shown = computed({
+    get: () => code.value || base.value,
+    set: (value) => { code.value = value === base.value ? '' : value; rate.value = ''; },
+});
+const label = (c) => `${c.code} — ${c.name_ar}${c.code === branchCurrency.value ? ' (عملة الفرع)' : (c.code === base.value ? ' (الأساسية)' : '')}`;
+
+onMounted(() => {
+    if (!code.value && currencies.value.length > 1 && branchCurrency.value !== base.value && currencies.value.some((c) => c.code === branchCurrency.value)) {
+        code.value = branchCurrency.value;
+    }
+});
 </script>
 
 <template>
     <div v-if="currencies.length > 1" class="grid grid-cols-2 gap-2">
         <div>
             <label :for="`${id}-code`" class="block text-xs font-bold text-slate-700 mb-1">العملة</label>
-            <select :id="`${id}-code`" v-model="code" class="w-full rounded-xl border-slate-200 text-xs" @change="rate = ''">
-                <option value="">{{ base }} (الأساسية)</option>
-                <option v-for="c in currencies.filter((c) => c.code !== base)" :key="c.code" :value="c.code">{{ c.code }} — {{ c.name_ar }}</option>
+            <select :id="`${id}-code`" v-model="shown" class="w-full rounded-xl border-slate-200 text-xs">
+                <option v-if="!currencies.some((c) => c.code === base)" :value="base">{{ base }} (الأساسية)</option>
+                <option v-for="c in currencies" :key="c.code" :value="c.code">{{ label(c) }}</option>
             </select>
             <span v-if="errors.currency_code" class="block text-[11px] text-rose-600 mt-1">{{ errors.currency_code }}</span>
         </div>
         <div v-if="foreign">
             <label :for="`${id}-rate`" class="block text-xs font-bold text-slate-700 mb-1">سعر الصرف (1 {{ code }} = ؟ {{ base }})</label>
-            <input :id="`${id}-rate`" v-model="rate" type="number" step="0.000001" min="0" dir="ltr" :placeholder="`تلقائي حسب التاريخ (${Number(selected?.exchange_rate || 0).toFixed(4)})`" class="w-full rounded-xl border-slate-200 text-xs font-mono" />
+            <input :id="`${id}-rate`" v-model="rate" type="number" step="0.000001" min="0" dir="ltr" :required="noRate" :placeholder="noRate ? 'أدخل سعر الصرف' : `تلقائي حسب التاريخ (${Number(selected?.exchange_rate || 0).toFixed(4)})`" class="w-full rounded-xl border-slate-200 text-xs font-mono" />
+            <span v-if="noRate && !errors.exchange_rate" class="block text-[11px] text-amber-600 mt-1">لا يوجد سعر صرف محفوظ لهذه العملة؛ أدخله هنا أو من الإعدادات ← العملات.</span>
             <span v-if="errors.exchange_rate" class="block text-[11px] text-rose-600 mt-1">{{ errors.exchange_rate }}</span>
         </div>
     </div>

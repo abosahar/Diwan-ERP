@@ -19,4 +19,5 @@ export const taxLabel = (withRate = true) => {
 };
 
 /** Symbol of the company's base currency (ر.س, ج.م, د.إ ...). */
-export const cur = () => usePage().props.tenant?.currency_symbol || 'ر.س';
+// Symbol of the active branch's currency (a Saudi branch of a Yemeni company shows ر.س).
+export const cur = () => usePage().props.tax?.currency_symbol || usePage().props.tenant?.currency_symbol || 'ر.س';

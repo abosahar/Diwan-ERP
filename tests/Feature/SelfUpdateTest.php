@@ -74,4 +74,17 @@ class SelfUpdateTest extends TestCase
         config(['app.local_install' => false]);
         $this->postJson(route('system.update.apply'))->assertNotFound();
     }
+
+    public function test_a_finished_update_is_forgotten_after_a_few_minutes(): void
+    {
+        $file = storage_path('app/update-status.json');
+        file_put_contents($file, json_encode(['state' => 'done', 'to' => '1.4.0', 'at' => time() - 60]));
+        $this->assertSame('done', app(SelfUpdate::class)->status()['state']);
+
+        file_put_contents($file, json_encode(['state' => 'done', 'to' => '1.4.0', 'at' => time() - 3600]));
+        $this->assertNull(app(SelfUpdate::class)->status());
+
+        file_put_contents($file, json_encode(['state' => 'failed', 'message' => 'x', 'at' => time() - 3600]));
+        $this->assertSame('failed', app(SelfUpdate::class)->status()['state']);
+    }
 }

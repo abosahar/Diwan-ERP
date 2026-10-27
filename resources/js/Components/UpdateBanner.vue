@@ -16,7 +16,9 @@ let startedAt = 0;
 
 const state = computed(() => status.value?.state);
 const working = computed(() => busy.value || ['requested', 'running'].includes(state.value));
-const show = computed(() => info.value && (info.value.available || working.value || state.value === 'done'));
+// "Updated" is shown only by the page that watched the update finish, never after a reload or a later visit.
+const finished = ref(false);
+const show = computed(() => info.value && (info.value.available || working.value || finished.value));
 
 const poll = async () => {
     try {
@@ -24,6 +26,7 @@ const poll = async () => {
         status.value = data.status;
         if (data.status?.state === 'done' || (!data.available && data.current !== info.value.current)) {
             clearInterval(timer);
+            finished.value = true;
             setTimeout(() => window.location.reload(), 1500);
         } else if (data.status?.state === 'failed') {
             clearInterval(timer);
@@ -64,8 +67,8 @@ onBeforeUnmount(() => clearInterval(timer));
         <ArrowDownTrayIcon v-if="!working" class="w-6 h-6 text-emerald-700 flex-shrink-0" />
         <ArrowPathIcon v-else class="w-6 h-6 text-emerald-700 flex-shrink-0 animate-spin" />
         <div class="flex-1 min-w-0 text-sm">
-            <template v-if="state === 'done'">
-                <b class="text-emerald-800">تم التحديث إلى الإصدار {{ status.to }}.</b> جارٍ إعادة تحميل الصفحة...
+            <template v-if="finished">
+                <b class="text-emerald-800">تم التحديث إلى الإصدار {{ status?.to || info.latest?.version }}.</b> جارٍ إعادة تحميل الصفحة...
             </template>
             <template v-else-if="working">
                 <b class="text-emerald-800">جارٍ التحديث إلى أحدث إصدار{{ status?.to ? ' ' + status.to : '' }}</b>
