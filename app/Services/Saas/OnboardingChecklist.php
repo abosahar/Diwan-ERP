@@ -5,6 +5,7 @@ namespace App\Services\Saas;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\JournalEntry;
+use App\Models\PosRegister;
 use App\Models\User;
 use App\Models\ZatcaDevice;
 use App\Services\Tax\CountryFeatures;
@@ -24,11 +25,15 @@ class OnboardingChecklist
             ['key' => 'profile', 'label' => $saudi ? 'بيانات المنشأة والعنوان الوطني والرقم الضريبي' : 'بيانات المنشأة والرقم الضريبي', 'done' => $saudi ? app(DocumentMapper::class)->missingSellerFields($company) === [] : (filled($company->tax_number) && TaxProfile::current()->validTaxNumber($company->tax_number)), 'route' => 'settings.index'],
             ['key' => 'logo', 'label' => 'شعار المنشأة على الفواتير', 'done' => (bool) $company->logoPath(), 'route' => 'settings.index'],
             ['key' => 'zatca', 'label' => 'الربط مع منصة فاتورة (المرحلة الثانية)', 'done' => ZatcaDevice::where('status', 'active')->exists(), 'route' => 'zatca.index'],
+            ['key' => 'pos', 'label' => 'إضافة جهاز كاشير لنقاط البيع', 'done' => PosRegister::withoutGlobalScope('branch')->exists(), 'route' => 'pos.registers.create'],
             ['key' => 'opening', 'label' => 'الأرصدة الافتتاحية (حسابات، عملاء، موردون، مخزون)', 'done' => JournalEntry::where('entry_type', 'opening')->exists(), 'route' => 'accounting.journals.index'],
             ['key' => 'users', 'label' => 'إضافة المستخدمين وصلاحياتهم', 'done' => User::where('company_id', $company->id)->count() > 1, 'route' => 'users.index'],
             ['key' => 'invoice', 'label' => 'إصدار أول فاتورة', 'done' => Invoice::withoutGlobalScope('branch')->exists(), 'route' => 'sales.invoices.create'],
         ];
 
+        if (! app(PlanGuard::class)->hasModule($company->loadMissing('plan'), 'pos')) {
+            $steps = array_values(array_filter($steps, fn ($s) => $s['key'] !== 'pos'));
+        }
         if (! $saudi) {
             $steps = array_values(array_filter($steps, fn ($s) => $s['key'] !== 'zatca'));
         }

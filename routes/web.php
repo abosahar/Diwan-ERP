@@ -48,6 +48,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LookupController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\PosRegisterController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Projects as PR;
@@ -291,6 +292,12 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
             ->middleware('throttle:pos-orders');
         Route::get('/history', [PosController::class, 'history'])->name('history');
         Route::get('/products/search', [PosController::class, 'productSearch'])->name('products.search');
+        Route::get('/registers', [PosRegisterController::class, 'index'])->name('registers.index');
+        Route::get('/registers/create', [PosRegisterController::class, 'create'])->name('registers.create');
+        Route::post('/registers', [PosRegisterController::class, 'store'])->name('registers.store');
+        Route::get('/registers/{register}/edit', [PosRegisterController::class, 'edit'])->name('registers.edit');
+        Route::put('/registers/{register}', [PosRegisterController::class, 'update'])->name('registers.update');
+        Route::delete('/registers/{register}', [PosRegisterController::class, 'destroy'])->name('registers.destroy');
     });
 
     // 6. Inventory Module

@@ -11,6 +11,7 @@
         "payments_received": "Payments Received",
         "pos": "Point of Sale",
         "pos_session": "Cashier Session",
+        "pos_registers": "Cashier Devices",
         "pos_history": "Sales History",
         "inventory": "Inventory",
         "products": "Products & Costs",

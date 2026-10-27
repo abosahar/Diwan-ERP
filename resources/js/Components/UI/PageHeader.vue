@@ -11,7 +11,7 @@ defineProps({
 </script>
 
 <template>
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+    <div data-page-header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
         <div>
             <div class="flex items-center text-xs text-slate-500 mb-1">
                 <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600"><HomeIcon class="w-4 h-4" /></Link>
