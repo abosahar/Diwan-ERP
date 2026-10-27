@@ -98,7 +98,7 @@ const formatCurrency = (val) => {
                         <span>البحث والتصفية</span>
                     </button>
 
-                    <ImportButton v-if="$can('inventory.products.create')" type="products" title="استيراد الأصناف من Excel" hint="الأصناف الموجودة (بنفس SKU) تُحدّث. opening_quantity و opening_cost و warehouse_code للرصيد الافتتاحي." />
+
                     
                     <Link 
                         v-if="$canRoute('inventory.products.create')"
@@ -108,6 +108,7 @@ const formatCurrency = (val) => {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة</span>
                     </Link>
+<ImportButton v-if="$can('inventory.products.create')" type="products" title="استيراد الأصناف من Excel" hint="الأصناف الموجودة (بنفس SKU) تُحدّث. opening_quantity و opening_cost و warehouse_code للرصيد الافتتاحي." />
 </template>
 </PageHeader>
 

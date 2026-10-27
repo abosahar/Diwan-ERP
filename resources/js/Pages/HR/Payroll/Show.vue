@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { confirmAction } from '@/composables/useDialog';
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -82,7 +83,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
                 <span><b class="font-mono">{{ a.type === 'overtime_hours' ? a.amount + ' ساعة' : money(a.amount) }}</b> <button v-if="payroll.status === 'draft' && $can('hr.payroll.create')" @click="remove(route('hr.payroll.adjustments.destroy', [payroll.id, a.id]), 'حذف هذا التعديل وإعادة احتساب المسير؟')" class="text-rose-600 ms-2">✕</button></span>
             </div>
             <div v-if="payroll.status === 'draft' && $can('hr.payroll.create')" class="grid grid-cols-6 gap-2 mt-3">
-                <select v-model="adjForm.employee_id" class="col-span-2 rounded-xl border-slate-200 text-xs"><option value="">الموظف...</option><option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option></select>
+                <SelectCreate v-model="adjForm.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
                 <select v-model="adjForm.type" class="rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in typeLabel" :key="k" :value="k">{{ l }}</option></select>
                 <input v-model="adjForm.amount" type="number" step="0.01" class="rounded-xl border-slate-200 text-xs font-mono" />
                 <input v-model="adjForm.description" placeholder="ملاحظة" class="rounded-xl border-slate-200 text-xs" />
@@ -94,7 +95,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
         <Dialog :show="payOpen" title="صرف الرواتب" @close="payOpen = false">
             <div class="grid grid-cols-2 gap-3">
                 <Field label="تاريخ الصرف"><input v-model="payForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="الحساب البنكي"><select v-model="payForm.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field label="الحساب البنكي"><SelectCreate v-model="payForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <p class="text-xs mt-2">المبلغ: <b class="font-mono">{{ money(payroll.net_total) }}</b></p>
             <template #footer><button @click="payForm.post(route('hr.payroll.pay', payroll.id), { onSuccess: () => (payOpen = false) })" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">تأكيد الصرف</button></template>

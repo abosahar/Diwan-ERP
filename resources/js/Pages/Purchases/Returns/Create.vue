@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -38,7 +39,7 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.filter((i) => N
                 <Field label="التسوية">
                     <select v-model="form.settlement" class="w-full rounded-xl border-slate-200 text-xs"><option value="credit">تخفيض رصيد المورد</option><option value="cash">استرداد نقدي</option><option value="bank_transfer">استرداد بنكي</option></select>
                 </Field>
-                <Field v-if="form.settlement !== 'credit'" label="الحساب"><select v-model="form.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field v-if="form.settlement !== 'credit'" label="الحساب"><SelectCreate v-model="form.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
                 <Field label="السبب" class="md:col-span-3"><input v-model="form.reason" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <div class="overflow-x-auto" v-if="invoice"><table class="w-full text-xs">

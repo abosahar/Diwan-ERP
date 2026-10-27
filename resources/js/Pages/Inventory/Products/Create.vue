@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -129,28 +130,13 @@ const submit = () => {
                         <!-- Category -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">التصنيف</label>
-                            <select 
-                                v-model="form.category_id"
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 font-medium"
-                            >
-                                <option value="">بدون تصنيف</option>
-                                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                                    {{ cat.name_ar }}
-                                </option>
-                            </select>
+                            <SelectCreate v-model="form.category_id" :options="categories" entity="category" label="name_ar" placeholder="بدون تصنيف" />
                         </div>
 
                         <!-- Unit -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">وحدة القياس</label>
-                            <select 
-                                v-model="form.unit_id"
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 font-medium"
-                            >
-                                <option v-for="u in units" :key="u.id" :value="u.id">
-                                    {{ u.name_ar }}
-                                </option>
-                            </select>
+                            <SelectCreate v-model="form.unit_id" :options="units" entity="unit" label="name_ar" :allow-empty="false" />
                         </div>
 
                         <!-- SKU -->
@@ -215,14 +201,7 @@ const submit = () => {
                         <!-- Warehouse (if product) -->
                         <div v-if="form.type === 'product'">
                             <label class="block text-xs font-bold text-slate-700 mb-1">المستودع</label>
-                            <select 
-                                v-model="form.warehouse_id"
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 font-medium"
-                            >
-                                <option v-for="w in warehouses" :key="w.id" :value="w.id">
-                                    {{ w.name_ar }}
-                                </option>
-                            </select>
+                            <SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" />
                         </div>
                     </div>
 

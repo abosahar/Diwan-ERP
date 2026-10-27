@@ -55,7 +55,7 @@ class BankAccountController extends Controller
             'account_id' => 'nullable|tenant_exists:accounts,id',
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $box = DB::transaction(function () use ($validated) {
             $box = BankAccount::create([
                 'name' => $validated['name'],
                 'type' => $validated['type'],
@@ -77,7 +77,13 @@ class BankAccountController extends Controller
                 now(),
                 'رصيد افتتاحي - '.$box->name,
             );
+
+            return $box;
         });
+
+        if ($json = $this->createdResponse($request, $box, $box->name)) {
+            return $json;
+        }
 
         return redirect()->route('finance.banks.index')
             ->with('success', 'تم إضافة الحساب البنكي / الخزينة بنجاح');

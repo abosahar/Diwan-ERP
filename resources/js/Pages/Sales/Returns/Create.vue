@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
 import { ref, computed, watch } from 'vue';
@@ -237,16 +238,7 @@ const submit = () => {
                         <!-- Customer Selection -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">العميل *</label>
-                            <select 
-                                v-model="form.customer_id"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-rose-500 focus:ring-rose-500 py-2.5 bg-slate-50/50"
-                                required
-                            >
-                                <option value="" disabled>-- اختر العميل --</option>
-                                <option v-for="c in customers" :key="c.id" :value="c.id">
-                                    {{ c.name }} {{ c.company_name ? `(${c.company_name})` : '' }}
-                                </option>
-                            </select>
+                            <SelectCreate v-model="form.customer_id" :options="customers" entity="customer" :label="(c) => `${c.name} ${c.company_name ? `(${c.company_name})` : ''}`" placeholder="-- اختر العميل --" required />
                             <p v-if="form.errors.customer_id" class="text-2xs text-rose-500 mt-1">{{ form.errors.customer_id }}</p>
                         </div>
 

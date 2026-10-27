@@ -75,7 +75,11 @@ class FixedAssetController extends Controller
         $validated['accumulated_account_id'] ??= $map->id('accumulated_depreciation');
         $validated['expense_account_id'] ??= $map->id('depreciation_expense');
 
-        AssetCategory::create($validated);
+        $category = AssetCategory::create($validated);
+
+        if ($json = $this->createdResponse($request, $category, $category->name_ar)) {
+            return $json;
+        }
 
         return back()->with('success', 'تم إضافة فئة الأصول');
     }

@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -24,10 +25,10 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                 <Field label="الرمز *" :error="form.errors.code"><input v-model="form.code" :class="input" class="font-mono" required /></Field>
                 <Field label="الاسم *" :error="form.errors.name"><input v-model="form.name" :class="input" required /></Field>
                 <Field label="التسلسل *"><input v-model="form.sequence" type="number" :class="input" /></Field>
-                <Field label="ناتج المرحلة *" hint="للمرحلة الأخيرة: المنتج التام الذي يدخل المخزون" :error="form.errors.product_id"><select v-model="form.product_id" :class="input" required><option value="">— اختر —</option><option v-for="p in products" :key="p.id" :value="p.id">{{ p.name_ar }}</option></select></Field>
+                <Field label="ناتج المرحلة *" hint="للمرحلة الأخيرة: المنتج التام الذي يدخل المخزون" :error="form.errors.product_id"><SelectCreate v-model="form.product_id" :options="products" entity="product" label="name_ar" placeholder="— اختر —" required /></Field>
                 <Field label="تستلم من مرحلة" hint="تنتقل تكلفة المرحلة السابقة إليها"><select v-model="form.previous_stage_id" :class="input"><option value="">— أول مرحلة —</option><option v-for="x in stages" :key="x.id" :value="x.id">{{ x.code }} — {{ x.name }}</option></select></Field>
-                <Field label="المستودع *" :error="form.errors.warehouse_id"><select v-model="form.warehouse_id" :class="input" required><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
-                <Field label="مركز العمل"><select v-model="form.work_center_id" :class="input"><option value="">—</option><option v-for="w in workCenters" :key="w.id" :value="w.id">{{ w.code }} — {{ w.name }}</option></select></Field>
+                <Field label="المستودع *" :error="form.errors.warehouse_id"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required /></Field>
+                <Field label="مركز العمل"><SelectCreate v-model="form.work_center_id" :options="workCenters" entity="work_center" :label="(w) => `${w.code} — ${w.name}`" placeholder="—" /></Field>
             </div>
             <label class="inline-flex items-center gap-2 text-xs"><input v-model="form.is_active" type="checkbox" class="rounded" /> نشطة</label>
             <div class="flex gap-2 pt-2 border-t border-slate-100">

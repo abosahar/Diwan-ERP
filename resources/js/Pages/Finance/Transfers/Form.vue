@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -30,29 +31,13 @@ const submitTransfer = () => form.post(route('finance.transfers.store'));
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">من حساب / خزينة *</label>
-                                    <select 
-                                        v-model="form.from_account_id"
-                                        required
-                                        class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                                    >
-                                        <option v-for="a in accounts" :key="a.id" :value="a.id">
-                                            {{ a.name }} ({{ Number(a.current_balance).toLocaleString() }} {{ a.currency }})
-                                        </option>
-                                    </select>
+                                    <SelectCreate v-model="form.from_account_id" :options="accounts" entity="account" :label="(a) => `${a.name} (${Number(a.current_balance).toLocaleString()} ${a.currency})`" :allow-empty="false" required />
                                     <p v-if="form.errors.from_account_id" class="text-[11px] text-rose-600 mt-1">{{ form.errors.from_account_id }}</p>
                                 </div>
             
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">إلى حساب / خزينة *</label>
-                                    <select 
-                                        v-model="form.to_account_id"
-                                        required
-                                        class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                                    >
-                                        <option v-for="a in accounts" :key="a.id" :value="a.id">
-                                            {{ a.name }} ({{ Number(a.current_balance).toLocaleString() }} {{ a.currency }})
-                                        </option>
-                                    </select>
+                                    <SelectCreate v-model="form.to_account_id" :options="accounts" entity="account" :label="(a) => `${a.name} (${Number(a.current_balance).toLocaleString()} ${a.currency})`" :allow-empty="false" required />
                                     <p v-if="form.errors.to_account_id" class="text-[11px] text-rose-600 mt-1">{{ form.errors.to_account_id }}</p>
                                 </div>
                             </div>

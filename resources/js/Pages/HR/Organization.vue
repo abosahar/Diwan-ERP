@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -22,8 +23,8 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <div v-for="d in departments" :key="d.id" class="flex justify-between py-1 border-b border-slate-50"><span>{{ d.parent ? d.parent.name + ' / ' : '' }}<b>{{ d.name }}</b> <span class="text-slate-400">{{ d.cost_center?.code }}</span></span><span>{{ d.employees_count }}</span></div>
                 <div v-if="$can('hr.organization.manage')" class="space-y-2 mt-3">
                     <input v-model="dept.name" placeholder="اسم الإدارة" :class="inp" />
-                    <select v-model="dept.parent_id" :class="inp"><option value="">إدارة رئيسية</option><option v-for="d in departments" :key="d.id" :value="d.id">تابعة لـ {{ d.name }}</option></select>
-                    <select v-model="dept.cost_center_id" :class="inp"><option value="">بدون مركز تكلفة</option><option v-for="c in costCenters" :key="c.id" :value="c.id">{{ c.code }} {{ c.name_ar }}</option></select>
+                    <SelectCreate v-model="dept.parent_id" :options="departments" entity="department" :label="(d) => `تابعة لـ ${d.name}`" placeholder="إدارة رئيسية" />
+                    <SelectCreate v-model="dept.cost_center_id" :options="costCenters" entity="cost_center" :label="(c) => `${c.code} ${c.name_ar}`" placeholder="بدون مركز تكلفة" />
                     <button @click="dept.post(route('hr.departments.store'), { ...opts, onSuccess: () => dept.reset() })" class="w-full px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">إضافة</button>
                 </div>
             </div>

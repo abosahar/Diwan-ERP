@@ -66,10 +66,14 @@ class WarehouseController extends Controller
             Warehouse::where('is_main', true)->update(['is_main' => false]);
         }
 
-        Warehouse::create(array_merge($validated, [
+        $warehouse = Warehouse::create(array_merge($validated, [
             'company_id' => $companyId,
             'is_active' => true,
         ]));
+
+        if ($json = $this->createdResponse($request, $warehouse, $warehouse->name_ar)) {
+            return $json;
+        }
 
         return redirect()->route('inventory.warehouses.index')
             ->with('success', 'تم إضافة المستودع بنجاح');

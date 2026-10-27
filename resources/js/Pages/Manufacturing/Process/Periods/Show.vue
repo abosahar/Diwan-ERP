@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -53,7 +54,7 @@ const els = [['ti', 'محوّل من مرحلة سابقة'], ['mat', 'مواد 
                 <h2 class="font-black text-slate-800 text-sm mb-3">صرف مواد مباشرة من مستودع المرحلة</h2>
                 <form @submit.prevent="sendIssue" class="space-y-2">
                     <div v-for="(l, i) in issue.lines" :key="i" class="grid grid-cols-[1fr_8rem_2rem] gap-2">
-                        <select v-model="l.product_id" :class="input" required><option value="">— مادة —</option><option v-for="x in products" :key="x.id" :value="x.id">{{ x.name_ar }}</option></select>
+                        <SelectCreate v-model="l.product_id" :options="products" entity="product" label="name_ar" placeholder="— مادة —" required />
                         <input v-model="l.quantity" type="number" step="0.0001" placeholder="الكمية" :class="input" required />
                         <button type="button" :disabled="issue.lines.length <= 1" @click="issue.lines.splice(i, 1)" class="text-slate-400 hover:text-rose-600 disabled:opacity-20"><TrashIcon class="w-4 h-4" /></button>
                     </div>
@@ -62,7 +63,7 @@ const els = [['ti', 'محوّل من مرحلة سابقة'], ['mat', 'مواد 
                 </form>
                 <h2 class="font-black text-slate-800 text-sm mt-6 mb-3">تكلفة التحويل (وقت التشغيل)</h2>
                 <form @submit.prevent="sendConv" class="grid grid-cols-[1fr_8rem_auto] gap-2">
-                    <select v-model="conv.work_center_id" :class="input"><option v-for="w in workCenters" :key="w.id" :value="w.id">{{ w.name }}</option></select>
+                    <SelectCreate v-model="conv.work_center_id" :options="workCenters" entity="work_center" label="name" :allow-empty="false" />
                     <input v-model="conv.minutes" type="number" step="0.01" placeholder="دقائق" :class="input" required />
                     <button type="submit" :disabled="conv.processing" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">إضافة</button>
                     <p v-if="conv.errors.work_center_id" class="col-span-3 text-xs text-rose-600">{{ conv.errors.work_center_id }}</p>

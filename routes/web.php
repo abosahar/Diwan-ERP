@@ -72,6 +72,7 @@ use App\Http\Controllers\SuperAdmin\SuperAdminDashboardController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\ZatcaController;
@@ -192,6 +193,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::get('/customers', [LookupController::class, 'customers'])->name('customers');
         Route::get('/products', [LookupController::class, 'products'])->name('products');
         Route::get('/suppliers', [LookupController::class, 'suppliers'])->name('suppliers');
+        Route::get('/list/{name}', [LookupController::class, 'list'])->name('list');
         Route::get('/price', [LookupController::class, 'price'])->name('price');
         Route::post('/lines/import', [LineImportController::class, 'import'])->name('lines.import');
         Route::get('/lines/template', [LineImportController::class, 'template'])->name('lines.template');
@@ -336,6 +338,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
 
         Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
         Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+        Route::post('/units', [UnitController::class, 'store'])->name('units.store');
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
         Route::get('/operations', [InventoryOperationController::class, 'index'])->name('operations.index');
         Route::get('/operations/transfer', [InventoryOperationController::class, 'transferForm'])->name('operations.transfer.create');

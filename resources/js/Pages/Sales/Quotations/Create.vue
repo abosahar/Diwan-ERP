@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate, taxLabel } from '@/utils/tax';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
@@ -66,12 +67,14 @@ watch(() => form.branch_id, (id) => {
 });
 
 // Auto-fill item from product selection
-const onProductSelect = (index, event) => {
-    const productId = event.target.value;
+const customerList = ref([...(props.customers || [])]);
+const productList = ref([...(props.products || [])]);
+
+const onProductSelect = (index, productId) => {
     const item = form.items[index];
     if (!productId) return;
 
-    const prod = props.products.find(p => p.id == productId);
+    const prod = productList.value.find(p => p.id == productId);
     if (prod) {
         item.product_id = prod.id;
         item.item_name = prod.name_ar || prod.name_en || '';
@@ -141,7 +144,7 @@ const formatCurrency = (val) => {
 };
 
 const selectedCustomer = computed(() => {
-    return props.customers.find(c => c.id == form.customer_id);
+    return customerList.value.find(c => c.id == form.customer_id);
 });
 
 const submit = () => {
@@ -203,16 +206,7 @@ const importLines = (lines, replace) => {
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">اختر العميل *</label>
-                            <select 
-                                v-model="form.customer_id"
-                                class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 bg-slate-50/50"
-                                required
-                            >
-                                <option value="" disabled>-- حدد العميل --</option>
-                                <option v-for="c in customers" :key="c.id" :value="c.id">
-                                    {{ c.name }} {{ c.company_name ? `(${c.company_name})` : '' }}
-                                </option>
-                            </select>
+                            <SelectCreate v-model="form.customer_id" :options="customerList" entity="customer" :label="(c) => `${c.name} ${c.company_name ? `(${c.company_name})` : ''}`" placeholder="-- حدد العميل --" :allow-empty="false" required @created="(c) => customerList.push(c)" />
                             <p v-if="form.errors.customer_id" class="text-2xs text-rose-500 mt-1">{{ form.errors.customer_id }}</p>
                         </div>
 
@@ -333,16 +327,7 @@ const importLines = (lines, replace) => {
                                         {{ idx + 1 }}
                                     </td>
                                     <td class="py-3 px-4 space-y-1">
-                                        <select 
-                                            v-if="products && products.length > 0"
-                                            @change="onProductSelect(idx, $event)"
-                                            class="w-full text-2xs rounded-lg border-slate-200 py-1.5 mb-1 bg-white text-slate-700"
-                                        >
-                                            <option value="">-- اختر من قائمة المنتجات (اختياري) --</option>
-                                            <option v-for="p in products" :key="p.id" :value="p.id">
-                                                {{ p.name_ar || p.name_en }} ({{ formatCurrency(p.selling_price) }} ﷼)
-                                            </option>
-                                        </select>
+                                        <SelectCreate :model-value="item.product_id || ''" :options="productList" entity="product" :label="(p) => `${p.name_ar || p.name_en} (${formatCurrency(p.selling_price)} ﷼)`" placeholder="-- اختر من قائمة المنتجات (اختياري) --" class="mb-1" @created="(p) => productList.push(p)" @update:modelValue="(id) => onProductSelect(idx, id)" />
                                         <input 
                                             v-model="item.item_name"
                                             type="text" 

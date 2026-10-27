@@ -90,6 +90,8 @@ class SelfUpdate
     /** Ask the update script to run now (it watches the queue folder; Windows starts a scheduled task). */
     public function request(): void
     {
+        // The script installs whatever GitHub calls latest right now, so do not announce a cached older version.
+        $this->forget();
         File::ensureDirectoryExists($this->queueDir());
         file_put_contents($this->queueDir().'/request', (string) time());
         file_put_contents($this->statusFile(), json_encode(['state' => 'requested', 'from' => $this->current(), 'to' => $this->latest()['version'] ?? '', 'message' => '', 'at' => time()]));

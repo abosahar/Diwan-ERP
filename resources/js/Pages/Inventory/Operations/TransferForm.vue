@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -25,38 +26,20 @@ const submitTransfer = () => transferForm.post(route('inventory.operations.trans
             <form @submit.prevent="submitTransfer" class="form-grid text-xs">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">اختر المنتج *</label>
-                                <select 
-                                    v-model="transferForm.product_id"
-                                    required
-                                    class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                                >
-                                    <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name_ar }} ({{ p.sku }})</option>
-                                </select>
+                                <SelectCreate v-model="transferForm.product_id" :options="products" entity="product" :label="(p) => `${p.name_ar} (${p.sku})`" :allow-empty="false" required />
                                 <p v-if="transferForm.errors.product_id" class="text-[11px] text-rose-600 mt-1">{{ transferForm.errors.product_id }}</p>
                             </div>
             
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">من مستودع *</label>
-                                    <select 
-                                        v-model="transferForm.from_warehouse_id"
-                                        required
-                                        class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                                    >
-                                        <option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option>
-                                    </select>
+                                    <SelectCreate v-model="transferForm.from_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required />
                                     <p v-if="transferForm.errors.from_warehouse_id" class="text-[11px] text-rose-600 mt-1">{{ transferForm.errors.from_warehouse_id }}</p>
                                 </div>
             
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">إلى مستودع *</label>
-                                    <select 
-                                        v-model="transferForm.to_warehouse_id"
-                                        required
-                                        class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600"
-                                    >
-                                        <option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option>
-                                    </select>
+                                    <SelectCreate v-model="transferForm.to_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required />
                                     <p v-if="transferForm.errors.to_warehouse_id" class="text-[11px] text-rose-600 mt-1">{{ transferForm.errors.to_warehouse_id }}</p>
                                 </div>
                             </div>

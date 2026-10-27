@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -23,7 +24,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
         <form @submit.prevent="submit" class="space-y-5">
             <div class="bg-white border border-slate-200/80 rounded-2xl p-6 grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                 <Field label="اسم الخطة *" :error="form.errors.name"><input v-model="form.name" :class="input" required /></Field>
-                <Field label="المنتج" hint="فارغ = كل المنتجات"><select v-model="form.product_id" :class="input"><option value="">كل المنتجات</option><option v-for="x in products" :key="x.id" :value="x.id">{{ x.name_ar }}</option></select></Field>
+                <Field label="المنتج" hint="فارغ = كل المنتجات"><SelectCreate v-model="form.product_id" :options="products" entity="product" label="name_ar" placeholder="كل المنتجات" /></Field>
                 <Field label="تُطبَّق على"><select v-model="form.applies_to" :class="input"><option value="production">استلام الإنتاج (يحجز المخزون حتى الفحص)</option><option value="purchase">استلام المشتريات (تسجيل فقط)</option></select></Field>
                 <label class="inline-flex items-center gap-2 text-xs"><input v-model="form.is_active" type="checkbox" class="rounded" /> نشطة</label>
             </div>

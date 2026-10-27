@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -26,8 +27,8 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <Field label="الاسم بالإنجليزية" class="md:col-span-2"><input v-model="form.name_en" :class="inp" /></Field>
                 <Field label="الرمز (SKU)"><input v-model="form.sku" :class="inp" class="font-mono" /></Field>
                 <Field label="الباركود"><input v-model="form.barcode" :class="inp" class="font-mono" /></Field>
-                <Field label="التصنيف"><select v-model="form.category_id" :class="inp"><option value="">—</option><option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name_ar }}</option></select></Field>
-                <Field label="الوحدة الأساسية"><select v-model="form.unit_id" :class="inp"><option value="">—</option><option v-for="u in units" :key="u.id" :value="u.id">{{ u.name_ar }}</option></select></Field>
+                <Field label="التصنيف"><SelectCreate v-model="form.category_id" :options="categories" entity="category" label="name_ar" placeholder="—" /></Field>
+                <Field label="الوحدة الأساسية"><SelectCreate v-model="form.unit_id" :options="units" entity="unit" label="name_ar" placeholder="—" /></Field>
                 <Field label="النوع"><select v-model="form.type" :class="inp"><option value="product">صنف مخزني</option><option value="service">خدمة</option></select></Field>
                 <Field label="سعر الشراء" :error="form.errors.purchase_price"><input v-model="form.purchase_price" type="number" step="0.01" :class="inp" /></Field>
                 <Field label="سعر البيع" :error="form.errors.selling_price"><input v-model="form.selling_price" type="number" step="0.01" :class="inp" /></Field>

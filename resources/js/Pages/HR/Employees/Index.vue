@@ -26,7 +26,8 @@ const docLabel = { national_id: 'الهوية', iqama: 'الإقامة', border_
     <AppLayout>
         <Head title="الموظفون" />
         <PageHeader title="الموظفون" subtitle="ملفات الموظفين، الوثائق، الرواتب والبدلات" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'الموظفون' }]">
-            <template #actions><ImportButton v-if="$can('hr.employees.create')" type="employees" title="استيراد الموظفين من Excel" hint="الموظف الموجود (بنفس الرقم الوظيفي) تُحدّث بياناته الشخصية فقط. الرواتب والآيبان تُستورد لمن يملك صلاحية الرواتب." /><Link v-if="$can('hr.employees.create')" :href="route('hr.employees.create')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> موظف جديد</Link></template>
+            <template #actions><Link v-if="$can('hr.employees.create')" :href="route('hr.employees.create')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> موظف جديد</Link><ImportButton v-if="$can('hr.employees.create')" type="employees" title="استيراد الموظفين من Excel" hint="الموظف الموجود (بنفس الرقم الوظيفي) تُحدّث بياناته الشخصية فقط. الرواتب والآيبان تُستورد لمن يملك صلاحية الرواتب." />
+</template>
         </PageHeader>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             <StatCard label="على رأس العمل" :value="stats.active" />

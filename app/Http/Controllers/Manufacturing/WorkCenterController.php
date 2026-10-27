@@ -42,7 +42,11 @@ class WorkCenterController extends Controller
 
     public function store(Request $request)
     {
-        WorkCenter::create($this->validated($request));
+        $center = WorkCenter::create($this->validated($request));
+
+        if ($json = $this->createdResponse($request, $center, $center->name)) {
+            return $json;
+        }
 
         return redirect()->route('manufacturing.work-centers.index')->with('success', 'تمت إضافة مركز العمل.');
     }

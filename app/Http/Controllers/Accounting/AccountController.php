@@ -87,7 +87,7 @@ class AccountController extends Controller
             }
         }
 
-        Account::create([
+        $account = Account::create([
             'code' => $validated['code'],
             'name_ar' => $validated['name_ar'],
             'name_en' => $validated['name_en'] ?? null,
@@ -101,6 +101,10 @@ class AccountController extends Controller
             'cash_flow_category' => $validated['cash_flow_category'] ?? null,
             'requires_cost_center' => $validated['requires_cost_center'] ?? false,
         ]);
+
+        if ($json = $this->createdResponse($request, $account, $account->code.' - '.$account->name_ar)) {
+            return $json;
+        }
 
         return redirect()->route('accounting.accounts.index')
             ->with('success', 'تم إضافة الحساب المحاسبي بنجاح');

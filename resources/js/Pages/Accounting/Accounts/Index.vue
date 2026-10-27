@@ -214,7 +214,7 @@ const typeBadgeColors = {
             <!-- Header Ribbon -->
             <PageHeader title="دليل الحسابات" :crumbs="[{ label: 'المحاسبة' }, { label: 'دليل الحسابات' }]">
 <template #actions>
-<ImportButton v-if="$can('accounting.accounts.create')" type="accounts" title="استيراد دليل الحسابات من Excel" hint="الحساب الجديد يُنشأ تحت أبيه (parent_code) ويرث نوعه. الحساب الموجود يُحدّث اسمه فقط." />
+
                     <button 
                         @click="handleSearch"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-colors shadow-xs"
@@ -244,6 +244,7 @@ const typeBadgeColors = {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة حساب رئيسي جديد</span>
                     </Link>
+<ImportButton v-if="$can('accounting.accounts.create')" type="accounts" title="استيراد دليل الحسابات من Excel" hint="الحساب الجديد يُنشأ تحت أبيه (parent_code) ويرث نوعه. الحساب الموجود يُحدّث اسمه فقط." />
 </template>
 </PageHeader>
 

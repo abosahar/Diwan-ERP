@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { taxRate } from '@/utils/tax';
 import { computed, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -274,7 +275,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
                 <Field label="التاريخ"><input v-model="advanceForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المبلغ قبل الضريبة" :error="advanceForm.errors.amount"><input v-model="advanceForm.amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="طريقة الاستلام"><select v-model="advanceForm.payment_method" class="w-full rounded-xl border-slate-200 text-xs"><option value="bank_transfer">تحويل بنكي</option><option value="cheque">شيك</option><option value="cash">نقدي</option></select></Field>
-                <Field label="الحساب"><select v-model="advanceForm.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field label="الحساب"><SelectCreate v-model="advanceForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <p class="text-[11px] text-slate-500 mt-2">تصدر فاتورة ضريبية بالدفعة (الضريبة مستحقة عند الاستلام) وتُسترد من المستخلصات بنسبة {{ project.advance_percent }}%.</p>
             <template #footer><button @click="advanceForm.post(route('projects.advance', project.id), opts)" :disabled="advanceForm.processing" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">تسجيل</button></template>
@@ -313,7 +314,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
             <div class="grid grid-cols-2 gap-3">
                 <Field label="التاريخ"><input v-model="subAdvanceForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المبلغ"><input v-model="subAdvanceForm.amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field label="الحساب" class="col-span-2"><select v-model="subAdvanceForm.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field label="الحساب" class="col-span-2"><SelectCreate v-model="subAdvanceForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <template #footer><button @click="subAdvanceForm.post(route('projects.subcontracts.advance', selectedSub.id), opts)" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">صرف</button></template>
         </Dialog>
@@ -338,7 +339,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
                 <Field label="ضريبة المدخلات"><input v-model="costForm.vat_amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="السداد"><select v-model="costForm.paid_from" class="w-full rounded-xl border-slate-200 text-xs"><option value="accrued">مستحق (لاحقاً)</option><option value="payables">آجل لمورد</option><option value="cash">نقدي</option><option value="bank_transfer">بنكي</option></select></Field>
                 <Field v-if="costForm.paid_from === 'payables'" label="المورد" :error="costForm.errors.supplier_id"><PartyPicker v-model="costForm.supplier_id" route-name="lookup.suppliers" /></Field>
-                <Field v-if="['cash', 'bank_transfer'].includes(costForm.paid_from)" label="الحساب"><select v-model="costForm.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field v-if="['cash', 'bank_transfer'].includes(costForm.paid_from)" label="الحساب"><SelectCreate v-model="costForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <template #footer><button @click="costForm.post(route('projects.costs.store', project.id), { ...opts, onSuccess: () => { close(); costForm.reset('description', 'amount', 'vat_amount'); } })" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">تسجيل</button></template>
         </Dialog>
@@ -346,7 +347,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
         <Dialog :show="dialog === 'materials'" :title="materialForm.direction === 'issue' ? 'صرف مواد للمشروع' : 'مرتجع مواد من المشروع'" size="lg" @close="close">
             <div class="grid grid-cols-3 gap-3 mb-3">
                 <Field label="التاريخ"><input v-model="materialForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="المستودع"><select v-model="materialForm.warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+                <Field label="المستودع"><SelectCreate v-model="materialForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="المرجع"><input v-model="materialForm.reference" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <div class="relative mb-2">

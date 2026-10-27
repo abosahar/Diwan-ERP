@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ImportButton from '@/Components/UI/ImportButton.vue';
 import { computed, ref, reactive } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
@@ -43,11 +44,12 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
         <Head title="الأصول الثابتة" />
         <PageHeader title="الأصول الثابتة" :crumbs="[{ label: 'المحاسبة' }, { label: 'الأصول الثابتة' }]">
             <template #actions>
-                <ImportButton v-if="$can('accounting.fixed_assets.create')" type="fixed_assets" title="استيراد الأصول الثابتة من Excel" hint="تُسجّل كأصول افتتاحية بتاريخ اليوم: التكلفة والمجمع السابق (opening_accumulated) مقابل الأرصدة الافتتاحية. الفئة باسمها كما في النظام." />
+
                 <button v-if="$can('accounting.fixed_assets.post')" @click="depreciateOpen = true" class="px-3 py-2 rounded-xl border border-amber-300 text-amber-700 text-xs font-bold">ترحيل الإهلاك الشهري</button>
                 <button v-if="$can('accounting.fixed_assets.edit')" @click="categoryOpen = true" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold">فئة أصول</button>
                 <button v-if="$can('accounting.fixed_assets.create')" @click="assetOpen = true" :disabled="!categories.length" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold disabled:opacity-40"><PlusIcon class="w-4 h-4" /> أصل جديد</button>
-            </template>
+            <ImportButton v-if="$can('accounting.fixed_assets.create')" type="fixed_assets" title="استيراد الأصول الثابتة من Excel" hint="تُسجّل كأصول افتتاحية بتاريخ اليوم: التكلفة والمجمع السابق (opening_accumulated) مقابل الأرصدة الافتتاحية. الفئة باسمها كما في النظام." />
+</template>
         </PageHeader>
 
         <div class="grid grid-cols-3 gap-3 mb-4">
@@ -89,12 +91,12 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
 
         <Dialog :show="assetOpen" title="تسجيل أصل ثابت" size="lg" @close="assetOpen = false">
             <form @submit.prevent="saveAsset" class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                <Field label="الفئة" :error="assetForm.errors.asset_category_id"><select v-model="assetForm.asset_category_id" required class="w-full rounded-xl border-slate-200 text-xs"><option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name_ar }}</option></select></Field>
+                <Field label="الفئة" :error="assetForm.errors.asset_category_id"><SelectCreate v-model="assetForm.asset_category_id" :options="categories" entity="category" label="name_ar" :allow-empty="false" required /></Field>
                 <Field label="رمز الأصل" :error="assetForm.errors.code"><input v-model="assetForm.code" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="اسم الأصل" :error="assetForm.errors.name_ar"><input v-model="assetForm.name_ar" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الرقم التسلسلي"><input v-model="assetForm.serial_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الموقع"><input v-model="assetForm.location" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="مركز التكلفة"><select v-model="assetForm.cost_center_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">—</option><option v-for="c in costCenters" :key="c.id" :value="c.id">{{ c.name_ar }}</option></select></Field>
+                <Field label="مركز التكلفة"><SelectCreate v-model="assetForm.cost_center_id" :options="costCenters" entity="cost_center" label="name_ar" placeholder="—" /></Field>
                 <Field label="تاريخ الشراء" :error="assetForm.errors.acquisition_date"><input v-model="assetForm.acquisition_date" type="date" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="التكلفة" :error="assetForm.errors.cost"><input v-model="assetForm.cost" type="number" step="0.01" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="القيمة التخريدية" :error="assetForm.errors.salvage_value"><input v-model="assetForm.salvage_value" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
@@ -104,7 +106,7 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
                     <Field label="وحدة القياس"><input v-model="assetForm.unit_label" placeholder="ساعة، كم، قطعة" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </template>
                 <Field label="طريقة السداد"><select v-model="assetForm.paid_from" class="w-full rounded-xl border-slate-200 text-xs"><option value="bank_transfer">بنك</option><option value="cash">نقداً</option><option value="payables">آجل لمورد</option><option value="opening">رصيد افتتاحي</option></select></Field>
-                <Field v-if="['cash','bank_transfer'].includes(assetForm.paid_from)" label="الصندوق / البنك"><select v-model="assetForm.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field v-if="['cash','bank_transfer'].includes(assetForm.paid_from)" label="الصندوق / البنك"><SelectCreate v-model="assetForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
                 <Field v-if="assetForm.paid_from === 'payables'" label="رقم المورد" :error="assetForm.errors.supplier_id"><input v-model="assetForm.supplier_id" type="number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field v-if="assetForm.paid_from !== 'opening'" label="ضريبة المدخلات" :error="assetForm.errors.acquisition_vat">
                     <label class="flex items-center gap-2 py-2"><input v-model="assetForm.taxable" type="checkbox" class="rounded" /> فاتورة ضريبية {{ $taxRate() }}% ({{ ((parseFloat(assetForm.cost) || 0) * $taxRate() / 100).toFixed(2) }})</label>
@@ -124,9 +126,9 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
                     <Field label="العمر الإنتاجي (شهر)"><input v-model="categoryForm.useful_life_months" type="number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="طريقة الإهلاك"><select v-model="categoryForm.depreciation_method" class="w-full rounded-xl border-slate-200 text-xs"><option value="straight_line">القسط الثابت</option><option value="declining_balance">القسط المتناقص</option><option value="units_of_production">وحدات الإنتاج (ساعات/كم/وحدات)</option></select></Field>
                 </div>
-                <Field label="حساب الأصل" hint="فارغ = الحساب الافتراضي"><select v-model="categoryForm.asset_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="a in accounts.filter(x => x.type === 'asset')" :key="a.id" :value="a.id">{{ a.code }} - {{ a.name_ar }}</option></select></Field>
-                <Field label="حساب مجمع الإهلاك"><select v-model="categoryForm.accumulated_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="a in accounts.filter(x => x.type === 'asset')" :key="a.id" :value="a.id">{{ a.code }} - {{ a.name_ar }}</option></select></Field>
-                <Field label="حساب مصروف الإهلاك"><select v-model="categoryForm.expense_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="a in accounts.filter(x => x.type === 'expense')" :key="a.id" :value="a.id">{{ a.code }} - {{ a.name_ar }}</option></select></Field>
+                <Field label="حساب الأصل" hint="فارغ = الحساب الافتراضي"><SelectCreate v-model="categoryForm.asset_account_id" :options="accounts.filter(x => x.type === 'asset')" entity="account" :label="(a) => `${a.code} - ${a.name_ar}`" placeholder="الافتراضي" /></Field>
+                <Field label="حساب مجمع الإهلاك"><SelectCreate v-model="categoryForm.accumulated_account_id" :options="accounts.filter(x => x.type === 'asset')" entity="account" :label="(a) => `${a.code} - ${a.name_ar}`" placeholder="الافتراضي" /></Field>
+                <Field label="حساب مصروف الإهلاك"><SelectCreate v-model="categoryForm.expense_account_id" :options="accounts.filter(x => x.type === 'expense')" entity="account" :label="(a) => `${a.code} - ${a.name_ar}`" placeholder="الافتراضي" /></Field>
             </form>
             <template #footer>
                 <button @click="saveCategory" :disabled="categoryForm.processing" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">{{ $t('ui.save') }}</button>

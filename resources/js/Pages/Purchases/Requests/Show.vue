@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ask } from '@/composables/useDialog';
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -62,7 +63,7 @@ const convert = () => form.post(route('purchases.requests.convert', props.reques
         </div>
         <Dialog :show="open" title="تحويل إلى أمر شراء" @close="open = false">
             <Field label="المورد" :error="form.errors.supplier_id"><PartyPicker v-model="form.supplier_id" route-name="lookup.suppliers" /></Field>
-            <Field label="المستودع" class="mt-3"><select v-model="form.warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+            <Field label="المستودع" class="mt-3"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
             <p v-if="form.errors.request" class="text-xs text-rose-600 mt-2">{{ form.errors.request }}</p>
             <template #footer><button @click="convert" :disabled="form.processing || !form.supplier_id" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">إنشاء مسودة أمر شراء</button></template>
         </Dialog>

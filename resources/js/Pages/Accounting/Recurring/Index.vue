@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref, computed } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -55,8 +56,8 @@ const freq = { monthly: 'شهري', quarterly: 'ربع سنوي', yearly: 'سن�
             </div>
             <div class="overflow-x-auto"><table class="w-full text-xs">
                 <tr v-for="(l, i) in form.lines" :key="i">
-                    <td class="p-1"><select v-model="l.account_id" class="w-full rounded-lg border-slate-200 text-xs"><option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.code }} - {{ a.name_ar }}</option></select></td>
-                    <td class="p-1 w-36"><select v-model="l.cost_center_id" class="w-full rounded-lg border-slate-200 text-xs"><option value="">مركز تكلفة</option><option v-for="c in costCenters" :key="c.id" :value="c.id">{{ c.name_ar }}</option></select></td>
+                    <td class="p-1"><SelectCreate v-model="l.account_id" :options="accounts" entity="account" :label="(a) => `${a.code} - ${a.name_ar}`" :allow-empty="false" /></td>
+                    <td class="p-1 w-36"><SelectCreate v-model="l.cost_center_id" :options="costCenters" entity="cost_center" label="name_ar" placeholder="مركز تكلفة" /></td>
                     <td class="p-1 w-28"><input v-model="l.debit" @focus="l.credit = 0" type="number" step="0.01" placeholder="مدين" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td class="p-1 w-28"><input v-model="l.credit" @focus="l.debit = 0" type="number" step="0.01" placeholder="دائن" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td class="p-1 w-8"><button v-if="form.lines.length > 2" @click="form.lines.splice(i, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td>

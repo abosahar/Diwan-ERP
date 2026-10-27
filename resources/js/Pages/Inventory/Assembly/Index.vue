@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -54,7 +55,7 @@ const run = () => orderForm.post(route('inventory.assembly.orders.store'), { pre
             <form v-if="$can('inventory.assembly.create') && boms.length" @submit.prevent="run" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 text-xs h-fit">
                 <h3 class="font-black text-slate-800">أمر تجميع</h3>
                 <Field label="قائمة المواد" :error="orderForm.errors.bom_id"><select v-model="orderForm.bom_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="b in boms" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
-                <Field label="المستودع"><select v-model="orderForm.warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+                <Field label="المستودع"><SelectCreate v-model="orderForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" /></Field>
                 <Field label="الكمية المنتجة" :error="orderForm.errors.quantity"><input v-model="orderForm.quantity" type="number" step="0.0001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="التاريخ"><input v-model="orderForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <p v-if="orderForm.errors.items" class="text-rose-600">{{ orderForm.errors.items }}</p>

@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, onMounted, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -69,7 +70,7 @@ onMounted(() => { if (props.prefill) create(); });
                 <Field v-if="selected && ['hours','both'].includes(selected.meter_type)" label="عداد الساعات" :hint="`الحالي ${selected.current_hours}`"><input v-model="form.hours_reading" type="number" min="0" step="0.1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field v-if="selected && ['km','both'].includes(selected.meter_type)" label="الكيلومترات" :hint="`الحالي ${Number(selected.current_km).toLocaleString('en-US')}`"><input v-model="form.km_reading" type="number" min="0" step="0.1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الفني / الورشة"><input v-model="form.technician" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="مستودع الصرف"><select v-model="form.warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+                <Field label="مستودع الصرف"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" /></Field>
                 <Field label="وصف العمل / العطل" class="col-span-2"><textarea v-model="form.notes" rows="2" class="w-full rounded-xl border-slate-200 text-xs"></textarea></Field>
                 <p v-if="form.type === 'preventive'" class="col-span-2 text-slate-500">تُضاف البنود المستحقة أو القريبة تلقائياً، ويمكنك تعديلها عند الإكمال.</p>
             </div>

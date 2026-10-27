@@ -68,7 +68,7 @@ onBeforeUnmount(() => clearInterval(timer));
                 <b class="text-emerald-800">تم التحديث إلى الإصدار {{ status.to }}.</b> جارٍ إعادة تحميل الصفحة...
             </template>
             <template v-else-if="working">
-                <b class="text-emerald-800">جارٍ التحديث إلى الإصدار {{ info.latest?.version }}</b>
+                <b class="text-emerald-800">جارٍ التحديث إلى أحدث إصدار{{ status?.to ? ' ' + status.to : '' }}</b>
                 <span class="text-slate-600"> — يمكنك متابعة العمل، لن يتوقف النظام. ستُعاد الصفحة تلقائياً عند الانتهاء.</span>
             </template>
             <template v-else>

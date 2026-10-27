@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { reactive } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -32,7 +33,7 @@ const save = (op) => {
                 <div class="grid grid-cols-3 gap-2">
                     <input v-model="entry(op.id).minutes" type="number" step="0.01" placeholder="دقائق" class="text-xs rounded-xl border-slate-200" />
                     <input v-model="entry(op.id).quantity" type="number" step="0.0001" placeholder="كمية" class="text-xs rounded-xl border-slate-200" />
-                    <select v-model="entry(op.id).employee_id" class="text-xs rounded-xl border-slate-200"><option value="">عامل</option><option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option></select>
+                    <SelectCreate v-model="entry(op.id).employee_id" :options="employees" entity="employee" label="name" placeholder="عامل" />
                 </div>
                 <button type="button" :disabled="!entry(op.id).minutes" @click="save(op)" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold disabled:opacity-40">تسجيل</button>
             </div>
