@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -210,30 +211,16 @@ const removeLogo = async () => {
 
         <div class="space-y-5 w-full pb-12">
             <!-- Top Breadcrumbs & Action Bar -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs Ribbon -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">الإعدادات والفوترة</span>
-                    </div>
-
-                    <!-- Refresh Button -->
-                    <button 
+            <PageHeader title="الإعدادات والفوترة" :crumbs="[{ label: 'الإعدادات والفوترة' }]">
+<template #actions>
+<button 
                         @click="router.reload()" 
                         title="تحديث البيانات"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xs transition-all"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <!-- Action Button -->
-                <div class="flex items-center gap-2">
-                    <button 
+<button 
                         @click="saveSettings"
                         :disabled="form.processing"
                         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150 disabled:opacity-50"
@@ -241,8 +228,8 @@ const removeLogo = async () => {
                         <CheckBadgeIcon class="w-4 h-4 stroke-2" />
                         <span>{{ form.processing ? 'جارٍ الحفظ...' : 'حفظ كافة التعديلات' }}</span>
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <LocalAccessCard v-if="localAccess" :urls="localAccess" />
 

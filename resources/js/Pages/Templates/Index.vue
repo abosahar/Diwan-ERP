@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
@@ -23,27 +24,9 @@ const props = defineProps({
     templates: Array,
 });
 
-// Modal for creating a new template
-const showCreateModal = ref(false);
-const createForm = useForm({
-    name: '',
-    mode: 'freeform',
-    template_type: 'invoice',
-    primary_color: '#1e293b',
-});
 // Free-form templates exist for every printable document kind.
 const kinds = { invoice: 'فاتورة مبيعات', quotation: 'عرض سعر', sales_order: 'أمر بيع', credit_note: 'إشعار دائن / مرتجع', debit_note: 'إشعار مدين', receipt: 'سند قبض', payment: 'سند صرف لمورد' };
-const setMode = (mode) => { createForm.mode = mode; createForm.template_type = mode === 'freeform' ? 'invoice' : 'invoice_a4'; };
 const isFreeform = (t) => t.layout_data?.mode === 'freeform';
-
-const submitCreate = () => {
-    createForm.post(route('templates.store'), {
-        onSuccess: () => {
-            showCreateModal.value = false;
-            createForm.reset();
-        },
-    });
-};
 
 const duplicateTemplate = (template) => {
     router.post(route('templates.duplicate', template.id));
@@ -81,39 +64,21 @@ const getTypeName = (type) => {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs Ribbon -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">قوالب الطباعة</span>
-                    </div>
-
-                    <!-- Refresh Button -->
-                    <button 
+            <PageHeader title="قوالب الطباعة" :crumbs="[{ label: 'قوالب الطباعة' }]">
+<template #actions>
+<button 
                         @click="router.reload()" 
                         title="تحديث البيانات"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xs transition-all"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <!-- Action Button -->
-                <div class="flex items-center gap-2">
-                    <button 
-                        @click="showCreateModal = true"
-                        type="button"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150"
-                    >
+<Link v-if="$can('admin.templates.create')" :href="route('templates.create')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow-indigo-500/20 transition-all duration-150">
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إنشاء قالب جديد</span>
-                    </button>
-                </div>
-            </div>
+                    </Link>
+</template>
+</PageHeader>
 
             <!-- KPI Mini Summary Bar -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -237,104 +202,6 @@ const getTypeName = (type) => {
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Create New Template Modal -->
-            <div 
-                v-if="showCreateModal" 
-                class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"
-            >
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 max-w-md w-full shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <div class="flex items-center gap-2">
-                            <PaintBrushIcon class="w-5 h-5 text-indigo-600" />
-                            <h3 class="font-bold text-slate-900 text-sm">إنشاء قالب طباعة جديد</h3>
-                        </div>
-                        <button @click="showCreateModal = false" class="text-slate-400 hover:text-slate-600">
-                            <XMarkIcon class="w-5 h-5" />
-                        </button>
-                    </div>
-
-                    <form @submit.prevent="submitCreate" class="space-y-4 text-xs">
-                        <div>
-                            <label class="block font-medium text-slate-700 mb-1">اسم القالب</label>
-                            <input 
-                                v-model="createForm.name" 
-                                type="text" 
-                                required 
-                                placeholder="مثال: قالب الفاتورة الهندسية الحديثة" 
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
-                            />
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2" role="radiogroup" aria-label="طريقة التصميم">
-                            <button type="button" role="radio" :aria-checked="createForm.mode === 'freeform'" @click="setMode('freeform')" :class="['p-3 rounded-xl border text-start', createForm.mode === 'freeform' ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200']">
-                                <span class="block font-black text-slate-800">تصميم حر</span>
-                                <span class="block text-slate-500 mt-1">ضع أي عنصر في أي مكان بالسحب والإفلات</span>
-                            </button>
-                            <button type="button" role="radio" :aria-checked="createForm.mode === 'quick'" @click="setMode('quick')" :class="['p-3 rounded-xl border text-start', createForm.mode === 'quick' ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200']">
-                                <span class="block font-black text-slate-800">تصميم سريع</span>
-                                <span class="block text-slate-500 mt-1">أقسام جاهزة تختار ما يظهر منها</span>
-                            </button>
-                        </div>
-
-                        <div v-if="createForm.mode === 'freeform'">
-                            <label class="block font-medium text-slate-700 mb-1" for="ff-kind">المستند</label>
-                            <select id="ff-kind" v-model="createForm.template_type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800">
-                                <option v-for="(l, k) in kinds" :key="k" :value="k">{{ l }}</option>
-                            </select>
-                            <p v-if="createForm.errors.template_type" class="text-rose-600 mt-1">{{ createForm.errors.template_type }}</p>
-                            <p class="text-slate-400 mt-1">يبدأ بتصميم جاهز يمكنك تغيير كل شيء فيه.</p>
-                        </div>
-
-                        <div v-else>
-                            <label class="block font-medium text-slate-700 mb-1">نوع المستند</label>
-                            <select 
-                                v-model="createForm.template_type" 
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
-                            >
-                                <option value="invoice_a4">فاتورة ضريبية قياسية (A4 ZATCA)</option>
-                                <option value="invoice_thermal_80mm">إيصال حراري كاشير (80mm POS)</option>
-                                <option value="quotation">عرض أسعار رسمي (Quotation A4)</option>
-                                <option value="voucher">سندات مالية (Voucher)</option>
-                            </select>
-                        </div>
-
-                        <div v-if="createForm.mode === 'quick'">
-                            <label class="block font-medium text-slate-700 mb-1">اللون الرئيسي المميز</label>
-                            <div class="flex items-center gap-3">
-                                <input 
-                                    v-model="createForm.primary_color" 
-                                    type="color" 
-                                    class="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-1"
-                                />
-                                <input 
-                                    v-model="createForm.primary_color" 
-                                    type="text" 
-                                    class="w-32 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs"
-                                />
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-                            <button 
-                                @click="showCreateModal = false"
-                                type="button" 
-                                class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold"
-                            >
-                                إلغاء
-                            </button>
-                            <button 
-                                type="submit" 
-                                :disabled="createForm.processing"
-                                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center gap-1.5 disabled:opacity-50"
-                            >
-                                <CheckIcon class="w-4 h-4 stroke-2" />
-                                <span>إنشاء وفتح المصمم</span>
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>

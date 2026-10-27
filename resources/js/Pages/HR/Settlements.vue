@@ -26,7 +26,7 @@ const approve = (s) => { if (confirm('اعتماد المخالصة وإنهاء
                 <div v-if="$can('hr.settlements.approve')" class="flex gap-2 items-center"><input v-model="provision.date" type="date" class="rounded-xl border-slate-200 text-xs" /><button @click="provision.post(route('hr.settlements.provision'))" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">تحديث مخصص نهاية الخدمة</button></div>
             </template>
         </PageHeader>
-        <div class="grid lg:grid-cols-3 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
             <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <table class="w-full">
                     <thead class="bg-slate-50 text-slate-500"><tr><th class="text-start px-3 py-2">الموظف</th><th class="px-3 py-2">السبب</th><th class="px-3 py-2">الخدمة</th><th class="px-3 py-2 text-end">المكافأة</th><th class="px-3 py-2 text-end">الإجازات</th><th class="px-3 py-2 text-end">الصافي</th><th class="px-3 py-2">الحالة</th><th></th></tr></thead>

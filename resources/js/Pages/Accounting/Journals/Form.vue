@@ -1,0 +1,254 @@
+<script setup>
+import ImportLines from '@/Components/Documents/ImportLines.vue';
+import { computed } from 'vue';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+import { PlusIcon, TrashIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
+
+const props = defineProps({
+    accounts: Array,
+    costCenters: Array,
+    customers: { type: Array, default: () => [] },
+    suppliers: { type: Array, default: () => [] },
+    partyAccounts: { type: Object, default: () => ({}) },
+});
+
+// Receivable / payable lines name their customer or supplier.
+const partyType = (line) => props.partyAccounts?.[String(line.account_id)] || null;
+const syncParty = (line) => {
+    const type = partyType(line);
+    if (line.party_type !== type) {
+        line.party_type = type || '';
+        line.party_id = '';
+    }
+};
+
+const blankLine = (i = 0) => ({ account_id: props.accounts?.[i]?.id || '', cost_center_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 });
+
+const form = useForm({
+    date: new Date().toISOString().split('T')[0],
+    reference: '',
+    description: '',
+    entry_type: 'manual',
+    save_as: 'posted',
+    lines: [blankLine(0), blankLine(1)],
+});
+
+const addLine = () => form.lines.push(blankLine(0));
+const removeLine = (index) => {
+    if (form.lines.length > 2) form.lines.splice(index, 1);
+};
+
+const totalDebit = computed(() => form.lines.reduce((acc, l) => acc + (parseFloat(l.debit) || 0), 0));
+const totalCredit = computed(() => form.lines.reduce((acc, l) => acc + (parseFloat(l.credit) || 0), 0));
+const isBalanced = computed(() => Math.abs(totalDebit.value - totalCredit.value) < 0.01 && totalDebit.value > 0);
+
+const submitEntry = (saveAs = 'posted') => {
+    form.lines.forEach(syncParty);
+    if (!isBalanced.value) return;
+    form.save_as = saveAs;
+    form.post(route('accounting.journals.store'));
+};
+
+const formatCurrency = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const importLines = (lines, replace) => {
+    const rows = lines.map((l) => ({ account_id: l.account_id, cost_center_id: l.cost_center_id || '', party_type: '', party_id: '', description: l.description || '', debit: l.debit, credit: l.credit }));
+    form.lines = replace ? rows : [...form.lines.filter((l) => Number(l.debit) || Number(l.credit)), ...rows];
+};
+</script>
+
+<template>
+    <AppLayout own-errors>
+        <Head title="قيد يومية جديد" />
+        <PageHeader title="قيد يومية جديد" :crumbs="[{ label: 'المحاسبة' }, { label: 'القيود اليومية', href: route('accounting.journals.index') }, { label: 'جديد' }]" />
+
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-6">
+                    <form @submit.prevent="submitEntry('posted')" class="space-y-4 text-xs ">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-medium text-slate-700 mb-1">تاريخ القيد <span class="text-rose-500">*</span></label>
+                                <input 
+                                    v-model="form.date" 
+                                    type="date" 
+                                    required 
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
+                                />
+                            </div>
+                            <div>
+                                <label class="block font-medium text-slate-700 mb-1">الرقم المرجعي (اختياري)</label>
+                                <input 
+                                    v-model="form.reference" 
+                                    type="text" 
+                                    placeholder="رقم شيك، إشعار، عقد..."
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
+                                />
+                            </div>
+                        </div>
+            
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">نوع القيد</label>
+                            <select v-model="form.entry_type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+                                <option value="manual">قيد يومية عادي</option>
+                                <option value="opening">قيد أرصدة افتتاحية</option>
+                                <option value="adjustment">قيد تسوية</option>
+                            </select>
+                        </div>
+            
+                        <div>
+                            <label class="block font-medium text-slate-700 mb-1">بيان القيد العام <span class="text-rose-500">*</span></label>
+                            <input 
+                                v-model="form.description" 
+                                type="text" 
+                                required 
+                                placeholder="شرح القيد المحاسبي..."
+                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500" 
+                            />
+                        </div>
+            
+                        <!-- Lines Table -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <table class="w-full text-3xs">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
+                                        <th class="py-2.5 px-3 text-start">الحساب المحاسبي</th>
+                                        <th class="py-2.5 px-3 text-start">مركز التكلفة</th>
+                                        <th class="py-2.5 px-3 text-start">شرح البند</th>
+                                        <th class="py-2.5 px-3 text-end w-28">مدين (Debit)</th>
+                                        <th class="py-2.5 px-3 text-end w-28">دائن (Credit)</th>
+                                        <th class="py-2.5 px-2 text-center w-10"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr v-for="(line, idx) in form.lines" :key="idx" class="bg-white">
+                                        <td class="p-2">
+                                            <select 
+                                                v-model="line.account_id" 
+                                                required 
+                                                @change="syncParty(line)"
+                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs"
+                                            >
+                                                <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
+                                                    {{ acc.code }} - {{ acc.name_ar }}
+                                                </option>
+                                            </select>
+                                            <select v-if="partyType(line)" v-model="line.party_id" required
+                                                class="mt-1 w-full py-1 px-2 bg-amber-50 border border-amber-200 rounded-lg text-3xs">
+                                                <option value="">{{ partyType(line) === 'customer' ? '— اختر العميل —' : '— اختر المورد —' }}</option>
+                                                <option v-for="p in (partyType(line) === 'customer' ? customers : suppliers)" :key="p.id" :value="p.id">{{ p.name }}</option>
+                                            </select>
+                                        </td>
+                                        <td class="p-2">
+                                            <select v-model="line.cost_center_id" class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs">
+                                                <option value="">—</option>
+                                                <option v-for="cc in costCenters" :key="cc.id" :value="cc.id">{{ cc.code }} - {{ cc.name_ar }}</option>
+                                            </select>
+                                        </td>
+                                        <td class="p-2">
+                                            <input 
+                                                v-model="line.description" 
+                                                type="text" 
+                                                placeholder="بيان تفصيلي"
+                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs"
+                                            />
+                                        </td>
+                                        <td class="p-2">
+                                            <input 
+                                                v-model="line.debit" 
+                                                type="number" 
+                                                step="0.01" 
+                                                min="0"
+                                                @focus="line.credit = 0"
+                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs font-mono text-end font-bold"
+                                            />
+                                        </td>
+                                        <td class="p-2">
+                                            <input 
+                                                v-model="line.credit" 
+                                                type="number" 
+                                                step="0.01" 
+                                                min="0"
+                                                @focus="line.debit = 0"
+                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs font-mono text-end font-bold"
+                                            />
+                                        </td>
+                                        <td class="p-2 text-center">
+                                            <button 
+                                                type="button" 
+                                                @click="removeLine(idx)" 
+                                                :disabled="form.lines.length <= 2"
+                                                class="p-1 text-slate-300 hover:text-rose-600 disabled:opacity-20"
+                                            >
+                                                <TrashIcon class="w-3.5 h-3.5" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-slate-50 font-bold border-t border-slate-200">
+                                        <td colspan="3" class="p-2 text-start">
+                                            <ImportLines kind="journal" label="استيراد الأطراف من Excel" @imported="importLines" />
+                                            <button 
+                                                type="button" 
+                                                @click="addLine" 
+                                                class="text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1"
+                                            >
+                                                <PlusIcon class="w-3.5 h-3.5" />
+                                                <span>إضافة طرف قيد</span>
+                                            </button>
+                                        </td>
+                                        <td class="p-2 text-end font-mono font-black text-xs text-slate-900">
+                                            {{ formatCurrency(totalDebit) }} ﷼
+                                        </td>
+                                        <td class="p-2 text-end font-mono font-black text-xs text-slate-900">
+                                            {{ formatCurrency(totalCredit) }} ﷼
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+            
+                        <div v-if="Object.keys(form.errors).length" class="p-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs space-y-1">
+                            <p v-for="(msg, key) in form.errors" :key="key">{{ msg }}</p>
+                        </div>
+            
+                        <!-- Balance Verification Status -->
+                        <div 
+                            :class="[
+                                isBalanced ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-800',
+                                'p-3 rounded-xl border flex items-center justify-between text-xs'
+                            ]"
+                        >
+                            <div class="flex items-center gap-2">
+                                <CheckCircleIcon v-if="isBalanced" class="w-5 h-5 text-emerald-600" />
+                                <ExclamationTriangleIcon v-else class="w-5 h-5 text-amber-600" />
+                                <span v-if="isBalanced" class="font-bold">القيد متوازن وجاهز للترحيل مباشرة.</span>
+                                <span v-else class="font-bold">القيد غير متوازن! الفرق بين المدين والدائن: {{ formatCurrency(Math.abs(totalDebit - totalCredit)) }} ﷼</span>
+                            </div>
+                        </div>
+            
+                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                            <Link :href="route('accounting.journals.index')" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-medium">إلغاء</Link>
+                            <button
+                                type="button"
+                                @click="submitEntry('draft')"
+                                :disabled="!isBalanced || form.processing"
+                                class="px-4 py-2 border border-amber-300 text-amber-700 rounded-xl font-bold disabled:opacity-50"
+                            >
+                                حفظ كمسودة
+                            </button>
+                            <button 
+                                v-if="$can('accounting.journals.post')"
+                                type="submit" 
+                                :disabled="!isBalanced || form.processing"
+                                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-xs hover:shadow-indigo-500/20 disabled:opacity-50"
+                            >
+                                ترحيل القيد اليومي
+                            </button>
+                        </div>
+                    </form>
+        </div>
+    </AppLayout>
+</template>

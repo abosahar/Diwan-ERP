@@ -71,6 +71,33 @@ class UserController extends Controller
         ]);
     }
 
+    public function create(): Response
+    {
+        return Inertia::render('Users/Form', $this->formLookups());
+    }
+
+    public function edit(User $user): Response
+    {
+        abort_unless((int) $user->company_id === (int) $this->tenantManager->getTenantId() && ! $user->is_super_admin, 404);
+        $user->load(['branches:id,name_ar', 'roles:id,name']);
+
+        return Inertia::render('Users/Form', $this->formLookups() + ['user' => $user]);
+    }
+
+    protected function formLookups(): array
+    {
+        return [
+            'branches' => Branch::where('is_active', true)->get(['id', 'name_ar', 'name_en']),
+            'roles' => $this->companyRoles()->orderBy('id')->get(['id', 'name'])
+                ->map(fn (Role $role) => [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'label' => $this->registry->roleLabel($role->name, app()->getLocale()),
+                    'is_owner' => $role->name === $this->registry->ownerRole(),
+                ]),
+        ];
+    }
+
     public function store(Request $request)
     {
         $companyId = $this->tenantManager->getTenantId();

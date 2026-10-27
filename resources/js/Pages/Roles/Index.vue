@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { computed, ref, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -102,17 +103,9 @@ const deleteRole = (role) => {
         <Head title="الأدوار والصلاحيات" />
 
         <div class="space-y-5">
-            <!-- Header -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                    <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                        <HomeIcon class="w-4 h-4" />
-                    </Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <span class="text-indigo-600 font-bold">{{ $t('nav.roles') }}</span>
-                </div>
-
-                <button
+<PageHeader :title="$t('nav.roles')" :crumbs="[{ label: $t('nav.roles') }]">
+<template #actions>
+<button
                     v-if="$can('admin.roles.create')"
                     @click="openCreate"
                     class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 shadow-sm"
@@ -120,7 +113,8 @@ const deleteRole = (role) => {
                     <PlusIcon class="w-4 h-4" />
                     {{ $t('permissions.new_role') }}
                 </button>
-            </div>
+</template>
+</PageHeader>
 
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-5">
                 <!-- Roles list -->

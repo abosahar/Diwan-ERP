@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 import {
@@ -31,29 +32,16 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Breadcrumbs Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-slate-500">المبيعات</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">المرتجعات والإشعارات الدائنة</span>
-                    </div>
-
-                    <button 
+            <PageHeader title="المرتجعات والإشعارات الدائنة" :crumbs="[{ label: 'المبيعات' }, { label: 'المرتجعات والإشعارات الدائنة' }]">
+<template #actions>
+<button 
                         @click="router.reload()" 
                         title="تحديث البيانات"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 transition-all"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <Link 
+<Link 
                         v-if="$canRoute('sales.returns.create')"
                         :href="route('sales.returns.create')"
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs hover:shadow-indigo-500/20 transition-all duration-150"
@@ -61,8 +49,8 @@ const formatCurrency = (val) => {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إصدار إشعار دائن جديد</span>
                     </Link>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Summary KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

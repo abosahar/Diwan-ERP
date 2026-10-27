@@ -27,7 +27,7 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.filter((i) => N
         <Head title="مرتجع مشتريات" />
         <PageHeader title="مرتجع مشتريات" :subtitle="`الرقم المتوقع: ${suggestedNumber}`" :crumbs="[{ label: 'المشتريات' }, { label: 'المرتجعات', href: route('purchases.returns.index') }, { label: 'جديد' }]" />
         <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="فاتورة الشراء" class="md:col-span-2">
                     <select :value="invoice?.id" @change="pick" class="w-full rounded-xl border-slate-200 text-xs">
                         <option value="">اختر الفاتورة...</option>

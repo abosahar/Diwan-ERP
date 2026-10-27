@@ -33,6 +33,19 @@ class WarehouseController extends Controller
         ]);
     }
 
+    public function create(): Response
+    {
+        return Inertia::render('Inventory/Warehouses/Form', ['branches' => Branch::where('is_active', true)->get(['id', 'name_ar', 'name_en'])]);
+    }
+
+    public function edit(Warehouse $warehouse): Response
+    {
+        return Inertia::render('Inventory/Warehouses/Form', [
+            'warehouse' => $warehouse,
+            'branches' => Branch::where('is_active', true)->get(['id', 'name_ar', 'name_en']),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

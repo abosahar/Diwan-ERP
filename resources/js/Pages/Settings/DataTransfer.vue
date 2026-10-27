@@ -61,7 +61,7 @@ const masterTypes = computed(() => props.types.filter((t) => !t.opening));
             </ol>
         </section>
 
-        <div class="grid md:grid-cols-2 gap-4 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div v-for="t in masterTypes" :key="t.key" class="bg-white border border-slate-200 rounded-2xl p-4">
                 <h3 class="font-black text-slate-700">{{ t.label }}</h3>
                 <p class="text-slate-400 font-mono mt-1 break-words" dir="ltr">{{ t.columns.join(', ') }}</p>

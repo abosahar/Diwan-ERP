@@ -26,7 +26,7 @@ const setMethod = (method) => router.get(route('accounting.reports.cash-flow'), 
         </PageHeader>
         <DateRangeFilter route-name="accounting.reports.cash-flow" :filters="filters" :extra="{ method: filters.method }" />
 
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 max-w-4xl">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
             <template v-if="indirect">
                 <div class="mb-4">
                     <h3 class="font-black text-sm text-slate-800 bg-slate-50 px-4 py-2 rounded-xl">{{ labels.operating }}</h3>

@@ -30,7 +30,7 @@ const loan = useForm({ amount: 0, monthly_installment: 0, reason: '' });
             <StatCard label="تاريخ المباشرة" :value="date(employee.hire_date)" />
             <StatCard label="انتهاء الهوية/الإقامة" :value="employee.id_expiry ? `${date(employee.id_expiry)} — ${hijri(employee.id_expiry)}` : '—'" />
         </div>
-        <div class="grid lg:grid-cols-3 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
             <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
                 <h3 class="font-black text-slate-700">طلب إجازة</h3>
                 <select v-model="leave.leave_type_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="t in leaveTypes" :key="t.id" :value="t.id">{{ t.name }}</option></select>

@@ -130,6 +130,11 @@ class TemplateController extends Controller
     /**
      * Store a new template.
      */
+    public function create(): Response
+    {
+        return Inertia::render('Templates/Create');
+    }
+
     public function store(Request $request)
     {
         $tenantManager = app(TenantManager::class);

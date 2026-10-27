@@ -15,8 +15,10 @@ use App\Models\Lead;
 use App\Models\LeaveRequest;
 use App\Models\LetterOfGuarantee;
 use App\Models\Product;
+use App\Models\ProductionOrder;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
+use App\Models\QcInspection;
 use App\Models\SalesOrder;
 use App\Models\User;
 use App\Models\ZatcaDevice;
@@ -80,6 +82,15 @@ class AlertService
         $gosiMissing = ! $saudi ? 0 : $active()->where('nationality', 'SA')->where('gosi_registered', true)->where(fn ($q) => $q->whereNull('gosi_number')->orWhere('gosi_number', ''))->count();
         if ($gosiMissing) {
             $alerts[] = $this->alert('gosi_numbers', 'hr.employees.view', 'موظفون بلا رقم اشتراك في التأمينات', "{$gosiMissing} موظف سعودي مسجل في التأمينات دون رقم اشتراك", route('hr.employees.index', [], false));
+        }
+
+        $lateOrders = ProductionOrder::whereIn('status', ['released', 'in_progress'])->whereNotNull('planned_end')->where('planned_end', '<', $today)->count();
+        if ($lateOrders) {
+            $alerts[] = $this->alert('late_production_orders', 'manufacturing.orders.view', 'أوامر إنتاج متأخرة', "{$lateOrders} أمر تجاوز موعد انتهائه المخطط", route('manufacturing.orders.index', ['status' => 'in_progress'], false), 'warning');
+        }
+        $pendingQc = QcInspection::where('result', 'pending')->count();
+        if ($pendingQc) {
+            $alerts[] = $this->alert('pending_qc', 'manufacturing.quality.view', 'فحوصات جودة معلّقة', "{$pendingQc} فحص بانتظار النتيجة؛ المنتج محجوز عن المخزون حتى اعتماده", route('manufacturing.inspections.index', ['result' => 'pending'], false), 'warning');
         }
 
         $guarantees = LetterOfGuarantee::where('status', 'active')->whereDate('expiry_date', '<=', $soon)->count();

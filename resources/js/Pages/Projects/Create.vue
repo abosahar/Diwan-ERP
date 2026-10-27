@@ -22,7 +22,7 @@ const save = () => {
         <Head title="مشروع جديد" />
         <PageHeader title="مشروع / عقد جديد" :subtitle="`الرمز المتوقع: ${suggestedCode}`" :crumbs="[{ label: 'المقاولات' }, { label: 'المشاريع', href: route('projects.index') }, { label: 'جديد' }]" />
         <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="اسم المشروع" :error="form.errors.name" class="md:col-span-2"><input v-model="form.name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="العميل (المالك)" :error="form.errors.customer_id" class="md:col-span-2"><PartyPicker v-model="form.customer_id" /></Field>
                 <Field label="رقم العقد"><input v-model="form.contract_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>

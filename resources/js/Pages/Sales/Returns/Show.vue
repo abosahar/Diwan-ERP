@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { ref, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
@@ -66,6 +67,8 @@ const formatDateArabic = (dateStr) => {
 <template>
     <AppLayout>
         <Head :title="`إشعار دائن رقم ${creditNote.credit_note_number}`" />
+
+        <PageHeader :title="`إشعار دائن رقم ${creditNote.credit_note_number}`" :crumbs="[{ label: 'المبيعات' }, { label: 'المرتجعات', href: route('sales.returns.index') }, { label: creditNote.credit_note_number }]" />
 
         <div class="space-y-6 w-full pb-12">
             <!-- Top Action Ribbon (Hidden on Print) -->

@@ -46,7 +46,7 @@ const act = (name, message) => { if (!message || confirm(message)) router.post(r
             </template>
         </PageHeader>
 
-        <div class="grid lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-2 space-y-4">
                 <div class="bg-white border border-slate-200 rounded-2xl p-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                     <div><div class="text-slate-400">العميل</div><b>{{ order.customer?.name }}</b></div>

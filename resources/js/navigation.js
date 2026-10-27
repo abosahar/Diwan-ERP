@@ -1,5 +1,6 @@
 import {
     HomeIcon,
+    CubeTransparentIcon,
     ShoppingCartIcon,
     DeviceTabletIcon,
     ArchiveBoxIcon,
@@ -82,6 +83,25 @@ export default [
             { label: 'nav.maintenance_dashboard', route: 'equipment.maintenance.dashboard', path: '/equipment/maintenance/dashboard' },
             { label: 'nav.maintenance_orders', route: 'equipment.maintenance.index', path: '/equipment/maintenance', exact: true },
             { label: 'nav.equipment_reports', route: 'equipment.reports.index', path: '/equipment/reports' },
+        ],
+    },
+    {
+        key: 'manufacturing', label: 'nav.manufacturing', icon: CubeTransparentIcon, color: 'emerald',
+        children: [
+            { label: 'nav.mfg_dashboard', route: 'manufacturing.dashboard', path: '/manufacturing', exact: true },
+            { label: 'nav.mfg_orders', route: 'manufacturing.orders.index', path: '/manufacturing/orders' },
+            { label: 'nav.mfg_shop_floor', route: 'manufacturing.shop-floor.index', path: '/manufacturing/shop-floor' },
+            { label: 'nav.mfg_boms', route: 'manufacturing.boms.index', path: '/manufacturing/boms' },
+            { label: 'nav.mfg_routings', route: 'manufacturing.routings.index', path: '/manufacturing/routings' },
+            { label: 'nav.mfg_work_centers', route: 'manufacturing.work-centers.index', path: '/manufacturing/work-centers' },
+            { label: 'nav.mfg_mrp', route: 'manufacturing.mrp.index', path: '/manufacturing/mrp' },
+            { label: 'nav.mfg_capacity', route: 'manufacturing.capacity.index', path: '/manufacturing/capacity' },
+            { label: 'nav.mfg_process', route: 'manufacturing.periods.index', path: '/manufacturing/process/periods' },
+            { label: 'nav.mfg_stages', route: 'manufacturing.stages.index', path: '/manufacturing/process/stages' },
+            { label: 'nav.mfg_quality', route: 'manufacturing.inspections.index', path: '/manufacturing/quality/inspections' },
+            { label: 'nav.mfg_qc_plans', route: 'manufacturing.plans.index', path: '/manufacturing/quality/plans' },
+            { label: 'nav.mfg_subcontracts', route: 'manufacturing.subcontracts.index', path: '/manufacturing/subcontracts' },
+            { label: 'nav.mfg_reports', route: 'manufacturing.reports.index', path: '/manufacturing/reports' },
         ],
     },
     {

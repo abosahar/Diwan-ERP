@@ -36,7 +36,7 @@ const docLabel = { national_id: 'الهوية', iqama: 'الإقامة', border_
         </div>
         <div v-if="expiring.length" class="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs">
             <div class="font-bold text-amber-800 flex items-center gap-1 mb-1"><ExclamationTriangleIcon class="w-4 h-4" /> وثائق تنتهي خلال 60 يوماً</div>
-            <div class="grid md:grid-cols-2 gap-x-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                 <Link v-for="(d, i) in expiring" :key="i" :href="route('hr.employees.show', d.employee_id)" class="text-amber-700 hover:underline">{{ d.name }} — {{ docLabel[d.type] || d.type }} — <span class="font-mono">{{ date(d.expiry) }}</span></Link>
             </div>
         </div>

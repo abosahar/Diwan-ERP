@@ -20,7 +20,7 @@ const foreign = () => props.currencies.filter((c) => c.code !== props.base);
         <Head title="العملات وأسعار الصرف" />
         <PageHeader title="العملات وأسعار الصرف" :subtitle="`العملة الأساسية للمنشأة: ${base} — القيود المحاسبية تُسجَّل دائماً بها`" :crumbs="[{ label: 'الإعدادات' }, { label: 'العملات' }]" />
 
-        <div class="grid lg:grid-cols-3 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
             <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <table class="w-full">
                     <thead class="bg-slate-50 text-slate-500"><tr><th class="px-3 py-2 text-start">العملة</th><th class="px-3 py-2">الرمز</th><th class="px-3 py-2">السعر الحالي</th><th class="px-3 py-2"></th></tr></thead>

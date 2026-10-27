@@ -8,7 +8,7 @@ defineProps({ form: Object, lookups: Object, supplier: { type: Object, default: 
 
 <template>
     <div class="space-y-4 text-xs">
-        <div class="grid md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <Field label="رمز المعدة" :error="form.errors.code"><input v-model="form.code" dir="ltr" placeholder="LD-01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
             <Field label="اسم المعدة" :error="form.errors.name" class="md:col-span-2"><input v-model="form.name" placeholder="مثال: شيول كاتربلر 950" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             <Field label="الفئة" :error="form.errors.category" hint="حفار، رافعة، شاحنة، مولد..."><input v-model="form.category" list="equipment-categories" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
@@ -22,7 +22,7 @@ defineProps({ form: Object, lookups: Object, supplier: { type: Object, default: 
 
         <fieldset class="border border-slate-200 rounded-2xl p-3">
             <legend class="px-2 font-black text-slate-700">الملكية</legend>
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="نوع الملكية">
                     <select v-model="form.ownership" class="w-full rounded-xl border-slate-200 text-xs"><option value="owned">مملوكة للشركة</option><option value="rented_in">مستأجرة من مورد</option></select>
                 </Field>
@@ -43,7 +43,7 @@ defineProps({ form: Object, lookups: Object, supplier: { type: Object, default: 
 
         <fieldset class="border border-slate-200 rounded-2xl p-3">
             <legend class="px-2 font-black text-slate-700">العداد وأسعار التأجير</legend>
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="نوع العداد" hint="تُحسب عليه الصيانة الدورية">
                     <select v-model="form.meter_type" class="w-full rounded-xl border-slate-200 text-xs"><option value="hours">ساعات تشغيل</option><option value="km">كيلومترات</option><option value="both">ساعات وكيلومترات</option><option value="none">بدون عداد</option></select>
                 </Field>
@@ -54,7 +54,7 @@ defineProps({ form: Object, lookups: Object, supplier: { type: Object, default: 
                     <input v-model="form.current_km" type="number" min="0" step="0.1" :disabled="metersLocked" class="w-full rounded-xl border-slate-200 text-xs disabled:bg-slate-50" />
                 </Field>
             </div>
-            <div class="grid md:grid-cols-4 gap-3 mt-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
                 <Field label="سعر الساعة" :error="form.errors.hourly_rate"><input v-model="form.hourly_rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="سعر اليوم" :error="form.errors.daily_rate"><input v-model="form.daily_rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="سعر الشهر" :error="form.errors.monthly_rate"><input v-model="form.monthly_rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>

@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
@@ -62,32 +63,16 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <!-- Breadcrumbs & Refresh -->
-                <div class="flex items-center gap-2">
-                    <button 
+            <PageHeader title="أوامر الشراء" :crumbs="[{ label: 'المشتريات' }, { label: 'أوامر الشراء' }]">
+<template #actions>
+<button 
                         @click="handleSearch"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 transition-colors shadow-xs"
                         title="تحديث البيانات"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-
-                    <nav class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="hover:text-indigo-600 flex items-center transition-colors">
-                            <HomeIcon class="w-4 h-4 ml-1.5 text-slate-400" />
-                            <span>الرئيسية</span>
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 mx-2 text-slate-400 rtl:rotate-180" />
-                        <span class="text-slate-500">المشتريات</span>
-                        <ChevronRightIcon class="w-3.5 h-3.5 mx-2 text-slate-400 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">أوامر الشراء</span>
-                    </nav>
-                </div>
-
-                <!-- Action & Filter Buttons -->
-                <div class="flex items-center gap-2">
-                    <Link v-if="$can('purchases.orders.create')" :href="route('purchases.orders.create')" class="px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold flex items-center gap-2"><PlusIcon class="w-4 h-4" /><span>أمر شراء</span></Link>
+<Link v-if="$can('purchases.orders.create')" :href="route('purchases.orders.create')" class="px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold flex items-center gap-2"><PlusIcon class="w-4 h-4" /><span>أمر شراء</span></Link>
                     <button 
                         @click="isFilterOpen = !isFilterOpen"
                         :class="[
@@ -98,8 +83,8 @@ const formatCurrency = (val) => {
                         <FunnelIcon class="w-4 h-4" />
                         <span>تصفية</span>
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Collapsible Filter Panel -->
             <transition

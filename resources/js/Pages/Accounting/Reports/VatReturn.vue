@@ -21,7 +21,7 @@ const printPage = () => window.print();
         </PageHeader>
         <DateRangeFilter route-name="accounting.reports.vat-return" :filters="filters" />
 
-        <div v-if="multi || !saudi" class="mb-6 max-w-5xl space-y-3" data-tax-by-branch>
+        <div v-if="multi || !saudi" class="mb-6 space-y-3" data-tax-by-branch>
             <h3 class="font-black text-sm text-slate-800">ملخص الضريبة حسب الفرع والدولة</h3>
             <p v-if="!byBranch.length" class="text-xs text-slate-400">لا توجد مستندات في هذه الفترة.</p>
             <div v-for="b in byBranch" :key="b.branch_id + b.currency" class="bg-white border border-slate-200 rounded-2xl p-4 text-xs">
@@ -44,7 +44,7 @@ const printPage = () => window.print();
         </div>
 
         <h3 v-if="saudi && multi" class="font-black text-sm text-slate-800 mb-2">نموذج إقرار هيئة الزكاة والضريبة والجمارك (فروع السعودية وبالعملة الأساسية)</h3>
-        <div v-if="saudi" class="bg-white border border-slate-200 rounded-2xl overflow-hidden max-w-5xl">
+        <div v-if="saudi" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
             <table class="w-full text-xs">
                 <thead class="bg-slate-50 text-slate-500">
                     <tr><th class="px-3 py-2 w-12">#</th><th class="text-start px-3 py-2">البند</th><th class="text-end px-3 py-2">المبلغ ({{ $cur() }})</th><th class="text-end px-3 py-2">مبلغ التعديل</th><th class="text-end px-3 py-2">مبلغ ضريبة القيمة المضافة</th></tr>

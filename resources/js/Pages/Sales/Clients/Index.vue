@@ -1,10 +1,9 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import ImportButton from '@/Components/UI/ImportButton.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
-import CustomerModal from './CustomerModal.vue';
-import CustomerViewModal from './CustomerViewModal.vue';
 import axios from 'axios';
 import {
     PlusIcon,
@@ -43,44 +42,9 @@ const status = ref(props.filters?.status || '');
 const customerType = ref(props.filters?.customer_type || '');
 const activeMenu = ref(null);
 
-// Modal states
-const isAddEditModalOpen = ref(false);
-const editingCustomer = ref(null);
-
-const isViewModalOpen = ref(false);
-const viewingCustomer = ref(null);
-
-const openAddModal = () => {
-    editingCustomer.value = null;
-    isAddEditModalOpen.value = true;
-};
-
-const openEditModal = (client) => {
-    editingCustomer.value = client;
-    isAddEditModalOpen.value = true;
-};
-
-const openViewModal = async (client) => {
-    viewingCustomer.value = { ...client };
-    isViewModalOpen.value = true;
-
-    // Load full relationships (invoices, payments, quotations)
-    try {
-        const res = await axios.get(route('sales.clients.show', client.id), {
-            headers: { 'Accept': 'application/json' },
-        });
-        if (res.data?.client) {
-            viewingCustomer.value = res.data.client;
-        }
-    } catch (err) {
-        console.error('Failed to load full customer details', err);
-    }
-};
-
-const handleCustomerSaved = () => {
-    isAddEditModalOpen.value = false;
-    router.reload({ preserveScroll: true });
-};
+const openAddModal = () => router.visit(route('sales.clients.create'));
+const openEditModal = (client) => router.visit(route('sales.clients.edit', client.id));
+const openViewModal = (client) => router.visit(route('sales.clients.show', client.id));
 
 const toggleMenu = (id) => {
     activeMenu.value = activeMenu.value === id ? null : id;
@@ -132,19 +96,10 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5" @click="closeMenu" dir="rtl">
             <!-- Top Breadcrumbs & Action Bar -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs Ribbon -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">العملاء</span>
-                    </div>
-
-                    <ImportButton v-if="$can('sales.clients.create')" type="customers" title="استيراد العملاء من Excel" hint="عمود opening_balance اختياري: رصيد العميل الافتتاحي (للعملاء الجدد فقط)." />
-                    <!-- Refresh Button -->
+            <PageHeader title="العملاء" :crumbs="[{ label: 'العملاء' }]">
+<template #actions>
+<ImportButton v-if="$can('sales.clients.create')" type="customers" title="استيراد العملاء من Excel" hint="عمود opening_balance اختياري: رصيد العميل الافتتاحي (للعملاء الجدد فقط)." />
+                    
                     <button 
                         @click="router.reload()" 
                         class="p-2 bg-white border border-slate-200/80 rounded-xl text-slate-400 hover:text-indigo-600 hover:border-indigo-100 transition-colors shadow-xs"
@@ -152,11 +107,7 @@ const formatCurrency = (val) => {
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-3">
-                    <button
+<button
                         @click="isFilterOpen = !isFilterOpen"
                         :class="[
                             'inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold transition-all shadow-xs',
@@ -176,8 +127,8 @@ const formatCurrency = (val) => {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة عميل</span>
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Summary KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -467,22 +418,5 @@ const formatCurrency = (val) => {
                 </div>
             </div>
         </div>
-
-        <!-- Add/Edit Customer Modal (Exact matching screenshots 2 & 3) -->
-        <CustomerModal
-            :show="isAddEditModalOpen"
-            :customer="editingCustomer"
-            :nextCode="nextCode"
-            @close="isAddEditModalOpen = false"
-            @saved="handleCustomerSaved"
-        />
-
-        <!-- View Customer Modal (Exact matching screenshot 1) -->
-        <CustomerViewModal
-            :show="isViewModalOpen"
-            :customer="viewingCustomer"
-            @close="isViewModalOpen = false"
-            @edit="openEditModal"
-        />
     </AppLayout>
 </template>

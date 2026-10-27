@@ -35,6 +35,13 @@ class BankAccountController extends Controller
         ]);
     }
 
+    public function create(): Response
+    {
+        return Inertia::render('Finance/Banks/Form', [
+            'chartAccounts' => Account::where('type', 'asset')->where('is_parent', false)->get(['id', 'code', 'name_ar']),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

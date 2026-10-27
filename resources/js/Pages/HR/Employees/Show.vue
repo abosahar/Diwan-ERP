@@ -31,7 +31,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
             <button v-for="[k, l] in [['profile', 'الملف'], ['documents', 'الوثائق'], ['pay', 'الراتب'], ['leaves', 'الإجازات'], ['attendance', 'الحضور'], ['payslips', 'قسائم الراتب']]" :key="k" @click="tab = k" :class="tab === k ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500'" class="px-3 py-2 text-xs font-bold border-b-2">{{ l }}</button>
         </div>
 
-        <div v-if="tab === 'profile'" class="grid md:grid-cols-3 gap-4 text-xs">
+        <div v-if="tab === 'profile'" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-1.5">
                 <div class="flex justify-between"><span>الجنسية</span><b>{{ employee.nationality }}</b></div>
                 <div class="flex justify-between"><span>{{ employee.id_type === 'iqama' ? 'الإقامة' : 'الهوية' }}</span><b class="font-mono">{{ employee.national_id }}</b></div>
@@ -57,7 +57,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
             </div>
         </div>
 
-        <div v-if="tab === 'documents'" class="grid md:grid-cols-3 gap-4">
+        <div v-if="tab === 'documents'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="md:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <table class="w-full text-xs">
                     <thead class="bg-slate-50 text-slate-500"><tr><th class="text-start px-3 py-2">النوع</th><th class="px-3 py-2">الرقم</th><th class="px-3 py-2">الانتهاء</th><th class="px-3 py-2">الملف</th><th></th></tr></thead>
@@ -79,7 +79,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
             </div>
         </div>
 
-        <div v-if="tab === 'pay'" class="grid md:grid-cols-3 gap-4 text-xs">
+        <div v-if="tab === 'pay'" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div v-if="$can('hr.salaries.view')" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-1.5">
                 <div class="flex justify-between"><span>الأساسي</span><b class="font-mono">{{ money(employee.basic_salary) }}</b></div>
                 <div class="flex justify-between"><span>السكن</span><b class="font-mono">{{ money(employee.housing_allowance) }}</b></div>

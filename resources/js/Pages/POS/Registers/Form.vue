@@ -25,7 +25,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
         <PageHeader :title="editing ? 'تعديل جهاز كاشير' : 'إضافة جهاز كاشير'" :crumbs="[{ label: 'نقاط البيع' }, { label: 'الأجهزة', href: route('pos.registers.index') }, { label: editing ? 'تعديل' : 'إضافة' }]" />
 
         <form @submit.prevent="submit" class="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-5">
-            <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 <Field label="اسم الجهاز *" :error="form.errors.name"><input v-model="form.name" :class="input" placeholder="كاشير 1" required /></Field>
                 <Field label="الرمز" :error="form.errors.code"><input v-model="form.code" :class="input" class="font-mono" placeholder="POS-01" /></Field>
                 <Field label="المستودع (يُخصم منه المخزون) *" :error="form.errors.warehouse_id">

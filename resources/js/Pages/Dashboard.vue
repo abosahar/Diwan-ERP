@@ -154,7 +154,7 @@ const costOptions = computed(() => ({
                     <span class="text-xs text-slate-400">{{ checklistOpen ? 'إخفاء' : 'عرض' }}</span>
                 </span>
             </button>
-            <ul v-show="checklistOpen" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs mt-3">
+            <ul v-show="checklistOpen" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs mt-3">
                 <li v-for="s in onboarding.steps" :key="s.key">
                     <Link :href="s.url" class="flex items-center gap-2 p-2 rounded-xl border" :class="s.done ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-slate-200 hover:border-brand-300 text-slate-700'">
                         <span class="w-5 h-5 rounded-full flex items-center justify-center text-3xs font-black" :class="s.done ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'">{{ s.done ? '✓' : '' }}</span>

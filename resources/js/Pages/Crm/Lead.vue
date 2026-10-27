@@ -21,7 +21,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <button v-else-if="$can('crm.leads.convert')" @click="router.post(route('crm.leads.convert', lead.id))" class="px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">تحويل إلى عميل</button>
             </template>
         </PageHeader>
-        <div class="grid lg:grid-cols-3 gap-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
             <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
                 <Field label="المرحلة"><select v-model="form.status" :class="inp"><option v-for="(lb, k) in statuses" :key="k" :value="k">{{ lb }}</option></select></Field>
                 <Field v-if="form.status === 'lost'" label="سبب الخسارة" :error="form.errors.lost_reason"><input v-model="form.lost_reason" :class="inp" /></Field>

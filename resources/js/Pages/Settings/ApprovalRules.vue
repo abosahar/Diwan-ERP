@@ -16,7 +16,7 @@ const actions = { submitted: 'أُرسل', approved: 'اعتُمد', rejected: '
     <AppLayout>
         <Head title="قواعد الاعتماد" />
         <PageHeader title="قواعد الاعتماد" subtitle="المستندات التي تبلغ الحد تنتظر اعتماد مستخدم يملك صلاحية الاعتماد، ولا يعتمد المنشئ مستنده" :crumbs="[{ label: 'الإعدادات' }, { label: 'قواعد الاعتماد' }]" />
-        <div class="grid lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <table class="w-full text-xs">
                     <thead class="bg-slate-50 text-slate-500"><tr><th class="text-start px-4 py-2">نوع المستند</th><th class="px-4 py-2 text-end">يتطلب اعتماداً من مبلغ</th><th class="px-4 py-2">الحالة</th><th></th></tr></thead>

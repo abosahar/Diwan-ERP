@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import DateRangeFilter from '@/Components/UI/DateRangeFilter.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
@@ -30,17 +31,7 @@ const formatCurrency = (val) => {
 
         <div class="space-y-6">
             <!-- Breadcrumb Navigation -->
-            <div class="flex items-center justify-between">
-                <nav class="flex items-center gap-1.5 text-xs text-slate-500 bg-white border border-slate-200/80 px-3 py-1.5 rounded-xl shadow-2xs">
-                    <Link :href="route('dashboard')" class="hover:text-indigo-600 transition-colors">
-                        <HomeIcon class="w-3.5 h-3.5" />
-                    </Link>
-                    <ChevronRightIcon class="w-3 h-3 text-slate-400 rotate-180" />
-                    <span>التقارير</span>
-                    <ChevronRightIcon class="w-3 h-3 text-slate-400 rotate-180" />
-                    <span class="text-slate-900 font-semibold">المبيعات</span>
-                </nav>
-            </div>
+            <PageHeader title="تقارير المبيعات" :crumbs="[{ label: 'التقارير' }, { label: 'المبيعات' }]" />
 
             <DateRangeFilter route-name="reports.sales" :filters="filters" />
 
@@ -100,7 +91,7 @@ const formatCurrency = (val) => {
             <div class="space-y-4">
                 <!-- 1. تقارير المبيعات -->
                 <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:shadow-md transition">
-                    <div class="space-y-2 max-w-3xl">
+                    <div class="space-y-2">
                         <div class="flex items-center gap-2">
                             <DocumentChartBarIcon class="w-5 h-5 text-indigo-600" />
                             <h2 class="text-base font-bold text-slate-900">تقارير المبيعات</h2>
@@ -128,7 +119,7 @@ const formatCurrency = (val) => {
 
                 <!-- 2. تقارير المدفوعات -->
                 <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:shadow-md transition">
-                    <div class="space-y-2 max-w-3xl">
+                    <div class="space-y-2">
                         <div class="flex items-center gap-2">
                             <BanknotesIcon class="w-5 h-5 text-emerald-600" />
                             <h2 class="text-base font-bold text-slate-900">تقارير المدفوعات</h2>
@@ -156,7 +147,7 @@ const formatCurrency = (val) => {
 
                 <!-- 3. تقارير أرباح بيع المنتجات -->
                 <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:shadow-md transition">
-                    <div class="space-y-2 max-w-3xl">
+                    <div class="space-y-2">
                         <div class="flex items-center gap-2">
                             <ArrowTrendingUpIcon class="w-5 h-5 text-sky-600" />
                             <h2 class="text-base font-bold text-slate-900">تقارير أرباح بيع المنتجات</h2>

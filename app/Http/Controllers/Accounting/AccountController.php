@@ -48,6 +48,24 @@ class AccountController extends Controller
         ]);
     }
 
+    public function create(Request $request): Response
+    {
+        return Inertia::render('Accounting/Accounts/Form', $this->lookups() + ['parentId' => (int) $request->query('parent_id') ?: '']);
+    }
+
+    public function edit(Account $account): Response
+    {
+        return Inertia::render('Accounting/Accounts/Form', $this->lookups() + ['account' => $account]);
+    }
+
+    protected function lookups(): array
+    {
+        return [
+            'accounts' => Account::orderBy('code')->get(['id', 'code', 'name_ar', 'type', 'nature', 'parent_id', 'is_parent']),
+            'parentAccounts' => Account::where('is_parent', true)->orderBy('code')->get(['id', 'code', 'name_ar', 'type']),
+        ];
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

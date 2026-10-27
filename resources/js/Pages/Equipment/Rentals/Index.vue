@@ -75,7 +75,7 @@ onMounted(() => { if (props.prefillEquipment) create(); });
                     <button type="button" role="radio" :aria-checked="form.type === 'customer'" @click="form.type = 'customer'" :class="['flex-1 px-3 py-2 rounded-xl border font-bold', form.type === 'customer' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-slate-200']">تأجير لعميل (فاتورة)</button>
                     <button type="button" role="radio" :aria-checked="form.type === 'project'" @click="form.type = 'project'" :class="['flex-1 px-3 py-2 rounded-xl border font-bold', form.type === 'project' ? 'bg-sky-600 text-white border-sky-600' : 'border-slate-200']">تشغيل في مشروع للشركة</button>
                 </div>
-                <div class="grid md:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <Field label="المعدة" :error="form.errors.equipment_id">
                         <select v-model="form.equipment_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">اختر</option><option v-for="e in equipment" :key="e.id" :value="e.id">{{ e.code }} — {{ e.name }}{{ e.status !== 'available' ? ' (مشغولة)' : '' }}</option></select>
                     </Field>

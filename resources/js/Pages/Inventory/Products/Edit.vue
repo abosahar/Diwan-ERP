@@ -21,7 +21,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
         <Head :title="`تعديل ${product.name_ar}`" />
         <PageHeader :title="`تعديل: ${product.name_ar}`" :crumbs="[{ label: 'المستودعات' }, { label: 'الأصناف', href: route('inventory.products.index') }, { label: product.name_ar, href: route('inventory.products.show', product.id) }]" />
         <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 text-xs">
-            <div class="grid md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="الاسم بالعربية" :error="form.errors.name_ar" class="md:col-span-2"><input v-model="form.name_ar" :class="inp" /></Field>
                 <Field label="الاسم بالإنجليزية" class="md:col-span-2"><input v-model="form.name_en" :class="inp" /></Field>
                 <Field label="الرمز (SKU)"><input v-model="form.sku" :class="inp" class="font-mono" /></Field>

@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import ImportButton from '@/Components/UI/ImportButton.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -75,31 +76,16 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5" @click="closeMenu">
             <!-- Top Breadcrumbs & Action Bar (Exact match to live screenshot) -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <!-- Breadcrumbs Ribbon -->
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">المنتجات</span>
-                    </div>
-
-                    <!-- Refresh Button -->
-                    <button 
+            <PageHeader title="المنتجات" :crumbs="[{ label: 'المنتجات' }]">
+<template #actions>
+<button 
                         @click="router.reload()" 
                         title="تحديث البيانات"
                         class="p-2.5 rounded-xl bg-white border border-slate-200/80 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xs transition-all"
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <!-- Search & Filter Toggle Button -->
-                    <button 
+<button 
                         @click.stop="isFilterOpen = !isFilterOpen"
                         :class="[
                             'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-150 shadow-xs border',
@@ -113,7 +99,7 @@ const formatCurrency = (val) => {
                     </button>
 
                     <ImportButton v-if="$can('inventory.products.create')" type="products" title="استيراد الأصناف من Excel" hint="الأصناف الموجودة (بنفس SKU) تُحدّث. opening_quantity و opening_cost و warehouse_code للرصيد الافتتاحي." />
-                    <!-- Add Product Button -->
+                    
                     <Link 
                         v-if="$canRoute('inventory.products.create')"
                         :href="route('inventory.products.create')"
@@ -122,8 +108,8 @@ const formatCurrency = (val) => {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة</span>
                     </Link>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Collapsible Search & Filter Panel -->
             <transition

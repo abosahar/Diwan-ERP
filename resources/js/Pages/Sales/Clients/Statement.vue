@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -60,21 +61,9 @@ const printStatement = () => {
 
         <div class="space-y-5 w-full" dir="rtl">
             <!-- Breadcrumbs Ribbon & Print Actions (Hidden on Print) -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
-                <div class="flex items-center gap-2">
-                    <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                        <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                            <HomeIcon class="w-4 h-4" />
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <Link :href="route('sales.clients.index')" class="text-slate-500 hover:text-indigo-600 transition-colors">
-                            العملاء
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                        <span class="text-indigo-600 font-bold">كشف حساب: {{ client.name }}</span>
-                    </div>
-
-                    <ShareDocument type="statement" :id="client.id" />
+            <PageHeader :title="`كشف حساب: ${client.name}`" :crumbs="[{ label: 'المبيعات' }, { label: 'العملاء', href: route('sales.clients.index') }, { label: 'كشف حساب' }]">
+<template #actions>
+<ShareDocument type="statement" :id="client.id" />
 
                     <button 
                         @click="router.reload()" 
@@ -83,10 +72,7 @@ const printStatement = () => {
                     >
                         <ArrowPathIcon class="w-4 h-4" />
                     </button>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <Link
+<Link
                         :href="route('sales.clients.index')"
                         class="px-4 py-2.5 rounded-xl border border-slate-200/80 bg-white text-slate-700 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
                     >
@@ -102,8 +88,8 @@ const printStatement = () => {
                         <PrinterIcon class="w-4 h-4" />
                         <span>طباعة كشف الحساب</span>
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- KPI Mini Summary Bar (Hidden on Print) -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 print:hidden">

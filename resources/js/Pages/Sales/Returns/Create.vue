@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
 import { ref, computed, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -105,23 +106,9 @@ const submit = () => {
 
         <div class="space-y-6 w-full pb-12">
             <!-- Breadcrumbs Header -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="inline-flex items-center bg-white border border-slate-200/80 rounded-xl px-4 py-2 text-xs sm:text-sm font-medium text-slate-600 shadow-xs">
-                    <Link :href="route('dashboard')" class="text-slate-400 hover:text-indigo-600 transition-colors flex items-center">
-                        <HomeIcon class="w-4 h-4" />
-                    </Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <span class="text-slate-500">المبيعات</span>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <Link :href="route('sales.returns.index')" class="text-slate-500 hover:text-indigo-600 transition-colors">
-                        المرتجعات
-                    </Link>
-                    <ChevronRightIcon class="w-3.5 h-3.5 text-slate-300 mx-2 rtl:rotate-180" />
-                    <span class="text-indigo-600 font-bold">إصدار إشعار دائن</span>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <Link 
+            <PageHeader title="إصدار إشعار دائن" :crumbs="[{ label: 'المبيعات' }, { label: 'المرتجعات' }, { label: 'إصدار إشعار دائن' }]">
+<template #actions>
+<Link 
                         :href="route('sales.returns.index')"
                         class="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold transition-colors"
                     >
@@ -135,8 +122,8 @@ const submit = () => {
                         <CheckIcon class="w-4 h-4 stroke-2" />
                         <span>اعتماد وإصدار الإشعار</span>
                     </button>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- Form Body -->
             <form @submit.prevent="submit" class="space-y-6">

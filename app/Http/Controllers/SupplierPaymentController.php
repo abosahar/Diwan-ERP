@@ -62,6 +62,15 @@ class SupplierPaymentController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Purchases/Payments/Form', [
+            'suppliers' => Supplier::where('status', 'active')->orderBy('name')->limit(500)->get(['id', 'name', 'current_balance']),
+            'unpaidInvoices' => PurchaseInvoice::where('remaining_amount', '>', 0)->with('supplier:id,name')
+                ->get(['id', 'supplier_id', 'invoice_number', 'total', 'remaining_amount', 'currency_code']),
+        ]);
+    }
+
     /**
      * Store a newly created supplier payment voucher (سند صرف).
      */

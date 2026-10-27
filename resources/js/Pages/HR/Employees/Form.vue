@@ -34,7 +34,7 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
         <div class="space-y-4">
             <div class="bg-white border border-slate-200 rounded-2xl p-4">
                 <h3 class="text-xs font-black text-slate-700 mb-3">البيانات الشخصية والهوية</h3>
-                <div class="grid md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <Field label="الاسم الكامل" :error="form.errors.name" class="md:col-span-2"><input v-model="form.name" :class="input" /></Field>
                     <Field label="الرقم الوظيفي" :error="form.errors.employee_number" hint="يُولد تلقائياً إن تُرك فارغاً"><input v-model="form.employee_number" :class="input" /></Field>
                     <Field label="الجنسية (رمز دولة)" :error="form.errors.nationality"><input v-model="form.nationality" maxlength="2" :class="input" class="uppercase font-mono" /></Field>
@@ -52,7 +52,7 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl p-4">
                 <h3 class="text-xs font-black text-slate-700 mb-3">الوظيفة والعقد</h3>
-                <div class="grid md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <Field label="المسمى الوظيفي" :error="form.errors.job_title"><input v-model="form.job_title" :class="input" /></Field>
                     <Field label="المهنة (في الإقامة / قوى)"><input v-model="form.profession" :class="input" /></Field>
                     <Field label="الإدارة"><select v-model="form.department_id" :class="input"><option value="">—</option><option v-for="x in departments" :key="x.id" :value="x.id">{{ x.name }}</option></select></Field>
@@ -70,7 +70,7 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
             </div>
             <div v-if="$can('hr.salaries.view')" class="bg-white border border-slate-200 rounded-2xl p-4">
                 <h3 class="text-xs font-black text-slate-700 mb-3">الراتب والتأمينات والبنك</h3>
-                <div class="grid md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <Field label="الراتب الأساسي" :error="form.errors.basic_salary"><input v-model="form.basic_salary" type="number" step="0.01" :class="input" class="font-mono" /></Field>
                     <Field label="بدل السكن"><input v-model="form.housing_allowance" type="number" step="0.01" :class="input" class="font-mono" /></Field>
                     <Field label="بدل النقل"><input v-model="form.transport_allowance" type="number" step="0.01" :class="input" class="font-mono" /></Field>

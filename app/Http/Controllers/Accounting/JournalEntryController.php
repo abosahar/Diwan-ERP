@@ -60,12 +60,18 @@ class JournalEntryController extends Controller
         return Inertia::render('Accounting/Journals/Index', [
             'entries' => $entries,
             'stats' => $stats,
+            'filters' => $filters,
+        ]);
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('Accounting/Journals/Form', [
             'accounts' => Account::where('is_parent', false)->where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar', 'type', 'requires_cost_center']),
             'costCenters' => CostCenter::where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar']),
             'customers' => Customer::orderBy('name')->get(['id', 'name']),
             'suppliers' => Supplier::orderBy('name')->get(['id', 'name']),
             'partyAccounts' => collect(self::PARTY_ROLES)->mapWithKeys(fn ($type, $role) => [(string) $this->map->find($role) => $type])->except(''),
-            'filters' => $filters,
         ]);
     }
 

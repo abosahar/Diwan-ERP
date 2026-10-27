@@ -21,7 +21,7 @@ const pct = (u) => (u.max && u.max > 0 ? Math.min(100, Math.round((u.used / u.ma
             <template #actions><span :class="stateLabel[state][1]" class="px-3 py-1.5 rounded-xl text-xs font-bold">{{ stateLabel[state][0] }}</span></template>
         </PageHeader>
 
-        <div class="grid lg:grid-cols-3 gap-4 mb-4 text-xs">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 text-xs">
             <div class="bg-white border border-slate-200 rounded-2xl p-4">
                 <h3 class="font-black text-slate-700 mb-2">الباقة الحالية</h3>
                 <p class="text-base font-black text-indigo-700">{{ plan?.name_ar || 'بدون باقة' }}</p>
@@ -59,7 +59,7 @@ const pct = (u) => (u.max && u.max > 0 ? Math.min(100, Math.round((u.used / u.ma
             <button @click="cycle = 'monthly'" :class="cycle === 'monthly' ? 'bg-slate-800 text-white' : 'bg-white border'" class="px-3 py-1.5 rounded-xl font-bold">شهري</button>
             <button @click="cycle = 'yearly'" :class="cycle === 'yearly' ? 'bg-slate-800 text-white' : 'bg-white border'" class="px-3 py-1.5 rounded-xl font-bold">سنوي</button>
         </div>
-        <div class="grid md:grid-cols-3 gap-4 mb-4 text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-xs">
             <div v-for="p in plans" :key="p.id" class="bg-white border rounded-2xl p-4" :class="p.id === plan?.id ? 'border-indigo-500 ring-2 ring-indigo-100' : 'border-slate-200'">
                 <div class="flex justify-between"><h3 class="font-black text-sm">{{ p.name_ar }}</h3><span v-if="p.is_popular" class="text-indigo-600 font-bold">الأكثر طلباً</span></div>
                 <p class="text-lg font-black mt-1 font-mono">{{ money(cycle === 'yearly' ? p.price_yearly : p.price_monthly) }} <span class="text-xs font-normal text-slate-500">ر.س / {{ cycle === 'yearly' ? 'سنة' : 'شهر' }} + ض.ق.م</span></p>

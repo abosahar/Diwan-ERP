@@ -38,7 +38,7 @@ const convert = () => form.post(route('purchases.requests.convert', props.reques
                 <button v-if="request.status === 'approved' && $can('purchases.requests.convert')" @click="open = true" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">تحويل لأمر شراء</button>
             </template>
         </PageHeader>
-        <div class="grid lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <div class="p-4 grid grid-cols-3 gap-3 text-xs">
                     <div><div class="text-slate-400">التاريخ</div><b class="font-mono">{{ date(request.request_date) }}</b></div>

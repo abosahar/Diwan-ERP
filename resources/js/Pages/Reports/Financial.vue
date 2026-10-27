@@ -1,4 +1,5 @@
 <script setup>
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import DateRangeFilter from '@/Components/UI/DateRangeFilter.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
@@ -30,26 +31,9 @@ const printReport = () => {
         <div class="space-y-6">
             <DateRangeFilter route-name="reports.financial" :filters="filters" />
             <!-- Breadcrumbs & Header -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <div class="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                        <Link :href="route('dashboard')" class="hover:text-indigo-600 flex items-center gap-1">
-                            <HomeIcon class="w-4 h-4" />
-                            <span>{{ $t('nav.dashboard') }}</span>
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-400" />
-                        <Link :href="route('reports.sales')" class="hover:text-indigo-600">
-                            {{ $t('nav.reports') }}
-                        </Link>
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-slate-400" />
-                        <span class="text-slate-800 font-medium">قائمة الدخل والأرباح والخسائر</span>
-                    </div>
-                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">قائمة الدخل (الأرباح والخسائر)</h1>
-                    <p class="text-sm text-slate-500 mt-0.5">تقرير الأداء المالي الشامل للإيرادات والمصروفات وصافي الأرباح للفترة الحالية</p>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <button
+            <PageHeader title="قائمة الدخل (الأرباح والخسائر)" subtitle="تقرير الأداء المالي الشامل للإيرادات والمصروفات وصافي الأرباح للفترة الحالية" :crumbs="[{ label: $t('nav.reports') }, { label: 'قائمة الدخل والأرباح والخسائر' }]">
+<template #actions>
+<button
                         @click="printReport"
                         class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-xs transition"
                     >
@@ -63,8 +47,8 @@ const printReport = () => {
                         <ScaleIcon class="w-4 h-4" />
                         <span>ميزان المراجعة</span>
                     </Link>
-                </div>
-            </div>
+</template>
+</PageHeader>
 
             <!-- KPI Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

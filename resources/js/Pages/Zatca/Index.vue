@@ -66,7 +66,7 @@ const typeLabel = { '388': 'فاتورة', '381': 'إشعار دائن', '383': 
             <ExclamationTriangleIcon class="w-5 h-5" /> {{ overdue }} فاتورة مبسطة تجاوزت مهلة الإبلاغ (24 ساعة). تحقق من الاتصال وأعد الإرسال.
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
             <div class="bg-white border border-slate-200 rounded-2xl p-4 lg:col-span-1">
                 <h3 class="text-xs font-black text-slate-700 mb-1">بيانات البائع (إلزامية في XML)</h3>
                 <p v-if="missing.length" class="text-[11px] text-rose-600 mb-2">ناقص: {{ missing.join('، ') }}</p>

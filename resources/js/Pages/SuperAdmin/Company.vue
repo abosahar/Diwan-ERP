@@ -22,7 +22,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <div><h1 class="text-lg font-black">{{ company.name }}</h1><p class="text-slate-500 font-mono">{{ company.subdomain }} · {{ company.tax_number }} · الحالة: {{ state }}</p></div>
                 <button @click="impersonate" class="px-4 py-2 rounded-xl bg-purple-600 text-white font-bold">دخول للمساندة</button>
             </div>
-            <div class="grid lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="bg-white rounded-2xl border p-4 space-y-2">
                     <h3 class="font-black">الاشتراك</h3>
                     <label class="block">الباقة<select v-model="form.subscription_plan_id" :class="inp"><option value="">—</option><option v-for="p in plans" :key="p.id" :value="p.id">{{ p.name_ar }}</option></select></label>
@@ -46,7 +46,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                     <div v-for="u in users" :key="u.id" class="flex justify-between py-0.5"><span>{{ u.name }}</span><span class="text-slate-400">{{ u.email }}</span></div>
                 </div>
             </div>
-            <div class="grid lg:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-white rounded-2xl border p-4">
                     <h3 class="font-black mb-2">فواتير الاشتراك</h3>
                     <div v-for="i in invoices" :key="i.id" class="flex justify-between py-1 border-b border-slate-50"><span class="font-mono">{{ i.number }} · {{ i.plan?.name_ar }}</span><span><b class="font-mono">{{ money(i.total) }}</b> {{ i.status }}</span></div>

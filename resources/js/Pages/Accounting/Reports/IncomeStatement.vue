@@ -28,7 +28,7 @@ const printPage = () => window.print();
             </label>
         </DateRangeFilter>
 
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 max-w-4xl">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
             <StatementSection title="الإيرادات" :rows="report.revenue.rows" :total="report.total_revenue" :ledger-query="filters" />
             <StatementSection title="المصروفات والتكاليف" :rows="report.expense.rows" :total="report.total_expense" :ledger-query="filters" />
 

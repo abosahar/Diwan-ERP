@@ -17,6 +17,11 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    // Rendered as the body of a page (create / edit) instead of a pop-up.
+    page: {
+        type: Boolean,
+        default: false,
+    },
     customer: {
         type: Object,
         default: null,
@@ -263,14 +268,14 @@ const saveCustomer = async () => {
 <template>
     <div
         v-if="show"
-        class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200"
+        :class="page ? '' : 'fixed inset-0 z-50 overflow-y-auto bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200'"
     >
         <div
-            class="bg-white rounded-2xl w-full max-w-5xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]"
+            :class="page ? 'bg-white rounded-2xl w-full border border-slate-200/80 overflow-hidden flex flex-col' : 'bg-white rounded-2xl w-full max-w-5xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]'"
             dir="rtl"
         >
             <!-- Header Bar -->
-            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-white sticky top-0 z-10">
+            <div v-if="!page" class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-white sticky top-0 z-10">
                 <div class="flex items-center gap-3">
                     <h2 class="text-xl font-bold text-slate-800">
                         {{ customer ? 'تعديل بيانات العميل' : 'إضافة عميل' }}

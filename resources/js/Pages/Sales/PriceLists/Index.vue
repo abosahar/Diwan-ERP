@@ -43,7 +43,7 @@ const destroy = (list) => { if (confirm(`حذف قائمة "${list.name}"؟`)) r
         <PageHeader title="قوائم الأسعار" subtitle="أسعار خاصة لكل فئة عملاء مع شرائح كميات؛ تُطبّق تلقائياً في أوامر البيع" :crumbs="[{ label: 'المبيعات' }, { label: 'قوائم الأسعار' }]">
             <template #actions><button v-if="$can('sales.price_lists.create')" @click="create" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> قائمة جديدة</button></template>
         </PageHeader>
-        <div class="grid md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div v-for="list in lists" :key="list.id" class="bg-white border border-slate-200 rounded-2xl p-4 text-xs">
                 <div class="flex justify-between items-start">
                     <h3 class="font-black text-slate-800">{{ list.name }} <span v-if="list.is_default" class="text-indigo-600">(افتراضية)</span></h3>
