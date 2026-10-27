@@ -26,6 +26,8 @@ const onSupplierChange = () => {
 };
 onSupplierChange();
 
+const formatCurrency = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 const submitPayment = () => form.post(route('purchases.payments.store'));
 </script>
 

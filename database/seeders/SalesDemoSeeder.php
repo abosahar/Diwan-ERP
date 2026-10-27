@@ -91,7 +91,9 @@ class SalesDemoSeeder extends Seeder
 
         $createdCustomers = [];
         foreach ($customersData as $c) {
-            $createdCustomers[] = Customer::create(array_merge($c, ['company_id' => $company->id]));
+            // A tax invoice to a registered customer needs the national address (building, street, district, city, postal code).
+            $address = ! empty($c['tax_number']) ? ['building_number' => '4021', 'street_name' => $c['address'] ?? 'الشارع الرئيسي', 'district' => 'الصحافة', 'postal_code' => '13315'] : [];
+            $createdCustomers[] = Customer::create(array_merge($address, $c, ['company_id' => $company->id]));
         }
 
         // 2. Create Invoices matching dashboard table

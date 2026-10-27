@@ -656,7 +656,7 @@ class AccountingReports
         DB::table('purchase_invoice_items as i')->join('purchase_invoices as p', 'p.id', '=', 'i.purchase_invoice_id')->where('p.company_id', $companyId)->whereBetween('p.invoice_date', $range)
             ->selectRaw('p.branch_id, p.currency_code, i.tax_rate, SUM(i.quantity * i.unit_price - i.discount) as amount, SUM(i.tax_amount) as tax')
             ->groupBy('p.branch_id', 'p.currency_code', 'i.tax_rate')->get()
-            ->each(fn ($r) => $add($r->branch_id, $r->currency_code, 'purchases', (float) $r->tax_amount > 0 ? (float) $r->tax_rate : 0, (float) $r->amount, (float) $r->tax));
+            ->each(fn ($r) => $add($r->branch_id, $r->currency_code, 'purchases', (float) $r->tax > 0 ? (float) $r->tax_rate : 0, (float) $r->amount, (float) $r->tax));
 
         $branches = Branch::query()->get()->keyBy('id');
         $out = [];

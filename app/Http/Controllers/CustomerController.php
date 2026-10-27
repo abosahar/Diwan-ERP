@@ -143,10 +143,10 @@ class CustomerController extends Controller
         // Set address summary if individual parts are present
         if (empty($validated['address']) && (! empty($validated['building_number']) || ! empty($validated['street_name']))) {
             $parts = array_filter([
-                $validated['building_number'] ? ('مبنى '.$validated['building_number']) : null,
-                $validated['street_name'],
-                $validated['district'],
-                $validated['city'],
+                ! empty($validated['building_number']) ? ('مبنى '.$validated['building_number']) : null,
+                $validated['street_name'] ?? null,
+                $validated['district'] ?? null,
+                $validated['city'] ?? null,
             ]);
             $validated['address'] = implode(' - ', $parts);
         }

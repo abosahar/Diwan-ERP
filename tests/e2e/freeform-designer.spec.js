@@ -6,7 +6,7 @@ test('free-form designer: create, drag, add a field, save, print an invoice with
     const name = `تصميم حر ${Date.now().toString().slice(-5)}`;
 
     await page.goto('/templates');
-    await page.getByRole('button', { name: 'إنشاء قالب جديد' }).click();
+    await page.getByRole('link', { name: 'إنشاء قالب جديد' }).click();
     await page.getByPlaceholder('مثال: قالب الفاتورة الهندسية الحديثة').fill(name);
     await page.getByRole('radio', { name: /تصميم حر/ }).click();
     await page.getByLabel('المستند').selectOption('invoice');
