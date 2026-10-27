@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { reactive, computed } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -76,8 +77,8 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
                     <tr v-if="!o.operations.length"><td colspan="5" class="p-4 text-center text-slate-400">لا عمليات (بلا مسار تشغيل).</td></tr></tbody></table>
                 <form v-if="live && $can('manufacturing.orders.post')" @submit.prevent="logTime" class="grid grid-cols-2 md:grid-cols-3 gap-2 border-t border-slate-100 pt-3">
                     <select v-model="time.operation_id" @change="pickOp" :class="input"><option value="">عملية (اختياري)</option><option v-for="op in o.operations" :key="op.id" :value="op.id">{{ op.seq }} {{ op.name }}</option></select>
-                    <select v-model="time.work_center_id" :class="input" required><option v-for="w in workCenters" :key="w.id" :value="w.id">{{ w.name }}</option></select>
-                    <select v-model="time.employee_id" :class="input"><option value="">عامل (اختياري)</option><option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option></select>
+                    <SelectCreate v-model="time.work_center_id" :options="workCenters" entity="work_center" label="name" :allow-empty="false" required />
+                    <SelectCreate v-model="time.employee_id" :options="employees" entity="employee" label="name" placeholder="عامل (اختياري)" />
                     <input v-model="time.minutes" type="number" step="0.01" placeholder="الدقائق *" :class="input" required />
                     <input v-model="time.quantity" type="number" step="0.0001" placeholder="الكمية المنجزة" :class="input" />
                     <button type="submit" :disabled="time.processing" class="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">تسجيل الوقت</button>

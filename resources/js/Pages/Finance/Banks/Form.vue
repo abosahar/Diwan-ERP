@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -96,15 +97,7 @@ const submitAccount = () => form.post(route('finance.banks.store'));
             
                             <div>
                                 <label class="block font-medium text-slate-700 mb-1">ربط مع حساب بدليل الحسابات (اختياري)</label>
-                                <select 
-                                    v-model="form.account_id" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="">بدون ربط مباشر</option>
-                                    <option v-for="acc in chartAccounts" :key="acc.id" :value="acc.id">
-                                        {{ acc.code }} - {{ acc.name_ar }}
-                                    </option>
-                                </select>
+                                <SelectCreate v-model="form.account_id" :options="chartAccounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar}`" placeholder="بدون ربط مباشر" />
                             </div>
             
                             <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">

@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -21,7 +22,7 @@ const save = () => form.post(route('sales.orders.store'));
                 <Field label="العميل" :error="form.errors.customer_id" class="md:col-span-2"><PartyPicker v-model="form.customer_id" /></Field>
                 <Field label="تاريخ الأمر" :error="form.errors.order_date"><input v-model="form.order_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="تاريخ التسليم المتوقع" :error="form.errors.delivery_date"><input v-model="form.delivery_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="المستودع"><select v-model="form.warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+                <Field label="المستودع"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="ملاحظات" class="md:col-span-3"><input v-model="form.notes" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <LineItemsEditor v-model="form.items" :customer-id="form.customer_id" price-route="lookup.price" />

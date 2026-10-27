@@ -80,6 +80,10 @@ class EmployeeController extends Controller
     {
         $employee = Employee::create($this->validated($request));
 
+        if ($json = $this->createdResponse($request, $employee, $employee->name)) {
+            return $json;
+        }
+
         return redirect()->route('hr.employees.show', $employee->id)->with('success', 'تم تسجيل الموظف');
     }
 

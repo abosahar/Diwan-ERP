@@ -41,18 +41,26 @@ class HrOperationsController extends Controller
 
     public function storeDepartment(Request $request)
     {
-        Department::create($request->validate([
+        $department = Department::create($request->validate([
             'name' => 'required|string|max:255',
             'parent_id' => 'nullable|tenant_exists:departments,id',
             'cost_center_id' => 'nullable|tenant_exists:cost_centers,id',
         ]));
+
+        if ($json = $this->createdResponse($request, $department, $department->name)) {
+            return $json;
+        }
 
         return back()->with('success', 'تمت إضافة الإدارة');
     }
 
     public function storePosition(Request $request)
     {
-        JobPosition::create($request->validate(['title' => 'required|string|max:255', 'grade' => 'nullable|string|max:30']));
+        $position = JobPosition::create($request->validate(['title' => 'required|string|max:255', 'grade' => 'nullable|string|max:30']));
+
+        if ($json = $this->createdResponse($request, $position, $position->title)) {
+            return $json;
+        }
 
         return back()->with('success', 'تمت إضافة المسمى الوظيفي');
     }
@@ -72,7 +80,11 @@ class HrOperationsController extends Controller
         if (! empty($validated['is_default'])) {
             WorkShift::where('is_default', true)->update(['is_default' => false]);
         }
-        WorkShift::create($validated);
+        $shift = WorkShift::create($validated);
+
+        if ($json = $this->createdResponse($request, $shift, $shift->name)) {
+            return $json;
+        }
 
         return back()->with('success', 'تمت إضافة الوردية');
     }

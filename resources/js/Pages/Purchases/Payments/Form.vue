@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -40,16 +41,7 @@ const submitPayment = () => form.post(route('purchases.payments.store'));
             <form @submit.prevent="submitPayment" class="form-grid text-xs">
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">المورد <span class="text-rose-500">*</span></label>
-                                <select 
-                                    v-model="form.supplier_id" 
-                                    @change="onSupplierChange"
-                                    required 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-medium"
-                                >
-                                    <option v-for="s in suppliers" :key="s.id" :value="s.id">
-                                        {{ s.name }} (الرصيد: {{ formatCurrency(s.current_balance) }} ﷼)
-                                    </option>
-                                </select>
+                                <SelectCreate v-model="form.supplier_id" :options="suppliers" entity="supplier" :label="(s) => `${s.name} (الرصيد: ${formatCurrency(s.current_balance)} ﷼)`" placeholder="اختر المورد" :allow-empty="false" required @update:modelValue="$nextTick(onSupplierChange)" />
                             </div>
             
                             <div>

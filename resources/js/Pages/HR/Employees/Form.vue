@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -55,12 +56,12 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <Field label="المسمى الوظيفي" :error="form.errors.job_title"><input v-model="form.job_title" :class="input" /></Field>
                     <Field label="المهنة (في الإقامة / قوى)"><input v-model="form.profession" :class="input" /></Field>
-                    <Field label="الإدارة"><select v-model="form.department_id" :class="input"><option value="">—</option><option v-for="x in departments" :key="x.id" :value="x.id">{{ x.name }}</option></select></Field>
-                    <Field label="الدرجة / الوظيفة"><select v-model="form.position_id" :class="input"><option value="">—</option><option v-for="x in positions" :key="x.id" :value="x.id">{{ x.title }}</option></select></Field>
+                    <Field label="الإدارة"><SelectCreate v-model="form.department_id" :options="departments" entity="department" label="name" placeholder="—" /></Field>
+                    <Field label="الدرجة / الوظيفة"><SelectCreate v-model="form.position_id" :options="positions" entity="position" label="title" placeholder="—" /></Field>
                     <Field label="المدير المباشر"><select v-model="form.manager_id" :class="input"><option value="">—</option><option v-for="x in managers" :key="x.id" :value="x.id">{{ x.name }}</option></select></Field>
                     <Field label="الفرع"><select v-model="form.branch_id" :class="input"><option value="">—</option><option v-for="x in branches" :key="x.id" :value="x.id">{{ x.name_ar }}</option></select></Field>
-                    <Field label="الوردية"><select v-model="form.shift_id" :class="input"><option value="">الافتراضية</option><option v-for="x in shifts" :key="x.id" :value="x.id">{{ x.name }}</option></select></Field>
-                    <Field label="مركز التكلفة" hint="لتحميل الراتب على مشروع/إدارة"><select v-model="form.cost_center_id" :class="input"><option value="">—</option><option v-for="x in costCenters" :key="x.id" :value="x.id">{{ x.code }} {{ x.name_ar }}</option></select></Field>
+                    <Field label="الوردية"><SelectCreate v-model="form.shift_id" :options="shifts" entity="shift" label="name" placeholder="الافتراضية" /></Field>
+                    <Field label="مركز التكلفة" hint="لتحميل الراتب على مشروع/إدارة"><SelectCreate v-model="form.cost_center_id" :options="costCenters" entity="cost_center" :label="(x) => `${x.code} ${x.name_ar}`" placeholder="—" /></Field>
                     <Field label="تاريخ المباشرة" :error="form.errors.hire_date"><input v-model="form.hire_date" type="date" :class="input" /></Field>
                     <Field label="نوع العقد"><select v-model="form.contract_type" :class="input"><option value="unlimited">غير محدد المدة</option><option value="limited">محدد المدة</option></select></Field>
                     <Field label="نهاية العقد" :error="form.errors.contract_end"><input v-model="form.contract_end" type="date" :class="input" /></Field>

@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -41,7 +42,7 @@ const save = () => form.post(route('purchases.landed-costs.store'), { onSuccess:
                 <Field label="ضريبة المدخلات"><input v-model="form.tax_amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="السداد"><select v-model="form.paid_from" class="w-full rounded-xl border-slate-200 text-xs"><option value="payables">آجل على مورد الخدمة</option><option value="cash">نقدي</option><option value="bank_transfer">بنكي</option></select></Field>
                 <Field v-if="form.paid_from === 'payables'" label="مورد الخدمة" :error="form.errors.supplier_id" class="col-span-2"><PartyPicker v-model="form.supplier_id" route-name="lookup.suppliers" /></Field>
-                <Field v-else label="الحساب" class="col-span-2"><select v-model="form.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field v-else label="الحساب" class="col-span-2"><SelectCreate v-model="form.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <template #footer><button @click="save" :disabled="form.processing" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">{{ $t('ui.save') }}</button></template>
         </Dialog>

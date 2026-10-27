@@ -92,7 +92,7 @@ const formatDateArabic = (dateStr) => {
                         <span>البحث والتصفية</span>
                     </button>
 
-                    <ImportButton v-if="$can('sales.quotations.create')" type="quotations" title="استيراد عروض أسعار من Excel" hint="سطر لكل بند؛ الأسطر التي تحمل نفس quotation_ref تكوّن عرضاً واحداً. العميل برمزه (customer_code) أو اسمه. تُنشأ العروض كمسودات." />
+
                     <Link 
                         v-if="$canRoute('sales.quotations.create')"
                         :href="route('sales.quotations.create')"
@@ -101,6 +101,7 @@ const formatDateArabic = (dateStr) => {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إنشاء عرض سعر</span>
                     </Link>
+<ImportButton v-if="$can('sales.quotations.create')" type="quotations" title="استيراد عروض أسعار من Excel" hint="سطر لكل بند؛ الأسطر التي تحمل نفس quotation_ref تكوّن عرضاً واحداً. العميل برمزه (customer_code) أو اسمه. تُنشأ العروض كمسودات." />
 </template>
 </PageHeader>
 

@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -50,7 +51,7 @@ const save = () => form.transform((d) => ({ ...d, lines: selected.value.map(({ g
                 <Field label="طريقة الدفع"><select v-model="form.payment_method" class="w-full rounded-xl border-slate-200 text-xs"><option value="credit">آجل</option><option value="cash">نقدي</option><option value="bank_transfer">تحويل بنكي</option><option value="card">بطاقة</option></select></Field>
                 <Field label="حالة السداد"><select v-model="form.payment_status" class="w-full rounded-xl border-slate-200 text-xs"><option value="unpaid">غير مدفوعة</option><option value="partially_paid">مدفوعة جزئياً</option><option value="paid">مدفوعة</option></select></Field>
                 <Field v-if="form.payment_status === 'partially_paid'" label="المبلغ المدفوع"><input v-model="form.paid_amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field v-if="form.payment_status !== 'unpaid'" label="الحساب البنكي / الصندوق"><select v-model="form.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field v-if="form.payment_status !== 'unpaid'" label="الحساب البنكي / الصندوق"><SelectCreate v-model="form.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <div v-if="!supplier" class="text-xs text-slate-400 py-8 text-center">اختر المورد لعرض الاستلامات غير المفوترة.</div>
             <div v-else class="overflow-x-auto">

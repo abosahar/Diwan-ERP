@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref, computed } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -61,7 +62,7 @@ const remove = (c) => confirm(`حذف مركز التكلفة ${c.name_ar}؟`) &
 
         <Dialog :show="open" :title="editing ? 'تعديل مركز تكلفة' : 'مركز تكلفة جديد'" @close="open = false">
             <form @submit.prevent="save" class="space-y-3 text-xs">
-                <Field label="المركز الرئيسي"><select v-model="form.parent_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">— رئيسي —</option><option v-for="c in costCenters.filter(x => x.id !== editing?.id)" :key="c.id" :value="c.id">{{ c.code }} - {{ c.name_ar }}</option></select></Field>
+                <Field label="المركز الرئيسي"><SelectCreate v-model="form.parent_id" :options="costCenters.filter(x => x.id !== editing?.id)" entity="cost_center" :label="(c) => `${c.code} - ${c.name_ar}`" placeholder="— رئيسي —" /></Field>
                 <div class="grid grid-cols-2 gap-3">
                     <Field :label="$t('ui.code')" :error="form.errors.code"><input v-model="form.code" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="الاسم بالعربي" :error="form.errors.name_ar"><input v-model="form.name_ar" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>

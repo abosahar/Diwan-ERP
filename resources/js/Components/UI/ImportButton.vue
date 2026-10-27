@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import Dialog from '@/Components/UI/Dialog.vue';
-import { ArrowUpTrayIcon } from '@heroicons/vue/24/outline';
+import { ArrowUpTrayIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline';
 
 /**
  * "Import from Excel" on a list screen: template, upload, and the rows that
@@ -25,14 +25,17 @@ const submit = () => form.post(route('data-transfer.import', props.type), {
 </script>
 
 <template>
+    <!-- Always the last items of the header actions, i.e. the far end (top left in Arabic). -->
+    <a :href="route('data-transfer.template', type)" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold" data-template-button>
+        <ArrowDownTrayIcon class="w-4 h-4" /> تحميل القالب
+    </a>
     <button type="button" @click="open = true" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-700 text-xs font-bold" data-import-button>
         <ArrowUpTrayIcon class="w-4 h-4" /> استيراد Excel
     </button>
     <Dialog :show="open" :title="title" @close="open = false">
         <div class="space-y-3 text-xs">
-            <p class="text-slate-600">1. حمّل القالب واملأه (يقبل CSV أو Excel). 2. ارفع الملف. يُتحقق من كل الصفوف قبل الحفظ؛ إن وُجد خطأ لا يُحفظ شيء وتظهر الأسطر المرفوضة.</p>
+            <p class="text-slate-600">1. حمّل القالب من الزر «تحميل القالب» في أعلى الصفحة واملأه (يقبل CSV أو Excel). 2. ارفع الملف هنا. يُتحقق من كل الصفوف قبل الحفظ؛ إن وُجد خطأ لا يُحفظ شيء وتظهر الأسطر المرفوضة.</p>
             <p v-if="hint" class="text-slate-500">{{ hint }}</p>
-            <a :href="route('data-transfer.template', type)" class="inline-block px-3 py-1.5 rounded-xl border border-slate-200 font-bold">تحميل القالب</a>
             <input type="file" accept=".csv,.txt,.xlsx,.xls" @input="form.file = $event.target.files[0]" class="block text-xs" />
             <ul v-if="form.errors.file" class="list-disc ps-5 text-rose-600 max-h-40 overflow-y-auto"><li v-for="(e, i) in lines(form.errors.file)" :key="i">{{ e }}</li></ul>
         </div>

@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -50,7 +51,7 @@ const approve = (s) => { if (confirm('اعتماد المخالصة وإنهاء
             </div>
             <div v-if="$can('hr.settlements.create')" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
                 <h3 class="font-black text-slate-700">احتساب مخالصة</h3>
-                <select v-model="form.employee_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الموظف...</option><option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option></select>
+                <SelectCreate v-model="form.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
                 <select v-model="form.reason" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in reasons" :key="k" :value="k">{{ l }}</option></select>
                 <label class="block">تاريخ آخر يوم عمل<input v-model="form.termination_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
                 <label class="block">أيام راتب مستحقة لم تُصرف<input v-model="form.salary_days" type="number" step="1" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
@@ -63,7 +64,7 @@ const approve = (s) => { if (confirm('اعتماد المخالصة وإنهاء
         <Dialog :show="!!paying" title="صرف المخالصة" @close="paying = null">
             <div class="grid grid-cols-2 gap-3">
                 <Field label="التاريخ"><input v-model="payForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="الحساب"><select v-model="payForm.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field label="الحساب"><SelectCreate v-model="payForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <template #footer><button @click="payForm.post(route('hr.settlements.pay', paying.id), { onSuccess: () => (paying = null) })" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">صرف {{ money(paying?.net_amount) }}</button></template>
         </Dialog>

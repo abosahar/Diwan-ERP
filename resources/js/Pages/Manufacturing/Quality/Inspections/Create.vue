@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -17,7 +18,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
         <PageHeader title="فحص جودة جديد" subtitle="فحص يدوي لمشتريات أو مخزون. فحوصات استلام الإنتاج تُفتح تلقائياً." :crumbs="[{ label: 'التصنيع' }, { label: 'فحوصات الجودة', href: route('manufacturing.inspections.index') }, { label: 'جديد' }]" />
         <form @submit.prevent="form.post(route('manufacturing.inspections.store'))" class="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-5">
             <div class="grid md:grid-cols-3 gap-4">
-                <Field label="المنتج *" :error="form.errors.product_id"><select v-model="form.product_id" :class="input" required><option value="">— اختر —</option><option v-for="p in products" :key="p.id" :value="p.id">{{ p.name_ar }}</option></select></Field>
+                <Field label="المنتج *" :error="form.errors.product_id"><SelectCreate v-model="form.product_id" :options="products" entity="product" label="name_ar" placeholder="— اختر —" required /></Field>
                 <Field label="خطة الجودة"><select v-model="form.qc_plan_id" :class="input"><option value="">— بلا خطة —</option><option v-for="p in plans" :key="p.id" :value="p.id">{{ p.name }}</option></select></Field>
                 <Field label="الكمية المفحوصة *" :error="form.errors.inspected_quantity"><input v-model="form.inspected_quantity" type="number" step="0.0001" :class="input" required /></Field>
             </div>

@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -29,15 +30,10 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                 <Field label="اسم الجهاز *" :error="form.errors.name"><input v-model="form.name" :class="input" placeholder="كاشير 1" required /></Field>
                 <Field label="الرمز" :error="form.errors.code"><input v-model="form.code" :class="input" class="font-mono" placeholder="POS-01" /></Field>
                 <Field label="المستودع (يُخصم منه المخزون) *" :error="form.errors.warehouse_id">
-                    <select v-model="form.warehouse_id" :class="input" required>
-                        <option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option>
-                    </select>
+                    <SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required />
                 </Field>
                 <Field label="صندوق النقد" hint="الصندوق الذي تدخله مبيعات النقد" :error="form.errors.bank_account_id">
-                    <select v-model="form.bank_account_id" :class="input">
-                        <option value="">— الصندوق الافتراضي —</option>
-                        <option v-for="b in boxes" :key="b.id" :value="b.id">{{ b.name }}</option>
-                    </select>
+                    <SelectCreate v-model="form.bank_account_id" :options="boxes" entity="bank" label="name" placeholder="— الصندوق الافتراضي —" />
                 </Field>
             </div>
             <label class="inline-flex items-center gap-2 text-xs"><input v-model="form.is_active" type="checkbox" class="rounded" /> الجهاز يعمل</label>

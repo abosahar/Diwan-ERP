@@ -26,6 +26,8 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    // Typed in a dropdown's "create" option: becomes the new customer's name.
+    initialName: { type: String, default: '' },
     nextCode: {
         type: String,
         default: '1-000001',
@@ -129,7 +131,7 @@ watch(
             form.value = {
                 customer_type: 'individual', // Screenshot 2 defaults or shows individual/commercial
                 code: props.nextCode || '1-000001',
-                name: '',
+                name: props.initialName || '',
                 company_name: '',
                 contact_name: '',
                 email: '',

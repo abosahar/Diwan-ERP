@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ask } from '@/composables/useDialog';
 import { ref, reactive } from 'vue';
 import { Head, useForm, router, usePage } from '@inertiajs/vue3';
@@ -131,7 +132,7 @@ const move = async (cheque, status) => {
                 <Field label="تاريخ الإصدار"><input v-model="form.issue_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="تاريخ الاستحقاق" :error="form.errors.due_date"><input v-model="form.due_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="بنك الشيك"><input v-model="form.bank_name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="حسابنا البنكي"><select v-model="form.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">—</option><option v-for="b in bankAccounts.filter(x => x.type === 'bank')" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field label="حسابنا البنكي"><SelectCreate v-model="form.bank_account_id" :options="bankAccounts.filter(x => x.type === 'bank')" entity="bank" label="name" placeholder="—" /></Field>
             </div>
             <template #footer><button @click="save" :disabled="form.processing || !form.party_id" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold disabled:opacity-40">{{ $t('ui.save') }}</button></template>
         </Dialog>

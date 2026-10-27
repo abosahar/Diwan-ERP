@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import CancelDocument from '@/Components/CancelDocument.vue';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
@@ -179,10 +180,7 @@ const formatCurrency = (val) => {
                         </select>
                     </Field>
                     <Field label="الصندوق / البنك" :error="form.errors.bank_account_id">
-                        <select v-model="form.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs">
-                            <option value="">الافتراضي</option>
-                            <option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option>
-                        </select>
+                        <SelectCreate v-model="form.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" />
                     </Field>
                 </div>
                 <CurrencyPicker v-model:code="form.currency_code" v-model:rate="form.exchange_rate" :errors="form.errors" />

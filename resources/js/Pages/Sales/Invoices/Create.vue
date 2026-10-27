@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
@@ -1077,29 +1078,13 @@ const importLines = (lines, replace) => {
                         <!-- Category -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">التصنيف</label>
-                            <select 
-                                v-model="newProductForm.category_id"
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium"
-                            >
-                                <option value="">بدون تصنيف (عام)</option>
-                                <option v-for="cat in categoriesList" :key="cat.id" :value="cat.id">
-                                    {{ cat.name_ar }}
-                                </option>
-                            </select>
+                            <SelectCreate v-model="newProductForm.category_id" :options="categoriesList" entity="category" label="name_ar" placeholder="بدون تصنيف (عام)" />
                         </div>
 
                         <!-- Unit -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">الوحدة</label>
-                            <select 
-                                v-model="newProductForm.unit_id"
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium"
-                            >
-                                <option value="">اختر الوحدة...</option>
-                                <option v-for="u in unitsList" :key="u.id" :value="u.id">
-                                    {{ u.name_ar }} ({{ u.code || u.name_en || '-' }})
-                                </option>
-                            </select>
+                            <SelectCreate v-model="newProductForm.unit_id" :options="unitsList" entity="unit" :label="(u) => `${u.name_ar} (${u.code || u.name_en || '-'})`" placeholder="اختر الوحدة..." />
                         </div>
 
                         <!-- Selling Price -->

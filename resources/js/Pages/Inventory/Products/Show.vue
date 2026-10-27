@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { confirmAction } from '@/composables/useDialog';
 import { ref } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
@@ -63,7 +64,7 @@ const trackingLabel = { none: 'بدون', batch: 'تشغيلات وتواريخ 
                     <tbody><tr v-for="u in product.units" :key="u.id" class="border-t border-slate-100"><td class="py-2">{{ u.unit?.name_ar }}</td><td class="py-2 text-end font-mono">{{ qty(u.factor) }}</td><td class="py-2 font-mono">{{ u.barcode || '—' }}</td><td class="py-2 text-end font-mono">{{ u.selling_price ? money(u.selling_price) : '—' }}</td><td class="py-2 text-end"><button v-if="$can('inventory.products.edit')" @click="removeUnit(u)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td></tr></tbody>
                 </table></div>
                 <form v-if="$can('inventory.products.edit')" @submit.prevent="addUnit" class="grid grid-cols-2 md:grid-cols-6 gap-2 items-end">
-                    <Field label="الوحدة" :error="unitForm.errors.unit_id"><select v-model="unitForm.unit_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="u in units" :key="u.id" :value="u.id">{{ u.name_ar }}</option></select></Field>
+                    <Field label="الوحدة" :error="unitForm.errors.unit_id"><SelectCreate v-model="unitForm.unit_id" :options="units" entity="unit" label="name_ar" :allow-empty="false" /></Field>
                     <Field label="عدد الوحدات الأساسية" :error="unitForm.errors.factor"><input v-model="unitForm.factor" type="number" step="0.000001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="الباركود"><input v-model="unitForm.barcode" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="سعر البيع"><input v-model="unitForm.selling_price" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>

@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
@@ -626,15 +627,7 @@ const removeLogo = async () => {
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             حساب إيرادات المبيعات (الدائن الافتراضي) *
                                         </label>
-                                        <select 
-                                            v-model="form.acc_sales_revenue_id"
-                                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 bg-white"
-                                        >
-                                            <option value="">-- اختر حساب المبيعات من الدليل --</option>
-                                            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                {{ acc.code }} - {{ acc.name_ar }} ({{ acc.type }})
-                                            </option>
-                                        </select>
+                                        <SelectCreate v-model="form.acc_sales_revenue_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar} (${acc.type})`" placeholder="-- اختر حساب المبيعات من الدليل --" />
                                         <p class="text-[10px] text-slate-400 mt-1">يُسجل في الطرف الدائن كإيراد عند إصدار أي فاتورة بيع.</p>
                                     </div>
 
@@ -642,15 +635,7 @@ const removeLogo = async () => {
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             حساب الذمم المدينة / العملاء (المدين في الآجل) *
                                         </label>
-                                        <select 
-                                            v-model="form.acc_receivables_id"
-                                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 bg-white"
-                                        >
-                                            <option value="">-- اختر حساب العملاء والمدينين --</option>
-                                            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                {{ acc.code }} - {{ acc.name_ar }} ({{ acc.type }})
-                                            </option>
-                                        </select>
+                                        <SelectCreate v-model="form.acc_receivables_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar} (${acc.type})`" placeholder="-- اختر حساب العملاء والمدينين --" />
                                         <p class="text-[10px] text-slate-400 mt-1">يُسجل في الطرف المدين في حالة الفواتير الآجلة أو المبالغ المتبقية غير المسددة.</p>
                                     </div>
                                 </div>
@@ -667,15 +652,7 @@ const removeLogo = async () => {
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             حساب المشتريات / تكلفة البضاعة المباعة *
                                         </label>
-                                        <select 
-                                            v-model="form.acc_purchases_cogs_id"
-                                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 bg-white"
-                                        >
-                                            <option value="">-- اختر حساب تكلفة المشتريات --</option>
-                                            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                {{ acc.code }} - {{ acc.name_ar }} ({{ acc.type }})
-                                            </option>
-                                        </select>
+                                        <SelectCreate v-model="form.acc_purchases_cogs_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar} (${acc.type})`" placeholder="-- اختر حساب تكلفة المشتريات --" />
                                         <p class="text-[10px] text-slate-400 mt-1">يُسجل كمصروف أو تكلفة مشتريات عند شراء بضاعة ومواد.</p>
                                     </div>
 
@@ -683,15 +660,7 @@ const removeLogo = async () => {
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             حساب الذمم الدائنة / الموردين *
                                         </label>
-                                        <select 
-                                            v-model="form.acc_payables_id"
-                                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 bg-white"
-                                        >
-                                            <option value="">-- اختر حساب الموردين والدائنين --</option>
-                                            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                {{ acc.code }} - {{ acc.name_ar }} ({{ acc.type }})
-                                            </option>
-                                        </select>
+                                        <SelectCreate v-model="form.acc_payables_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar} (${acc.type})`" placeholder="-- اختر حساب الموردين والدائنين --" />
                                         <p class="text-[10px] text-slate-400 mt-1">يُسجل في الطرف الدائن كالتزام مالي عند فواتير المشتريات الآجلة.</p>
                                     </div>
                                 </div>
@@ -708,15 +677,7 @@ const removeLogo = async () => {
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             ضريبة القيمة المضافة المحصلة (مخرجات المبيعات) *
                                         </label>
-                                        <select 
-                                            v-model="form.acc_vat_output_id"
-                                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 bg-white"
-                                        >
-                                            <option value="">-- اختر حساب ضريبة المبيعات المحصلة --</option>
-                                            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                {{ acc.code }} - {{ acc.name_ar }} ({{ acc.type }})
-                                            </option>
-                                        </select>
+                                        <SelectCreate v-model="form.acc_vat_output_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar} (${acc.type})`" placeholder="-- اختر حساب ضريبة المبيعات المحصلة --" />
                                         <p class="text-[10px] text-slate-400 mt-1">حساب التزام مستحق للهيئة يُسجل فيه مبلغ الضريبة المضاف على فواتير المبيعات.</p>
                                     </div>
 
@@ -724,15 +685,7 @@ const removeLogo = async () => {
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             ضريبة القيمة المضافة المدخلة (مدخلات المشتريات) *
                                         </label>
-                                        <select 
-                                            v-model="form.acc_vat_input_id"
-                                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 bg-white"
-                                        >
-                                            <option value="">-- اختر حساب ضريبة المشتريات المدخلة --</option>
-                                            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                {{ acc.code }} - {{ acc.name_ar }} ({{ acc.type }})
-                                            </option>
-                                        </select>
+                                        <SelectCreate v-model="form.acc_vat_input_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar} (${acc.type})`" placeholder="-- اختر حساب ضريبة المشتريات المدخلة --" />
                                         <p class="text-[10px] text-slate-400 mt-1">حساب أصل متداول يُسجل فيه ضريبة المشتريات القابلة للاسترداد والخصم من الإقرار.</p>
                                     </div>
                                 </div>
@@ -749,15 +702,7 @@ const removeLogo = async () => {
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             الصندوق الرئيسي الافتراضي (الخزينة النقدية) *
                                         </label>
-                                        <select 
-                                            v-model="form.acc_default_cash_id"
-                                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 bg-white"
-                                        >
-                                            <option value="">-- اختر حساب الصندوق النقدي الرئيسي --</option>
-                                            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                {{ acc.code }} - {{ acc.name_ar }} ({{ acc.type }})
-                                            </option>
-                                        </select>
+                                        <SelectCreate v-model="form.acc_default_cash_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar} (${acc.type})`" placeholder="-- اختر حساب الصندوق النقدي الرئيسي --" />
                                         <p class="text-[10px] text-slate-400 mt-1">يُستخدم لتسجيل المقبوضات النقدية السريعة وفواتير نقاط البيع (الكاش).</p>
                                     </div>
 
@@ -765,15 +710,7 @@ const removeLogo = async () => {
                                         <label class="block text-xs font-bold text-slate-700 mb-1">
                                             الحساب البنكي الافتراضي الرئيسي *
                                         </label>
-                                        <select 
-                                            v-model="form.acc_default_bank_id"
-                                            class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 bg-white"
-                                        >
-                                            <option value="">-- اختر الحساب البنكي الافتراضي --</option>
-                                            <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                {{ acc.code }} - {{ acc.name_ar }} ({{ acc.type }})
-                                            </option>
-                                        </select>
+                                        <SelectCreate v-model="form.acc_default_bank_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar} (${acc.type})`" placeholder="-- اختر الحساب البنكي الافتراضي --" />
                                         <p class="text-[10px] text-slate-400 mt-1">يُعتمد تلقائياً للتحويلات البنكية ومدفوعات الشبكة إذا لم يحدد الكاشير بنكاً بعينه.</p>
                                     </div>
                                 </div>

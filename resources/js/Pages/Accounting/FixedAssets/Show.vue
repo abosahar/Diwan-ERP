@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -108,7 +109,7 @@ const dispose = () => form.transform((d) => ({ ...d, vat_amount: d.taxable ? Mat
                 <label class="flex items-center gap-2"><input v-model="form.taxable" type="checkbox" class="rounded" /> بيع خاضع للضريبة {{ $taxRate() }}% ({{ ((parseFloat(form.proceeds) || 0) * $taxRate() / 100).toFixed(2) }})</label>
                 <p v-if="form.errors.vat_amount" class="text-rose-600">{{ form.errors.vat_amount }}</p>
                 <Field label="طريقة القبض"><select v-model="form.method" class="w-full rounded-xl border-slate-200 text-xs"><option value="bank_transfer">بنك</option><option value="cash">نقداً</option></select></Field>
-                <Field label="الصندوق / البنك"><select v-model="form.bank_account_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
+                <Field label="الصندوق / البنك"><SelectCreate v-model="form.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
                 <p class="text-slate-500">يُحتسب إهلاك الأصل حتى تاريخ البيع أولاً، ثم الربح/الخسارة = مبلغ البيع (بدون الضريبة) − القيمة الدفترية (حالياً {{ money(asset.book_value) }}).</p>
             </div>
             <template #footer><button @click="dispose" :disabled="form.processing" class="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold">تأكيد الاستبعاد</button></template>

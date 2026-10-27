@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -26,7 +27,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
             <div class="bg-white border border-slate-200/80 rounded-2xl p-6 grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                 <Field label="الرمز *" :error="form.errors.code"><input v-model="form.code" :class="input" class="font-mono" required /></Field>
                 <Field label="الاسم *" :error="form.errors.name"><input v-model="form.name" :class="input" required /></Field>
-                <Field label="المنتج (اختياري)"><select v-model="form.product_id" :class="input"><option value="">—</option><option v-for="p in products" :key="p.id" :value="p.id">{{ p.name_ar }}</option></select></Field>
+                <Field label="المنتج (اختياري)"><SelectCreate v-model="form.product_id" :options="products" entity="product" label="name_ar" placeholder="—" /></Field>
                 <label class="inline-flex items-center gap-2 text-xs"><input v-model="form.is_active" type="checkbox" class="rounded" /> نشط</label>
             </div>
             <div class="bg-white border border-slate-200/80 rounded-2xl p-6">
@@ -39,7 +40,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                             <tr v-for="(op, i) in form.operations" :key="i" class="border-t border-slate-100">
                                 <td class="p-2"><input v-model="op.seq" type="number" :class="input" /></td>
                                 <td class="p-2"><input v-model="op.name" :class="input" placeholder="قص، كبس، طلاء..." required /></td>
-                                <td class="p-2"><select v-model="op.work_center_id" :class="input"><option v-for="w in workCenters" :key="w.id" :value="w.id">{{ w.code }} — {{ w.name }}</option></select></td>
+                                <td class="p-2"><SelectCreate v-model="op.work_center_id" :options="workCenters" entity="work_center" :label="(w) => `${w.code} — ${w.name}`" :allow-empty="false" /></td>
                                 <td class="p-2"><input v-model="op.setup_minutes" type="number" step="0.01" :class="input" /></td>
                                 <td class="p-2"><input v-model="op.run_minutes" type="number" step="0.0001" :class="input" /></td>
                                 <td class="p-2"><button type="button" :disabled="form.operations.length <= 1" @click="form.operations.splice(i, 1)" class="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20"><TrashIcon class="w-4 h-4" /></button></td>

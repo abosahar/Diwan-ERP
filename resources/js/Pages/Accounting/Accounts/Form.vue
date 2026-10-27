@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -53,20 +54,7 @@ const submitEditAccount = () => (editing
             <form @submit.prevent="submitEditAccount" class="form-grid text-xs">
                             <div>
                                 <label class="block font-medium text-slate-700 mb-1">الحساب الأب / التابع له</label>
-                                <select 
-                                    v-model="editForm.parent_id" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="">حساب رئيسي مستوى أول (بدون حساب أب)</option>
-                                    <option 
-                                        v-for="p in parentAccounts" 
-                                        :key="p.id" 
-                                        :value="p.id"
-                                        :disabled="p.id === editForm.id"
-                                    >
-                                        {{ p.code }} - {{ p.name_ar }} ({{ typeLabels[p.type] }})
-                                    </option>
-                                </select>
+                                <SelectCreate v-model="editForm.parent_id" :options="parentAccounts" entity="account" :label="(p) => `${p.code} - ${p.name_ar} (${typeLabels[p.type]})`" placeholder="حساب رئيسي مستوى أول (بدون حساب أب)" />
                             </div>
             
                             <div class="grid grid-cols-2 gap-3">

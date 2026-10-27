@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import BrandLogo from '../../Components/BrandLogo.vue';
 
@@ -64,10 +65,7 @@ const submit = () => {
                 </div>
                 <div v-if="registers?.length && form.opening_cash > 0">
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5 text-center">صُرفت العهدة من (اختياري)</label>
-                    <select v-model="form.float_bank_account_id" class="w-full text-xs rounded-xl border border-slate-200 px-4 py-2.5 text-center">
-                        <option value="">لم تُصرف الآن (موجودة بالدرج)</option>
-                        <option v-for="b in boxes" :key="b.id" :value="b.id">{{ b.name }}</option>
-                    </select>
+                    <SelectCreate v-model="form.float_bank_account_id" :options="boxes" entity="bank" label="name" placeholder="لم تُصرف الآن (موجودة بالدرج)" />
                     <p v-if="form.errors.float_bank_account_id" class="text-xs text-rose-600 mt-1 text-center">{{ form.errors.float_bank_account_id }}</p>
                 </div>
 

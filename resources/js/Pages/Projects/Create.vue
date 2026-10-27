@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -27,7 +28,7 @@ const save = () => {
                 <Field label="العميل (المالك)" :error="form.errors.customer_id" class="md:col-span-2"><PartyPicker v-model="form.customer_id" /></Field>
                 <Field label="رقم العقد"><input v-model="form.contract_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="مدير المشروع"><select v-model="form.manager_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">—</option><option v-for="m in managers" :key="m.id" :value="m.id">{{ m.name }}</option></select></Field>
-                <Field label="مستودع الموقع"><select v-model="form.warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+                <Field label="مستودع الموقع"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="الموقع"><input v-model="form.location" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="تاريخ البدء"><input v-model="form.start_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="تاريخ الانتهاء" :error="form.errors.end_date"><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>

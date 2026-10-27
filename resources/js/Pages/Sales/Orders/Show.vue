@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { computed, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -91,7 +92,7 @@ const act = (name, message) => { if (!message || confirm(message)) router.post(r
         <Dialog :show="showDeliver" title="إذن تسليم بضاعة" size="lg" @close="showDeliver = false">
             <div class="grid grid-cols-3 gap-3 mb-3">
                 <Field label="تاريخ التسليم"><input v-model="deliverForm.delivery_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="المستودع"><select v-model="deliverForm.warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الافتراضي</option><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+                <Field label="المستودع"><SelectCreate v-model="deliverForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="المستلم"><input v-model="deliverForm.receiver_name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <div class="overflow-x-auto"><table class="w-full text-xs">

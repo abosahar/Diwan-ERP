@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, ref } from 'vue';
 import axios from 'axios';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -80,7 +81,7 @@ const remove = () => confirm('حذف أمر الصيانة؟') && router.delete(
                 <div v-if="isOpen && $can('equipment.maintenance.issue')" class="border-t border-dashed border-slate-200 pt-3 space-y-2">
                     <div class="flex flex-wrap items-end gap-2">
                         <h4 class="font-black text-slate-700 flex-1">صرف من المستودع</h4>
-                        <Field label="المستودع" :error="issueForm.errors.warehouse_id"><select v-model="issueForm.warehouse_id" class="rounded-xl border-slate-200 text-xs"><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+                        <Field label="المستودع" :error="issueForm.errors.warehouse_id"><SelectCreate v-model="issueForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" /></Field>
                         <Field label="تاريخ الصرف"><input v-model="issueForm.date" type="date" class="rounded-xl border-slate-200 text-xs" /></Field>
                     </div>
                     <div v-for="(l, i) in issueForm.lines" :key="i" class="grid grid-cols-12 gap-2 items-start">

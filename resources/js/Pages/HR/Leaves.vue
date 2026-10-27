@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ask } from '@/composables/useDialog';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -46,7 +47,7 @@ const pay = { full: 'مدفوعة', sick_tiers: 'حسب شرائح المرضي�
             <div class="space-y-4 text-xs">
                 <div v-if="$can('hr.leaves.create')" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
                     <h3 class="font-black text-slate-700">طلب إجازة</h3>
-                    <select v-model="form.employee_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الموظف...</option><option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option></select>
+                    <SelectCreate v-model="form.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
                     <select v-model="form.leave_type_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="t in types" :key="t.id" :value="t.id">{{ t.name }}</option></select>
                     <div class="grid grid-cols-2 gap-2"><input v-model="form.start_date" type="date" class="rounded-xl border-slate-200 text-xs" /><input v-model="form.end_date" type="date" class="rounded-xl border-slate-200 text-xs" /></div>
                     <input v-model="form.reason" placeholder="السبب" class="w-full rounded-xl border-slate-200 text-xs" />

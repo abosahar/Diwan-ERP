@@ -98,7 +98,7 @@ const formatCurrency = (val) => {
             <!-- Top Breadcrumbs & Action Bar -->
             <PageHeader title="العملاء" :crumbs="[{ label: 'العملاء' }]">
 <template #actions>
-<ImportButton v-if="$can('sales.clients.create')" type="customers" title="استيراد العملاء من Excel" hint="عمود opening_balance اختياري: رصيد العميل الافتتاحي (للعملاء الجدد فقط)." />
+
                     
                     <button 
                         @click="router.reload()" 
@@ -127,6 +127,7 @@ const formatCurrency = (val) => {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة عميل</span>
                     </button>
+<ImportButton v-if="$can('sales.clients.create')" type="customers" title="استيراد العملاء من Excel" hint="عمود opening_balance اختياري: رصيد العميل الافتتاحي (للعملاء الجدد فقط)." />
 </template>
 </PageHeader>
 

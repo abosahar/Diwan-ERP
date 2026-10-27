@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\Documents\DocumentNumberService;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -25,6 +27,19 @@ abstract class Controller
     protected function wantsJsonResponse(Request $request): bool
     {
         return ! $request->header('X-Inertia') && ($request->wantsJson() || $request->ajax());
+    }
+
+    /**
+     * JSON answer for the "create "..."" dialog on a dropdown: the new record
+     * with a ready label, or null for a normal page post (the caller redirects).
+     */
+    protected function createdResponse(Request $request, Model $model, string $label): ?JsonResponse
+    {
+        if (! $this->wantsJsonResponse($request)) {
+            return null;
+        }
+
+        return response()->json(['success' => true, 'record' => ['id' => $model->getKey(), 'label' => $label] + $model->toArray()], 201);
     }
 
     /**

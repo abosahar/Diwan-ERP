@@ -18,14 +18,16 @@ const statusLabel = { present: 'حاضر', absent: 'غائب', leave: 'إجاز�
     <AppLayout>
         <Head title="الحضور والانصراف" />
         <PageHeader title="الحضور والانصراف" subtitle="يُحتسب التأخير والإضافي حسب وردية الموظف؛ الغياب يُخصم في المسير" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'الحضور' }]">
-            <template #actions><input type="date" :value="date" @change="changeDate" class="rounded-xl border-slate-200 text-xs" /></template>
-        </PageHeader>
-        <div class="flex flex-wrap gap-3 mb-3 text-xs">
-            <span v-for="s in summary" :key="s.status" class="px-3 py-1 rounded-lg bg-white border border-slate-200">{{ statusLabel[s.status] }} (الشهر): <b>{{ s.total }}</b></span>
-            <div v-if="$can('hr.attendance.create')" class="flex items-center gap-2 ms-auto">
+            <template #actions>
+                <input type="date" :value="date" @change="changeDate" class="rounded-xl border-slate-200 text-xs" />
+                <div v-if="$can('hr.attendance.create')" class="flex items-center gap-2">
                 <input type="file" accept=".csv,.txt" @input="importForm.file = $event.target.files[0]" class="text-xs" />
                 <button @click="importForm.post(route('hr.attendance.import'), { forceFormData: true })" :disabled="!importForm.file" class="px-3 py-1.5 rounded-xl border border-slate-200 font-bold disabled:opacity-40">استيراد (رقم الموظف، التاريخ، دخول، خروج)</button>
             </div>
+            </template>
+        </PageHeader>
+        <div class="flex flex-wrap gap-3 mb-3 text-xs">
+            <span v-for="s in summary" :key="s.status" class="px-3 py-1 rounded-lg bg-white border border-slate-200">{{ statusLabel[s.status] }} (الشهر): <b>{{ s.total }}</b></span>
         </div>
         <p v-for="(m, k) in importForm.errors" :key="k" class="text-xs text-rose-600 mb-2">{{ m }}</p>
         <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">

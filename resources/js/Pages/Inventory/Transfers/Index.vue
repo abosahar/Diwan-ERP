@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
 import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -59,8 +60,8 @@ const importLines = (lines, replace) => {
 
         <Dialog :show="open" title="أمر تحويل مخزني" size="lg" @close="open = false">
             <div class="grid grid-cols-3 gap-3 text-xs mb-3">
-                <Field label="من مستودع" :error="form.errors.from_warehouse_id"><select v-model="form.from_warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
-                <Field label="إلى مستودع" :error="form.errors.to_warehouse_id"><select v-model="form.to_warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></Field>
+                <Field label="من مستودع" :error="form.errors.from_warehouse_id"><SelectCreate v-model="form.from_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" /></Field>
+                <Field label="إلى مستودع" :error="form.errors.to_warehouse_id"><SelectCreate v-model="form.to_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" /></Field>
                 <Field label="التاريخ"><input v-model="form.transfer_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <div class="relative mb-2">

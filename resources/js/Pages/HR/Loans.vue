@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ask } from '@/composables/useDialog';
 import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
@@ -27,7 +28,7 @@ const decide = async (loan, approve) => {
         <PageHeader title="سلف الموظفين" subtitle="تُصرف عند الاعتماد وتُستقطع أقساطها من المسير (بحد أقصى نصف الأجر)" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'السلف' }]" />
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
             <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                <div class="p-3 border-b border-slate-100 flex items-center gap-2">صرف من: <select v-model="bank" class="rounded-xl border-slate-200 text-xs"><option value="">الحساب الافتراضي</option><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></div>
+                <div class="p-3 border-b border-slate-100 flex items-center gap-2">صرف من: <SelectCreate v-model="bank" :options="bankAccounts" entity="bank" label="name" placeholder="الحساب الافتراضي" /></div>
                 <table class="w-full">
                     <thead class="bg-slate-50 text-slate-500"><tr><th class="text-start px-3 py-2">الموظف</th><th class="px-3 py-2">التاريخ</th><th class="px-3 py-2 text-end">المبلغ</th><th class="px-3 py-2 text-end">القسط</th><th class="px-3 py-2 text-end">المسدد</th><th class="px-3 py-2">الحالة</th><th></th></tr></thead>
                     <tbody>
@@ -42,7 +43,7 @@ const decide = async (loan, approve) => {
             </div>
             <div v-if="$can('hr.loans.create')" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
                 <h3 class="font-black text-slate-700">سلفة جديدة</h3>
-                <select v-model="form.employee_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الموظف...</option><option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option></select>
+                <SelectCreate v-model="form.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
                 <label class="block">التاريخ<input v-model="form.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
                 <label class="block">المبلغ<input v-model="form.amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
                 <label class="block">القسط الشهري<input v-model="form.monthly_installment" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>

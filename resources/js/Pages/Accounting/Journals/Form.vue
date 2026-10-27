@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -123,27 +124,11 @@ const importLines = (lines, replace) => {
                                 <tbody class="divide-y divide-slate-100">
                                     <tr v-for="(line, idx) in form.lines" :key="idx" class="bg-white">
                                         <td class="p-2">
-                                            <select 
-                                                v-model="line.account_id" 
-                                                required 
-                                                @change="syncParty(line)"
-                                                class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs"
-                                            >
-                                                <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
-                                                    {{ acc.code }} - {{ acc.name_ar }}
-                                                </option>
-                                            </select>
-                                            <select v-if="partyType(line)" v-model="line.party_id" required
-                                                class="mt-1 w-full py-1 px-2 bg-amber-50 border border-amber-200 rounded-lg text-3xs">
-                                                <option value="">{{ partyType(line) === 'customer' ? '— اختر العميل —' : '— اختر المورد —' }}</option>
-                                                <option v-for="p in (partyType(line) === 'customer' ? customers : suppliers)" :key="p.id" :value="p.id">{{ p.name }}</option>
-                                            </select>
+                                            <SelectCreate v-model="line.account_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar}`" placeholder="اختر الحساب" :allow-empty="false" required @update:modelValue="$nextTick(() => syncParty(line))" />
+                                            <SelectCreate v-if="partyType(line)" v-model="line.party_id" :options="partyType(line) === 'customer' ? customers : suppliers" :entity="partyType(line)" label="name" :placeholder="partyType(line) === 'customer' ? '— اختر العميل —' : '— اختر المورد —'" :allow-empty="false" required class="mt-1" />
                                         </td>
                                         <td class="p-2">
-                                            <select v-model="line.cost_center_id" class="w-full py-1 px-2 bg-slate-50 border border-slate-200 rounded-lg text-3xs">
-                                                <option value="">—</option>
-                                                <option v-for="cc in costCenters" :key="cc.id" :value="cc.id">{{ cc.code }} - {{ cc.name_ar }}</option>
-                                            </select>
+                                            <SelectCreate v-model="line.cost_center_id" :options="costCenters" entity="cost_center" :label="(cc) => `${cc.code} - ${cc.name_ar}`" placeholder="—" />
                                         </td>
                                         <td class="p-2">
                                             <input 

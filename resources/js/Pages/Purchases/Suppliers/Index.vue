@@ -67,7 +67,7 @@ const formatCurrency = (val) => {
             <!-- Header Ribbon -->
             <PageHeader title="الموردين" :crumbs="[{ label: 'المشتريات' }, { label: 'الموردين' }]">
 <template #actions>
-<ImportButton v-if="$can('purchases.suppliers.create')" type="suppliers" title="استيراد الموردين من Excel" hint="عمود opening_balance اختياري: الرصيد الدائن الافتتاحي (للموردين الجدد فقط)." />
+
                     <button 
                         @click="handleSearch"
                         title="تحديث البيانات"
@@ -91,6 +91,7 @@ const formatCurrency = (val) => {
                         <PlusIcon class="w-4 h-4 stroke-2" />
                         <span>إضافة مورد</span>
                     </Link>
+<ImportButton v-if="$can('purchases.suppliers.create')" type="suppliers" title="استيراد الموردين من Excel" hint="عمود opening_balance اختياري: الرصيد الدائن الافتتاحي (للموردين الجدد فقط)." />
 </template>
 </PageHeader>
 

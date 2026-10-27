@@ -1,4 +1,5 @@
 <script setup>
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -29,7 +30,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
         <PageHeader :title="editing ? 'تعديل قائمة مواد' : 'قائمة مواد جديدة'" :crumbs="[{ label: 'التصنيع' }, { label: 'قوائم المواد', href: route('manufacturing.boms.index') }, { label: editing ? 'تعديل' : 'جديدة' }]" />
         <form @submit.prevent="submit" class="space-y-5">
             <div class="bg-white border border-slate-200/80 rounded-2xl p-6 grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-                <Field label="المنتج النهائي *" :error="form.errors.product_id"><select v-model="form.product_id" :class="input" required><option value="">— اختر —</option><option v-for="p in products" :key="p.id" :value="p.id">{{ p.name_ar }} ({{ p.sku }})</option></select></Field>
+                <Field label="المنتج النهائي *" :error="form.errors.product_id"><SelectCreate v-model="form.product_id" :options="products" entity="product" :label="(p) => `${p.name_ar} (${p.sku})`" placeholder="— اختر —" required /></Field>
                 <Field label="اسم القائمة *" :error="form.errors.name"><input v-model="form.name" :class="input" required /></Field>
                 <Field label="الرمز"><input v-model="form.code" :class="input" class="font-mono" /></Field>
                 <Field label="الإصدار *"><input v-model="form.version" :class="input" class="font-mono" /></Field>
@@ -46,7 +47,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                         <thead class="text-slate-500"><tr><th class="text-start p-2">المكوّن</th><th class="text-start p-2 w-36">الكمية لكل دفعة</th><th class="text-start p-2 w-32">هالك %</th><th class="w-10"></th></tr></thead>
                         <tbody>
                             <tr v-for="(it, i) in form.items" :key="i" class="border-t border-slate-100">
-                                <td class="p-2"><select v-model="it.component_id" :class="input" required><option value="">— اختر —</option><option v-for="p in products" :key="p.id" :value="p.id">{{ p.name_ar }} ({{ p.sku }})</option></select></td>
+                                <td class="p-2"><SelectCreate v-model="it.component_id" :options="products" entity="product" :label="(p) => `${p.name_ar} (${p.sku})`" placeholder="— اختر —" required /></td>
                                 <td class="p-2"><input v-model="it.quantity" type="number" step="0.0001" :class="input" /></td>
                                 <td class="p-2"><input v-model="it.scrap_percent" type="number" step="0.01" :class="input" /></td>
                                 <td class="p-2"><button type="button" :disabled="form.items.length <= 1" @click="form.items.splice(i, 1)" class="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20"><TrashIcon class="w-4 h-4" /></button></td>

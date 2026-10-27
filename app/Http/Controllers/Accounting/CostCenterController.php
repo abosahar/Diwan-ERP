@@ -22,7 +22,11 @@ class CostCenterController extends Controller
 
     public function store(Request $request)
     {
-        CostCenter::create($this->validated($request));
+        $center = CostCenter::create($this->validated($request));
+
+        if ($json = $this->createdResponse($request, $center, $center->code.' - '.$center->name_ar)) {
+            return $json;
+        }
 
         return back()->with('success', 'تم إضافة مركز التكلفة');
     }
