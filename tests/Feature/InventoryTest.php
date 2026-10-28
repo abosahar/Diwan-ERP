@@ -216,6 +216,10 @@ class InventoryTest extends TestCase
         $count = StockCount::firstOrFail();
         $this->assertSame(10.0, (float) $count->items()->where('product_id', $p->id)->value('system_quantity'));
 
+        // The count page itself (its summary must not use a MySQL reserved word as an alias).
+        $this->get(route('inventory.counts.show', $count->id))->assertOk()
+            ->assertInertia(fn ($page) => $page->where('summary.line_count', 1)->where('summary.uncounted', 1));
+
         $this->put(route('inventory.counts.update', $count->id), ['lines' => [['product_id' => $p->id, 'counted_quantity' => 8]]])->assertSessionHasNoErrors();
         $this->post(route('inventory.counts.approve', $count->id))->assertSessionHasNoErrors();
 

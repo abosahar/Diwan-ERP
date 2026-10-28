@@ -99,7 +99,7 @@ class StockCountController extends Controller
             ->withQueryString();
 
         $summary = StockCountItem::where('stock_count_id', $count->id)
-            ->selectRaw('COUNT(*) as lines, SUM(CASE WHEN counted_quantity IS NULL THEN 1 ELSE 0 END) as uncounted,
+            ->selectRaw('COUNT(*) as line_count, SUM(CASE WHEN counted_quantity IS NULL THEN 1 ELSE 0 END) as uncounted,
                 COALESCE(SUM(CASE WHEN counted_quantity IS NOT NULL THEN (counted_quantity - system_quantity) * unit_cost ELSE 0 END),0) as value_difference')
             ->first();
 

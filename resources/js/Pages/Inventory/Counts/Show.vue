@@ -57,7 +57,7 @@ const importCounts = (lines) => {
         </PageHeader>
 
         <div class="grid grid-cols-3 gap-3 mb-4">
-            <StatCard label="عدد الأصناف" :value="summary.lines" />
+            <StatCard label="عدد الأصناف" :value="summary.line_count" />
             <StatCard label="لم تُجرد بعد" :value="summary.uncounted" tone="amber" />
             <StatCard label="قيمة الفروقات" :value="amount(summary.value_difference)" :tone="summary.value_difference < 0 ? 'rose' : 'emerald'" />
         </div>
