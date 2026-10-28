@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مراجعة مثبّت الماك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f6f3;
+    --surface: #ffffff;
+    --surface-2: #fafaf8;
+    --text: #1c1d1f;
+    --muted: #5d6166;
+    --border: #e2e2dd;
+    --accent: #2b6e5c;
+    --accent-bg: #e5f2ed;
+    --high: #b4322a;
+    --high-bg: #fbe9e7;
+    --med: #9a5b00;
+    --med-bg: #fdf1dc;
+    --low: #4f5862;
+    --low-bg: #eceff2;
+    --ok: #1d7a4b;
+    --ok-bg: #e3f3ea;
+    --info: #1d5aa0;
+    --info-bg: #e6eefa;
+    --code-bg: #f1f2f0;
+    --code-text: #24292f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 2px 8px rgba(0, 0, 0, .04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111214;
+      --surface: #1a1b1e;
+      --surface-2: #1e2023;
+      --text: #e7e7e4;
+      --muted: #a2a6ab;
+      --border: #2d2f33;
+      --accent: #63c2a5;
+      --accent-bg: #16302a;
+      --high: #ff8a80;
+      --high-bg: #3a1c1a;
+      --med: #f2b55c;
+      --med-bg: #382a14;
+      --low: #b3bac2;
+      --low-bg: #26292d;
+      --ok: #72d29f;
+      --ok-bg: #163224;
+      --info: #82b6ff;
+      --info-bg: #172941;
+      --code-bg: #232528;
+      --code-text: #e1e4e8;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111214;
+    --surface: #1a1b1e;
+    --surface-2: #1e2023;
+    --text: #e7e7e4;
+    --muted: #a2a6ab;
+    --border: #2d2f33;
+    --accent: #63c2a5;
+    --accent-bg: #16302a;
+    --high: #ff8a80;
+    --high-bg: #3a1c1a;
+    --med: #f2b55c;
+    --med-bg: #382a14;
+    --low: #b3bac2;
+    --low-bg: #26292d;
+    --ok: #72d29f;
+    --ok-bg: #163224;
+    --info: #82b6ff;
+    --info-bg: #172941;
+    --code-bg: #232528;
+    --code-text: #e1e4e8;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Sans Arabic", -apple-system, "SF Arabic", "Geeza Pro", "Segoe UI", Tahoma, sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1, h2, h3 { line-height: 1.35; margin: 0; }
+  h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; }
+  h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 14px; }
+  h3 { font-size: 1.05rem; font-weight: 700; }
+  p { margin: 0 0 10px; }
+  a { color: var(--accent); }
+  code, pre, .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  code {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: .86em;
+    direction: ltr;
+    unicode-bidi: isolate;
+    overflow-wrap: anywhere; /* long file paths wrap on phones */
+  }
+  pre {
+    direction: ltr;
+    text-align: left;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-size: .82rem;
+    line-height: 1.6;
+    margin: 10px 0 4px;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  header.top { margin-bottom: 28px; }
+  .eyebrow { color: var(--accent); font-weight: 700; font-size: .9rem; margin-bottom: 6px; }
+  .meta { color: var(--muted); font-size: .92rem; margin-top: 8px; }
+  .lead { font-size: 1.05rem; margin-top: 14px; }
+
+  section { margin-top: 40px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+  }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 22px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .stat .n { font-size: 1.7rem; font-weight: 700; line-height: 1.2; }
+  .stat .l { color: var(--muted); font-size: .88rem; }
+  .stat.high .n { color: var(--high); }
+  .stat.ok .n { color: var(--ok); }
+  .stat.info .n { color: var(--info); }
+
+  .answer { border-inline-start: 4px solid var(--accent); }
+  .answer ul { margin: 6px 0 0; padding-inline-start: 20px; }
+  .answer li { margin-bottom: 4px; }
+
+  .badge {
+    display: inline-block;
+    font-size: .76rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 1px 10px;
+    white-space: nowrap;
+  }
+  .sev-high { color: var(--high); background: var(--high-bg); }
+  .sev-med { color: var(--med); background: var(--med-bg); }
+  .sev-low { color: var(--low); background: var(--low-bg); }
+  .where-repo { color: var(--ok); background: var(--ok-bg); }
+  .where-new { color: var(--info); background: var(--info-bg); }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .filters button {
+    font: inherit;
+    font-size: .88rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 4px 14px;
+    cursor: pointer;
+  }
+  .filters button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .9rem; }
+  th, td { padding: 10px 12px; text-align: start; vertical-align: top; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: .82rem; background: var(--surface-2); }
+  tr:last-child td { border-bottom: 0; }
+  td .badge + .badge { margin-inline-start: 4px; }
+  .num { color: var(--muted); font-variant-numeric: tabular-nums; width: 2.5em; }
+
+  .issues { display: grid; gap: 12px; }
+  /* Grid items may shrink below their code blocks' width: the code scrolls inside its box instead. */
+  .issues > *, .two > *, .steps > li { min-width: 0; }
+  details.issue {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  details.issue > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 14px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+  }
+  details.issue > summary::-webkit-details-marker { display: none; }
+  details.issue > summary::after {
+    content: "＋";
+    margin-inline-start: auto;
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+  details.issue[open] > summary::after { content: "－"; }
+  details.issue > summary h3 { flex: 1 1 260px; }
+  .issue .body { padding: 0 18px 16px; border-top: 1px solid var(--border); }
+  .issue .body h4 { margin: 14px 0 4px; font-size: .9rem; color: var(--muted); font-weight: 700; }
+  .file { color: var(--muted); font-size: .85rem; }
+  .hidden { display: none !important; }
+
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .steps li {
+    counter-increment: step;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    padding-inline-start: 56px;
+    position: relative;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    inset-inline-start: 16px;
+    top: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    font-size: .9rem;
+  }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .check-list { margin: 0; padding-inline-start: 20px; }
+  .check-list li { margin-bottom: 6px; }
+  .note { color: var(--muted); font-size: .9rem; }
+  .callout {
+    background: var(--med-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 12px;
+  }
+  footer { margin-top: 48px; color: var(--muted); font-size: .85rem; }
+  @media (max-width: 520px) {
+    .wrap { padding-top: 20px; }
+    details.issue > summary { padding: 12px 14px; }
+    .issue .body { padding: 0 14px 14px; }
+    .card { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">الديوان ERP · مراجعة تقنية</div>
+  <h1>مثبّت الديوان على الماك: المشاكل وحلولها</h1>
+  <p class="meta">
+    الملفات المراجَعة: <code>install-mac.sh</code> (مطابق حرفياً لـ <code>deploy/mac/install.sh</code> في الإصدار المنشور v1.4.0، commit <code>04264ae</code>) و <code>deploy/mac/update.sh</code> الذي يثبّته ·
+    29 أكتوبر 2026
+  </p>
+  <p class="lead">
+    المشاكل في السكربت نفسه لا في جهاز بعينه: أي عميل يثبّت الديوان اليوم يحصل على هذا الكود.
+    أُصلحت المشاكل الأربع عالية الخطورة في المستودع، وكُتب مثبّت جديد <code>install-mac-new.sh</code> يعالج كل الملاحظات،
+    واختُبر كل ذلك قبل التسليم.
+  </p>
+  <div class="stats">
+    <div class="stat"><div class="n">19</div><div class="l">ملاحظة على المثبّت والمحدّث</div></div>
+    <div class="stat high"><div class="n">4</div><div class="l">عالية الخطورة</div></div>
+    <div class="stat ok"><div class="n">7</div><div class="l">أُصلحت في كود المستودع</div></div>
+    <div class="stat info"><div class="n">19</div><div class="l">يعالجها المثبّت الجديد</div></div>
+    <div class="stat ok"><div class="n">29/29</div><div class="l">اختبار للمثبّت نجح</div></div>
+  </div>
+</header>
+
+<section>
+  <h2>الخلاصة</h2>
+  <div class="card answer">
+    <p><strong>ما الذي تغيّر؟</strong></p>
+    <ul>
+      <li><strong>في المستودع:</strong> إصلاح قفل التحديث العالق، واستعادة قاعدة البيانات عند الرجوع، وقراءة المنفذ الصحيحة (ماك ولينكس)، وقصر صفحة الإعداد الأول على الجهاز نفسه مع اختبار جديد.</li>
+      <li><strong>مثبّت جديد:</strong> <code>install-mac-new.sh</code> يعالج الملاحظات التسع عشرة كلها، ويحتفظ بنسخة من نفسه في <code>~/Diwan/bin/diwan</code> تدير التحديث والحالة والإزالة.</li>
+      <li><strong>لماذا محدّث خاص بالمثبّت الجديد؟</strong> الإصدار المنشور v1.4.0 يحمل <code>update.sh</code> القديم. لو اعتمد المثبّت الجديد عليه لبقيت أعطاله حتى صدور إصدار جديد.</li>
+      <li><strong>متوافق مع التثبيتات القائمة:</strong> نفس المجلد <code>~/Diwan</code>، ونفس أسماء الخدمات، ونفس ملف حالة التحديث الذي تقرؤه لوحة المالك.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>كل الملاحظات</h2>
+  <div class="filters" role="group" aria-label="تصفية حسب الخطورة">
+    <button type="button" data-filter="all" aria-pressed="true">الكل (19)</button>
+    <button type="button" data-filter="high" aria-pressed="false">عالية (4)</button>
+    <button type="button" data-filter="med" aria-pressed="false">متوسطة (8)</button>
+    <button type="button" data-filter="low" aria-pressed="false">منخفضة (7)</button>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th class="num">#</th><th>المشكلة</th><th>الخطورة</th><th>الموضع في الأصل</th><th>الحالة</th></tr>
+      </thead>
+      <tbody>
+        <tr data-sev="high"><td class="num">1</td><td>قفل التحديث يعلق للأبد بعد انقطاع الكهرباء</td><td><span class="badge sev-high">عالية</span></td><td><code>update.sh:45</code></td><td><span class="badge where-repo">أُصلح في المستودع</span> <span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="high"><td class="num">2</td><td>الرجوع التلقائي يعيد الكود دون قاعدة البيانات</td><td><span class="badge sev-high">عالية</span></td><td><code>update.sh:82-107</code></td><td><span class="badge where-repo">أُصلح في المستودع</span> <span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="high"><td class="num">3</td><td>المنفذ يُقرأ خطأً من <code>APP_URL</code> فيُلغى كل تحديث</td><td><span class="badge sev-high">عالية</span></td><td><code>update.sh:96</code> + لينكس <code>:98</code></td><td><span class="badge where-repo">أُصلح في المستودع</span> <span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="high"><td class="num">4</td><td>صفحة الإعداد الأول مفتوحة لكل الشبكة</td><td><span class="badge sev-high">عالية</span></td><td><code>LocalSetupController</code></td><td><span class="badge where-repo">أُصلح في المستودع</span> <span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="med"><td class="num">5</td><td>تعارض المنافذ (3306 / 8000) برسائل مضللة</td><td><span class="badge sev-med">متوسطة</span></td><td><code>install.sh:57, :166</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="med"><td class="num">6</td><td>إعادة تشغيل المثبّت تُرحّل بلا نسخة احتياطية</td><td><span class="badge sev-med">متوسطة</span></td><td><code>install.sh:111</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="med"><td class="num">7</td><td>سباق <code>launchctl bootout/bootstrap</code></td><td><span class="badge sev-med">متوسطة</span></td><td><code>install.sh:144</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="med"><td class="num">8</td><td>سجلات الخدمات تكبر بلا حد</td><td><span class="badge sev-med">متوسطة</span></td><td><code>install.sh:138</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="med"><td class="num">9</td><td>ملف الإعدادات قد يبقى فارغاً للأبد</td><td><span class="badge sev-med">متوسطة</span></td><td><code>install.sh:98</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="med"><td class="num">10</td><td>لا تحقق من إصدار PHP وامتداداته</td><td><span class="badge sev-med">متوسطة</span></td><td><code>install.sh:53</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="med"><td class="num">11</td><td>فشل اختصار سطح المكتب يوقف المثبّت</td><td><span class="badge sev-med">متوسطة</span></td><td><code>install.sh:159</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="med"><td class="num">12</td><td>بقايا إصدار ناقص عند فشل النسخة الاحتياطية</td><td><span class="badge sev-med">متوسطة</span></td><td><code>update.sh:83</code></td><td><span class="badge where-repo">أُصلح في المستودع</span> <span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="low"><td class="num">13</td><td>تنزيل 63MB كل يوم حتى بلا تحديث</td><td><span class="badge sev-low">منخفضة</span></td><td><code>update.sh:57</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="low"><td class="num">14</td><td>حالة «Downloading» تُكتب بعد انتهاء التنزيل</td><td><span class="badge sev-low">منخفضة</span></td><td><code>update.sh:62</code></td><td><span class="badge where-repo">أُصلح في المستودع</span> <span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="low"><td class="num">15</td><td>كشف الترحيلات المعلقة هش ويتخطاها بصمت</td><td><span class="badge sev-low">منخفضة</span></td><td><code>update.sh:82</code></td><td><span class="badge where-repo">أُصلح في المستودع</span> <span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="low"><td class="num">16</td><td>عنوان الشبكة من <code>en0/en1</code> فقط</td><td><span class="badge sev-low">منخفضة</span></td><td><code>install.sh:167</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="low"><td class="num">17</td><td>لا توجد طريقة لإزالة النظام</td><td><span class="badge sev-low">منخفضة</span></td><td>—</td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="low"><td class="num">18</td><td>التحقق من المجموع الاختباري اختياري</td><td><span class="badge sev-low">منخفضة</span></td><td><code>install.sh:69</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+        <tr data-sev="low"><td class="num">19</td><td>حالات تشغيل خاطئة لا تُكشف مبكراً</td><td><span class="badge sev-low">منخفضة</span></td><td><code>install.sh</code></td><td><span class="badge where-new">المثبّت الجديد</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>التفاصيل</h2>
+  <div class="issues">
+
+    <details class="issue" data-sev="high" open>
+      <summary><span class="badge sev-high">عالية</span><h3>1. قفل التحديث يعلق للأبد</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>deploy/mac/update.sh:45</code></p>
+        <h4>ما يحدث</h4>
+        <p>القفل مجلد <code>~/Diwan/.update.lock</code> لا يُحذف إلا عند خروج السكربت بشكل طبيعي. إذا انقطعت الكهرباء أو أُطفئ الماك قسرياً أثناء التحديث يبقى المجلد، فتفشل كل التحديثات التلقائية بعدها برسالة «Another update is already running» إلى أن يحذفه أحد يدوياً. ويكتب الطلب الثاني «failed» في لوحة المالك بينما الأول ما زال يعمل.</p>
+        <h4>الحل</h4>
+        <p>يحفظ القفل رقم العملية ووقت بدئها. لا يُعدّ القفل قائماً إلا إذا كانت العملية نفسها حيّة وبوقت البدء نفسه، لأن أرقام العمليات تُعاد بعد إعادة تشغيل الجهاز. وإذا وصل طلب ثانٍ أثناء تحديث جارٍ يخرج بهدوء دون أن يغيّر الحالة.</p>
+<pre><code>started_at() { ps -p "$1" -o lstart= 2&gt; /dev/null | awk '{ $1 = $1; print }' || true; }
+if ! mkdir "$LOCK" 2&gt; /dev/null; then
+    read -r owner since 2&gt; /dev/null &lt; "$LOCK/owner" || true
+    if [[ $owner =~ ^[0-9]+$ &amp;&amp; -n $since &amp;&amp; $(started_at "$owner") == "$since" ]]; then
+        ok "Another update is already running."; exit 0
+    fi
+    rm -rf "$LOCK"; mkdir "$LOCK" 2&gt; /dev/null || { ok "Another update is already running."; exit 0; }
+fi
+echo "$$ $(started_at $$)" &gt; "$LOCK/owner"</code></pre>
+        <h4>كيف تحققتُ</h4>
+        <p>اختبار وحدات بأربع حالات: مالك حيّ، ومالك ميت، ورقم عملية أُعيد استخدامه، وقفل قديم بلا ملف مالك. إضافة إلى السيناريوهات E و F (المثبّت الجديد) و I و J (<code>update.sh</code> المُصلح).</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="high">
+      <summary><span class="badge sev-high">عالية</span><h3>2. الرجوع التلقائي يعيد الكود دون قاعدة البيانات</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>deploy/mac/update.sh:82-107</code></p>
+        <h4>ما يحدث</h4>
+        <ul class="check-list">
+          <li>إذا فشل فحص <code>/up</code> بعد تنفيذ الـ migrations، يعود الإصدار القديم ليعمل على مخطط قاعدة بيانات جديد.</li>
+          <li>إذا فشل <code>migrate</code> في منتصفه تبقى القاعدة نصف مُرحّلة، لأن MySQL لا يتراجع عن أوامر DDL، بينما تقول الرسالة «unchanged».</li>
+          <li>النسخة الاحتياطية <code>preupdate</code> موجودة، لكنها لا تُستعاد أبداً.</li>
+        </ul>
+        <h4>الحل</h4>
+        <p>يأخذ الإصدار العامل النسخة الاحتياطية بنفسه. وعند فشل الترحيل أو فشل التشغيل يستعيدها هو بالأمر <code>erp:restore</code>، ثم تُحذف الجداول التي أنشأها التحديث، لأنها ليست في النسخة؛ ولو بقيت لتوقّف التحديث التالي على «table already exists». وتصف الرسائل الآن ما حدث فعلاً.</p>
+<pre><code>✗ The database update of version 1.2.0 failed; the database was restored and version 1.1.0 keeps running.
+✗ Version 1.3.0 did not start; switched back to 1.1.0 automatically, with the database restored.</code></pre>
+        <h4>كيف تحققتُ</h4>
+        <ul class="check-list">
+          <li><strong>السيناريو B:</strong> ترحيل ينشئ جدولاً ويضيف صفاً ثم يفشل؛ بعد الاستعادة اختفى الجدول والصف، وبقي 1.1.0 يعمل.</li>
+          <li><strong>السيناريوهان C و H:</strong> إصدار لا يستجيب؛ رجع النظام للإصدار السابق واستُعيدت القاعدة.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="high">
+      <summary><span class="badge sev-high">عالية</span><h3>3. المنفذ يُقرأ خطأً فيُلغى كل تحديث</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>deploy/mac/update.sh:96</code> و <code>deploy/linux/update.sh:98</code></p>
+        <h4>ما يحدث</h4>
+        <p>الأمر <code>sed -E 's#.*:([0-9]+)$#\1#'</code> لا يجد رقم منفذ في <code>APP_URL=http://localhost</code> ولا في رابط ينتهي بـ <code>/</code>، فيعيد السطر كله. عندها يصبح «المنفذ» <code>APP_URL=http://…</code> ويفشل فحص الصحة دائماً، فيُلغى كل تحديث. ويحدث الشيء نفسه عند إعادة التثبيت بقيمة <code>DIWAN_PORT</code> مختلفة: الخدمة تنتقل إلى المنفذ الجديد، بينما يبقى <code>.env</code> على القديم.</p>
+        <h4>الحل</h4>
+        <ul class="check-list">
+          <li><strong>في المستودع:</strong> يُقرأ المنفذ من تعريف الخدمة نفسها (<code>--port=</code> في ملف plist على الماك، أو وحدة systemd على لينكس)، ثم من <code>APP_URL</code> بتعبير صحيح، ثم القيمة 8000.</li>
+          <li><strong>في المثبّت الجديد:</strong> يُحفظ المنفذ في مكان واحد هو <code>~/Diwan/shared/diwan.conf</code>، ويُحدَّث <code>APP_URL</code> معه.</li>
+        </ul>
+<pre><code>PORT=8000
+port_re='--port=([0-9]+)'
+url_re=':([0-9]+)/?"?$'
+if [[ $(cat "$HOME/Library/LaunchAgents/com.diwan.web.plist" 2&gt; /dev/null) =~ $port_re ]]; then
+    PORT=${BASH_REMATCH[1]}
+elif [[ $(grep -E '^APP_URL=' "$DIR/shared/.env") =~ $url_re ]]; then
+    PORT=${BASH_REMATCH[1]}
+fi</code></pre>
+        <h4>كيف تحققتُ</h4>
+        <p>اختبار وحدات لكل حالة: بلا منفذ، ورابط بشرطة ومزدوجات، والخدمة، وإعداد المثبّت. والسيناريوهان G و H يقرآن المنفذ من plist.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="high">
+      <summary><span class="badge sev-high">عالية</span><h3>4. صفحة الإعداد الأول مفتوحة لكل الشبكة</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>app/Http/Controllers/Auth/LocalSetupController.php</code></p>
+        <h4>ما يحدث</h4>
+        <p>الخادم يستمع على <code>0.0.0.0</code>، وأول من يفتح <code>/setup</code> ينشئ المنشأة ويصبح مالكها. وقبل أن يكمل المالك الإعداد، يستطيع أي جهاز على شبكة المكتب أن يسبقه، أو أي جهاز على شبكة مقهى إن كان الجهاز لابتوب.</p>
+        <h4>الحل</h4>
+        <ul class="check-list">
+          <li><strong>في التطبيق:</strong> عرض الصفحة وإرسالها مقصوران على الجهاز نفسه. يُفحص <code>REMOTE_ADDR</code> مباشرة لا ترويسات الوسيط، وتظهر رسالة عربية واضحة، وأُضيف اختبار جديد.</li>
+          <li><strong>في المثبّت الجديد:</strong> للإصدارات التي لا تحوي هذا الإصلاح (مثل v1.4.0 الحالي)، تعمل خدمة الويب على <code>127.0.0.1</code> فقط حتى تُنشأ المنشأة، ثم تعيد تشغيل نفسها للشبكة تلقائياً.</li>
+        </ul>
+<pre><code>protected static function fromThisComputer(Request $request): bool
+{
+    return IpUtils::checkIp((string) $request-&gt;server('REMOTE_ADDR'), ['127.0.0.0/8', '::1', '::ffff:127.0.0.0/104']);
+}</code></pre>
+        <h4>كيف تحققتُ</h4>
+        <p>الاختبار الجديد يفشل على الكود القديم (توقّع 403 فجاءت 200) وينجح بعد الإصلاح. والسيناريو W يتحقق من أن الخدمة تبدأ على 127.0.0.1، ثم تفتح للشبكة بعد إنشاء المنشأة.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="med">
+      <summary><span class="badge sev-med">متوسطة</span><h3>5. تعارض المنافذ برسائل مضللة</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>install.sh:55-57</code> و <code>:166</code></p>
+        <h4>ما يحدث</h4>
+        <ul class="check-list">
+          <li>على جهازك مثلاً تحجز MariaDB من XAMPP المنفذ 3306، فلا يقلع mysql@8.4، وبعد دقيقة تظهر «Restart the Mac»؛ وإعادة التشغيل لن تفيد.</li>
+          <li>إذا كان المنفذ 8000 مشغولاً يطبع «Installed successfully!» رغم أن الخادم لم يعمل.</li>
+          <li>إذا كان لـ root كلمة مرور، ينجح <code>mysqladmin ping</code> ثم يفشل إنشاء القاعدة برسالة عامة.</li>
+        </ul>
+        <h4>الحل</h4>
+        <ul class="check-list">
+          <li>فحص مبكر قبل تثبيت أي شيء، برسالة تسمّي السبب (XAMPP أو MAMP أو MySQL آخر).</li>
+          <li>عرض سبب فشل MySQL من سجله، وكشف كلمة مرور root وإصدار MySQL مختلف.</li>
+          <li>تحذير صريح في النهاية إذا لم يستجب النظام.</li>
+          <li>الفحص بـ <code>nc -z</code>، لأن <code>lsof</code> بدون sudo لا يرى عمليات المستخدمين الآخرين (جُرّب ذلك على جهازك).</li>
+        </ul>
+        <h4>كيف تحققتُ</h4>
+        <p>اختبار وحدات على جهازك الحقيقي، حيث تحجز XAMPP المنفذ 3306، واختبار آخر لمنفذ ويب مشغول. في الحالتين يتوقف المثبّت قبل تثبيت أي شيء.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="med">
+      <summary><span class="badge sev-med">متوسطة</span><h3>6. إعادة تشغيل المثبّت تُرحّل بلا نسخة احتياطية</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>install.sh:111</code></p>
+        <h4>ما يحدث</h4>
+        <p>يُفترض أن تكون إعادة التشغيل آمنة («Safe to run again»)، لكنها تنزّل أحدث إصدار وتشغّل <code>migrate</code> مباشرة دون <code>erp:backup</code>. ولا تحذف الإصدارات القديمة، وقد تنزل إلى إصدار أقدم.</p>
+        <h4>الحل</h4>
+        <p>إعادة التشغيل على تثبيت قائم تمر بمسار التحديث الآمن نفسه: نسخة احتياطية، ثم ترحيل، ثم فحص، ثم رجوع واستعادة عند الفشل. ولا يُثبَّت إصدار أقدم إلا بـ <code>--force</code>.</p>
+        <h4>كيف تحققتُ</h4>
+        <p>السيناريو D: حزمة بالإصدار نفسه وحزمة أقدم، والنتيجة «up to date» دون أي نزول.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="med">
+      <summary><span class="badge sev-med">متوسطة</span><h3>7. سباق <code>launchctl bootout/bootstrap</code></h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>install.sh:144-145</code></p>
+        <h4>ما يحدث</h4>
+        <p>عند إعادة التشغيل قد يعود <code>bootout</code> قبل أن تتوقف الخدمة فعلاً، فيفشل <code>bootstrap</code> بخطأ «Bootstrap failed: 5: Input/output error» ويتوقف المثبّت عند الخطوة 5. لهذا السبب نفسه ينتظر <code>brew services</code> في حلقة.</p>
+        <h4>الحل</h4>
+        <p>الانتظار حتى تختفي الخدمة من launchd، ثم تنفيذ <code>bootstrap</code> مع إعادة المحاولة.</p>
+        <h4>كيف تحققتُ</h4>
+        <p>اختبار وحدات يحاكي launchd بطيئاً، ثم فشلين متتاليين بالخطأ نفسه.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="med">
+      <summary><span class="badge sev-med">متوسطة</span><h3>8. سجلات الخدمات تكبر بلا حد</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>install.sh:138</code></p>
+        <h4>ما يحدث</h4>
+        <p><code>artisan serve</code> يكتب سطراً لكل طلب في <code>com.diwan.web.log</code>، ولا شيء يقصّ هذا الملف. التدوير اليومي في Laravel لا يشمل مخرجات launchd.</p>
+        <h4>الحل</h4>
+        <p>كل سجل يتجاوز 10MB يُنقل إلى <code>.1</code> (تبقى نسخة قديمة واحدة)، ثم تُعاد تشغيل خدمته وحدها لتفتح ملفاً جديداً. ولا تُعاد تشغيل مهمة التحديث نفسها، لأنها هي التي تنفّذ التدوير.</p>
+        <h4>كيف تحققتُ</h4>
+        <p>اختبار وحدات بملفات حجمها 11MB.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="med">
+      <summary><span class="badge sev-med">متوسطة</span><h3>9. ملف الإعدادات قد يبقى فارغاً للأبد</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>install.sh:98-100</code></p>
+        <h4>ما يحدث</h4>
+        <p>الأمر <code>sed … &gt; .env</code> ينشئ الملف قبل أن ينجح <code>sed</code>. فإذا فشل يبقى الملف فارغاً، وتتخطاه كل إعادة تشغيل لأنه «موجود». كذلك لا يُعاد إنشاء مستخدم قاعدة البيانات إذا أُعيد ضبط MySQL.</p>
+        <h4>الحل</h4>
+        <ul class="check-list">
+          <li>الكتابة إلى ملف مؤقت ثم نقله دفعة واحدة.</li>
+          <li>الملف الناقص يُحفظ جانباً ويُنشأ ملف جديد.</li>
+          <li>كلمة مرور مستخدم القاعدة تُطابَق مع <code>.env</code> في كل تشغيل.</li>
+          <li>إذا وُجدت قاعدة بيانات قديمة بلا ملف إعداداتها يتوقف المثبّت، بدل أن يولّد مفتاحاً جديداً يجعل البيانات المشفرة غير مقروءة. لمن يريد البدء من جديد: <code>DIWAN_NEW_KEY=1</code>.</li>
+        </ul>
+        <h4>كيف تحققتُ</h4>
+        <p>اختبار وحدات: ملف فارغ، وملف فيه حقول لم تُملأ، وتعديل في مكانه، وصلاحيات 600.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="med">
+      <summary><span class="badge sev-med">متوسطة</span><h3>10. لا تحقق من إصدار PHP وامتداداته</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>install.sh:53</code></p>
+        <h4>ما يحدث</h4>
+        <p><code>brew --prefix php@8.3</code> يعيد مساراً حتى لو لم يكن الإصدار مثبتاً. وعلى جهازك يشير الرابط <code>/opt/homebrew/opt/php@8.3</code> إلى PHP 8.5، وهذا ترفضه مكتبات المشروع (PhpSpreadsheet 1.30 تتطلب إصداراً أقل من 8.5).</p>
+        <h4>الحل</h4>
+        <p>يتحقق المثبّت من أن الإصدار بين 8.2 و8.4 ومن وجود الامتدادات اللازمة. وإذا وجد رابطاً قديماً يعيد تثبيت الحزمة، ويمكن تحديد PHP آخر بالخيار <code>DIWAN_PHP</code>.</p>
+        <p class="note">تنبيه للتخطيط: Homebrew سيوقف <code>php@8.3</code> في 31 ديسمبر 2027.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="med">
+      <summary><span class="badge sev-med">متوسطة</span><h3>11. فشل اختصار سطح المكتب يوقف المثبّت</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>install.sh:159</code></p>
+        <p>إذا رفض المستخدم وصول Terminal إلى مجلد سطح المكتب تظهر «Setup stopped»، مع أن كل شيء قد تم. أصبح هذا تحذيراً فقط مع رابط بديل.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="med">
+      <summary><span class="badge sev-med">متوسطة</span><h3>12. بقايا إصدار ناقص عند فشل النسخة الاحتياطية</h3></summary>
+      <div class="body">
+        <p class="file">الأصل: <code>deploy/mac/update.sh:83</code></p>
+        <p><code>die</code> يخرج دون تنظيف المجلد الجديد. هذا المجلد يُعدّ «الأحدث»، فيُحذف بدلاً منه إصدار سليم صالح للرجوع. الحل تنظيف مضمون عند الخروج لأي إصدار حُضّر ولم يُفعَّل.</p>
+        <p><strong>كيف تحققتُ:</strong> في السيناريوهات B و C و H لم يتغير عدد الإصدارات.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="low">
+      <summary><span class="badge sev-low">منخفضة</span><h3>13. تنزيل 63MB كل يوم حتى بلا تحديث</h3></summary>
+      <div class="body">
+        <p>المحدّث القديم ينزّل الحزمة كاملة كل ليلة ليقارن رقم الإصدار فقط، أي نحو 1.9GB شهرياً لكل مكتب. المثبّت الجديد يقرأ رقم أحدث إصدار من تحويل <code>releases/latest</code> في GitHub أولاً، ولا ينزّل الحزمة إلا إذا كانت أحدث.</p>
+        <p><strong>كيف تحققتُ:</strong> اختبار وحدات على GitHub الحقيقي أعاد 1.4.0 دون أي تنزيل.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="low">
+      <summary><span class="badge sev-low">منخفضة</span><h3>14. حالة «Downloading» تُكتب بعد انتهاء التنزيل</h3></summary>
+      <div class="body"><p>لوحة المالك كانت تعرض «Downloading» بعد انتهاء التنزيل لا أثناءه. أصبحت الحالة تُكتب قبل التنزيل.</p></div>
+    </details>
+
+    <details class="issue" data-sev="low">
+      <summary><span class="badge sev-low">منخفضة</span><h3>15. كشف الترحيلات المعلقة هش ويتخطاها بصمت</h3></summary>
+      <div class="body">
+        <p>النمط <code>migrate:status --pending | grep -q Pending</code> تحت <code>pipefail</code> هش. وإذا فشل الأمر نفسه (قاعدة البيانات متوقفة مثلاً) تُتخطى الترحيلات بصمت ويُفعَّل الإصدار الجديد. الآن يُحفظ الناتج في متغير، وفشل الأمر يوقف التحديث برسالة. لم يتكرر الخلل مع artisan الحقيقي في 20 محاولة، لكن الحالة الصامتة كانت قائمة.</p>
+      </div>
+    </details>
+
+    <details class="issue" data-sev="low">
+      <summary><span class="badge sev-low">منخفضة</span><h3>16. عنوان الشبكة من <code>en0/en1</code> فقط</h3></summary>
+      <div class="body"><p>على أجهزة تتصل بمحوّل USB أو Thunderbolt لا يظهر عنوان المكتب. يقرأ المثبّت الجديد واجهة المسار الافتراضي أولاً، ثم <code>en0</code> و <code>en1</code>.</p></div>
+    </details>
+
+    <details class="issue" data-sev="low">
+      <summary><span class="badge sev-low">منخفضة</span><h3>17. لا توجد طريقة لإزالة النظام</h3></summary>
+      <div class="body"><p><code>~/Diwan/bin/diwan uninstall</code> يوقف الخدمات ويزيلها مع إبقاء البيانات. أما <code>--purge</code> فيحذف كل شيء بعد أن يكتب المستخدم كلمة DELETE، ويحذّره قبلها لينسخ النسخ الاحتياطية وكلمات المرور.</p></div>
+    </details>
+
+    <details class="issue" data-sev="low">
+      <summary><span class="badge sev-low">منخفضة</span><h3>18. التحقق من المجموع الاختباري اختياري</h3></summary>
+      <div class="body"><p>كان التحقق يُتخطى بصمت إذا لم يُنزَّل ملف <code>.sha256</code>. أصبح إلزامياً لإصدارات المشروع الرسمية (التي تنشره دائماً)، واختيارياً للحزم الخاصة.</p><p><strong>كيف تحققتُ:</strong> اختبار وحدات بخادم محلي: بلا مجموع، ومجموع خاطئ، ومجموع صحيح، وحزمة ليست إصداراً.</p></div>
+    </details>
+
+    <details class="issue" data-sev="low">
+      <summary><span class="badge sev-low">منخفضة</span><h3>19. حالات تشغيل خاطئة لا تُكشف مبكراً</h3></summary>
+      <div class="body">
+        <p>تُفحص مبكراً، برسائل واضحة، الحالات التالية: حساب ماك غير مدير (Homebrew يحتاج مديراً)، والتشغيل عبر SSH، ومساحة القرص، وتمرير السكربت عبر أنبوب (<code>curl | bash</code>).</p>
+        <p>كذلك أصبح السكربت كله دوالاً، ولا يبدأ التنفيذ إلا في آخر سطر؛ فإذا انقطع التنزيل في منتصفه لا يُنفَّذ شيء. وأصبحت مخرجات Homebrew ظاهرة بدل صمت يمتد 10 إلى 20 دقيقة، ويُحفظ سجل التثبيت في <code>~/Diwan/install.log</code> لطلب المساعدة.</p>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+<section>
+  <h2>المثبّت الجديد <code>install-mac-new.sh</code></h2>
+  <div class="two">
+    <div class="card">
+      <h3>كيف يعمل</h3>
+      <p>يثبّت Homebrew و PHP 8.3 و MySQL 8.4، وينزّل أحدث إصدار ويتحقق منه، ثم يحتفظ بنسخة من نفسه في <code>~/Diwan/bin/diwan</code>. هذه النسخة هي ما تستدعيه الخدمات:</p>
+      <ul class="check-list">
+        <li><code>com.diwan.web</code> ← <code>diwan serve</code>: على الجهاز وحده حتى ينتهي الإعداد الأول، ثم للشبكة.</li>
+        <li><code>com.diwan.queue</code> و <code>com.diwan.scheduler</code> كما كانتا.</li>
+        <li><code>com.diwan.update</code> (الساعة 3:30) و <code>com.diwan.update-now</code> (زر «حدّث الآن» في اللوحة) ← <code>diwan update</code>.</li>
+      </ul>
+      <p class="note">تحدّث الأداة نفسها تلقائياً عندما يحمل إصدار لاحق نسخة أحدث منها؛ يُحدَّد ذلك بالمتغير <code>DIWAN_SCRIPT_VERSION</code>.</p>
+    </div>
+    <div class="card">
+      <h3>الأوامر</h3>
+<pre><code>bash install-mac-new.sh                  # install or repair (safe to repeat)
+~/Diwan/bin/diwan status                 # versions, services, last update
+~/Diwan/bin/diwan update [--force]       # update now
+~/Diwan/bin/diwan uninstall [--purge]    # remove services (--purge: all data)
+DIWAN_PORT=8080 bash install-mac-new.sh  # another port</code></pre>
+      <p class="note">الرسائل داخل الطرفية بالإنجليزية، كما في الأصل، لأن الطرفيات لا تعرض العربية جيداً.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>كيف تحققتُ</h2>
+  <div class="two">
+    <div class="card">
+      <h3>ما اختُبر ونجح</h3>
+      <ul class="check-list">
+        <li><strong>16 اختبار وحدات</strong> شُغّلت بـ <code>/bin/bash</code> 3.2، وهو إصدار bash المدمج في macOS.</li>
+        <li><strong>13 سيناريو شاملاً</strong> على تثبيت تجريبي معزول، بمكوّنات حقيقية: قاعدة SQLite، و<code>artisan</code>، والنسخ الاحتياطي والاستعادة، وخادم ويب على 127.0.0.1. استُخدمت 7 حزم إصدارات مبنية من المستودع، منها ترحيل يفشل في منتصفه وإصدار لا يستجيب؛ وكان <code>launchctl</code> وحده مُحاكى.</li>
+        <li><strong>اختبارات PHP كاملة: 377 اختباراً نجحت</strong>، ومعها Pint.</li>
+        <li><strong>shellcheck:</strong> المثبّت الجديد بلا أي ملاحظة. ملفا <code>update.sh</code> فيهما تحذير قديم واحد غير مؤثر.</li>
+      </ul>
+      <p class="note">كشفت الاختبارات خطأين في مسودتي الأولى فأصلحتهما قبل التسليم: حشو <code>ps</code> بالمسافات أفشل التعرّف على القفل الحي، وتعامل bash 3.2 مع الشرطة المائلة العكسية كان خاطئاً.</p>
+    </div>
+    <div class="card">
+      <h3>ما لم يُختبر</h3>
+      <ul class="check-list">
+        <li>تثبيت فعلي كامل على ماك نظيف: Homebrew و MySQL 8.4 و launchd الحقيقي ونوافذ أذونات macOS. لم أشغّل المثبّت على جهازك لأنه يثبّت خدمات دائمة، ولأن XAMPP يحجز المنفذ 3306.</li>
+        <li>حذف الجداول الزائدة على MySQL تحديداً؛ اختُبر على SQLite عبر واجهة Laravel نفسها.</li>
+        <li><code>deploy/linux/update.sh</code> لم يُشغّل. فُحص بالقراءة وبـ shellcheck، ومنطق المنفذ فيه مطابق لنسخة الماك المختبرة.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>خطوات الاعتماد المقترحة</h2>
+  <ol class="steps">
+    <li><strong>راجع التغييرات.</strong> الملفات: <code>install-mac-new.sh</code> (جديد)، و <code>deploy/mac/update.sh</code>، و <code>deploy/linux/update.sh</code>، و <code>app/Http/Controllers/Auth/LocalSetupController.php</code>، و <code>tests/Feature/LocalInstallTest.php</code>. لم يُنفَّذ أي commit بعد.</li>
+    <li><strong>جرّب المثبّت الجديد على ماك نظيف</strong> أو آلة macOS افتراضية (UTM أو Tart)، لا على جهاز التطوير.</li>
+    <li><strong>اعتمده:</strong> انقله إلى <code>deploy/mac/install.sh</code> فيرفعه <code>release.yml</code> باسم <code>install-mac.sh</code> ويعمل سطر الدليل كما هو. وأبقِ <code>deploy/mac/update.sh</code> المُصلح من أجل التثبيتات القديمة.</li>
+    <li><strong>انشر إصداراً جديداً.</strong> التثبيتات القديمة تحصل على <code>update.sh</code> المُصلح في تحديثها الليلي التالي، ومن يعيد تشغيل المثبّت ينتقل إلى الأداة الجديدة دون فقد بيانات.</li>
+    <li><strong>اقتراح:</strong> أضف فحص <code>shellcheck</code> لملفات <code>deploy/</code> إلى CI، فأخطاء سكربتات التثبيت لا تظهر إلا على أجهزة العملاء.</li>
+  </ol>
+  <div class="callout">
+    <strong>خارج نطاق المثبّت ولم يُعدَّل:</strong>
+    حد الذاكرة في <code>phpunit.xml</code> (الاختبارات تنهار عند 128MB)، وعدم دعم PHP 8.5، وحجم <code>app.js</code> البالغ 1.4MB بسبب ApexCharts العالمي، وملف <code>.claude/settings.local.json</code> المرفوع إلى المستودع.
+  </div>
+</section>
+
+<footer>أُعدّ هذا التقرير مع التعديلات في المجلد <code>diwan-erp</code>. سكربتات الاختبار في مجلد مؤقت خاص بهذه الجلسة.</footer>
+</div>
+
+<script>
+  (function () {
+    var buttons = document.querySelectorAll('.filters button');
+    var items = document.querySelectorAll('[data-sev]');
+    buttons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        var filter = button.getAttribute('data-filter');
+        buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b === button)); });
+        items.forEach(function (item) {
+          item.classList.toggle('hidden', filter !== 'all' && item.getAttribute('data-sev') !== filter);
+        });
+      });
+    });
+  })();
+</script>
+</body>
+</html>
