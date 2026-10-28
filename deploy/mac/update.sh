@@ -5,14 +5,17 @@
 #   bash ~/Diwan/current/deploy/mac/update.sh
 #
 # Runs daily (com.diwan.update). Prepares the new release next to the running
-# one, backs up the database when it changes, then switches over; if the system
-# does not answer afterwards it switches back by itself.
+# one, backs up the database when it changes, then switches over; if the database
+# update fails or the system does not answer afterwards, it restores that backup
+# and switches back by itself.
+#
+# Options: DIWAN_PACKAGE=path-or-url-of-the-zip  DIWAN_DIR=~/Diwan  DIWAN_PHP=path-of-php
 
 set -Eeuo pipefail
 
 REPO=turkialawlqy/Diwan-ERP
 PACKAGE_URL=${DIWAN_PACKAGE:-https://github.com/$REPO/releases/latest/download/diwan-erp.zip}
-DIR="$HOME/Diwan"
+DIR=${DIWAN_DIR:-$HOME/Diwan}
 KEEP=3
 
 c_ok=$'\e[32m'; c_err=$'\e[31m'; c_off=$'\e[0m'
@@ -26,7 +29,7 @@ status() {
 die() { echo "${c_err}✗ $*${c_off}" >&2; status failed "$*"; exit 1; }
 
 for b in /opt/homebrew/bin/brew /usr/local/bin/brew; do [[ -x $b ]] && eval "$("$b" shellenv)" && break; done
-PHP="$(brew --prefix php@8.3)/bin/php"
+PHP=${DIWAN_PHP:-$(brew --prefix php@8.3)/bin/php}
 if [[ ! -f $HOME/Library/LaunchAgents/com.diwan.update-now.plist ]]; then
     mkdir -p "$DIR/shared/storage/app/update-queue" "$HOME/Library/LaunchAgents"
     cat > "$HOME/Library/LaunchAgents/com.diwan.update-now.plist" <<PLIST
@@ -42,15 +45,38 @@ PLIST
     launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.diwan.update-now.plist" > /dev/null 2>&1 || true
 fi
 LOCK="$DIR/.update.lock"
-mkdir "$LOCK" 2> /dev/null || die "Another update is already running (if not, delete the folder $LOCK)."
+# The lock records the updater's process id and start time, so a lock left by an update that
+# was cut off (power cut, forced shutdown) is taken over instead of blocking every later update;
+# the start time tells it from a new process given the same id after a restart.
+# A second request while one runs leaves quietly: it must not mark that update failed.
+started_at() { ps -p "$1" -o lstart= 2> /dev/null | awk '{ $1 = $1; print }' || true; } # (ps pads it with spaces)
+if ! mkdir "$LOCK" 2> /dev/null; then
+    owner="" since=""
+    read -r owner since 2> /dev/null < "$LOCK/owner" || true
+    if [[ $owner =~ ^[0-9]+$ && -n $since && $(started_at "$owner") == "$since" ]]; then
+        ok "Another update is already running."
+        exit 0
+    fi
+    rm -rf "$LOCK"
+    mkdir "$LOCK" 2> /dev/null || { ok "Another update is already running."; exit 0; }
+fi
+echo "$$ $(started_at $$)" > "$LOCK/owner"
 TMP=$(mktemp -d)
-trap 'rm -rf "$TMP" "$LOCK"' EXIT
+NEW=""
+SWITCHED=0
+# However the script ends, a prepared release that is not the running one goes away.
+cleanup() {
+    rm -rf "$TMP" "$LOCK"
+    if [[ -n $NEW && $SWITCHED != 1 ]]; then rm -rf "$NEW"; fi
+}
+trap cleanup EXIT
 
 # The dashboard asks for an update by dropping a file in this folder (launchd QueueDirectories).
 rm -f "$DIR"/shared/storage/app/update-queue/* 2> /dev/null || true
 CURRENT=$(cd "$DIR/current" && pwd -P)
 INSTALLED=$(cat "$CURRENT/VERSION" 2> /dev/null || echo 0)
 
+status running "Downloading"
 if [[ -f $PACKAGE_URL ]]; then
     cp "$PACKAGE_URL" "$TMP/diwan-erp.zip"
 else
@@ -59,7 +85,6 @@ else
         [[ $(shasum -a 256 "$TMP/diwan-erp.zip" | cut -d' ' -f1) == "$(tr -d '[:space:]' < "$TMP/sha")" ]] || die "The downloaded update is corrupted."
     fi
 fi
-status running "Downloading"
 unzip -q "$TMP/diwan-erp.zip" -d "$TMP"
 VERSION=$(cat "$TMP/diwan-erp/VERSION" 2> /dev/null || echo 0)
 if [[ $VERSION == "$INSTALLED" && ${1:-} != --force ]]; then
@@ -76,14 +101,65 @@ ln -sfn "$DIR/shared/storage" "$NEW/storage"
 ln -sfn "$DIR/shared/.env" "$NEW/.env"
 ln -sfn ../storage/app/public "$NEW/public/storage"
 
+# Small database chores through a release's own settings: list the tables, or drop some.
+db() { # release tables | release drop table...
+    "$PHP" -r '
+        [, $base, $cmd] = $argv;
+        require "$base/vendor/autoload.php";
+        (require "$base/bootstrap/app.php")->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        $db = Illuminate\Support\Facades\DB::connection();
+        $schema = $db->getSchemaBuilder();
+        if ($cmd === "tables") {
+            foreach ($schema->getTables($db->getDriverName() === "sqlite" ? null : $db->getDatabaseName()) as $table) {
+                echo $table["name"], "\n";
+            }
+        } elseif ($cmd === "drop") {
+            $schema->disableForeignKeyConstraints();
+            foreach (array_slice($argv, 3) as $table) {
+                $schema->dropIfExists($table);
+            }
+        }
+    ' "$@"
+}
+
+# Puts the database back as it was before the update: the previous version restores its
+# own backup, then the tables the update created (absent from the backup) are dropped,
+# or the next attempt would stop on "table already exists".
+restore_database() {
+    status running "Restoring the database"
+    if ! "$PHP" "$CURRENT/artisan" erp:restore "$BACKUP" --force > /dev/null; then
+        "$PHP" "$CURRENT/artisan" up > /dev/null 2>&1 || true
+        return 1
+    fi
+    local after table extra=()
+    after=$(db "$CURRENT" tables) || return 1
+    while IFS= read -r table; do
+        if [[ -n $table ]]; then extra+=("$table"); fi
+    done < <(comm -13 <(sort <<< "$TABLES") <(sort <<< "$after"))
+    if (( ${#extra[@]} )); then db "$CURRENT" drop "${extra[@]}" || return 1; fi
+    "$PHP" "$CURRENT/artisan" optimize > /dev/null 2>&1 || true
+}
+
 # Anything failing before the switch leaves the running version untouched.
-trap 'rm -rf "$TMP" "$LOCK" "$NEW"; status failed "Update stopped; the previous version keeps running"; echo "${c_err}✗ Update stopped; Diwan keeps running the previous version, unchanged.${c_off}" >&2' ERR
+trap 'status failed "Update stopped; the previous version keeps running"; echo "${c_err}✗ Update stopped; Diwan keeps running the previous version, unchanged.${c_off}" >&2' ERR
 "$PHP" "$NEW/artisan" optimize > /dev/null
-if "$PHP" "$NEW/artisan" migrate:status --pending 2> /dev/null | grep -q Pending; then
-    "$PHP" "$NEW/artisan" erp:backup --tag=preupdate > /dev/null || die "The backup failed, so the update was cancelled."
-    "$PHP" "$NEW/artisan" migrate --force > /dev/null
+BACKUP=""
+TABLES=""
+PENDING=$("$PHP" "$NEW/artisan" migrate:status --pending 2>&1) || die "Could not read the database state, so the update was cancelled."
+if [[ $PENDING == *Pending* ]]; then
+    status running "Backing up"
+    out=$("$PHP" "$CURRENT/artisan" erp:backup --tag=preupdate 2>&1) || die "The backup failed, so the update was cancelled."
+    backup_re='(diwan-preupdate-[0-9-]+\.zip)'
+    if [[ $out =~ $backup_re ]]; then BACKUP=${BASH_REMATCH[1]}; fi
+    [[ -n $BACKUP ]] || die "The backup failed, so the update was cancelled."
+    TABLES=$(db "$CURRENT" tables) || die "Could not read the database tables, so the update was cancelled."
+    status running "Updating the database"
+    if ! "$PHP" "$NEW/artisan" migrate --force > /dev/null; then
+        restore_database || die "The database update failed and restoring the backup $BACKUP failed too: Diwan may not work. Ask for help."
+        die "The database update failed; the database was restored and version $INSTALLED keeps running."
+    fi
 fi
-trap 'rm -rf "$TMP" "$LOCK"' ERR
+trap 'status failed "Update stopped unexpectedly (line $LINENO)"' ERR
 
 restart() {
     for label in com.diwan.web com.diwan.queue com.diwan.scheduler; do
@@ -91,19 +167,32 @@ restart() {
     done
 }
 ln -sfn "$NEW" "$DIR/current"
+SWITCHED=1
 restart
 
-PORT=$(grep -E '^APP_URL=' "$DIR/shared/.env" | sed -E 's#.*:([0-9]+)$#\1#')
+# The port the web service really listens on (its launchd job), else the one in APP_URL.
+PORT=8000
+port_re='--port=([0-9]+)'
+url_re=':([0-9]+)/?"?$'
+if [[ $(cat "$HOME/Library/LaunchAgents/com.diwan.web.plist" 2> /dev/null) =~ $port_re ]]; then
+    PORT=${BASH_REMATCH[1]}
+elif [[ $(grep -E '^APP_URL=' "$DIR/shared/.env") =~ $url_re ]]; then
+    PORT=${BASH_REMATCH[1]}
+fi
 healthy=0
 for _ in 1 2 3 4 5 6 7 8 9 10; do
     sleep 2
-    curl -fs -o /dev/null --max-time 10 "http://127.0.0.1:${PORT:-8000}/up" && { healthy=1; break; }
+    curl -fs -o /dev/null --max-time 10 "http://127.0.0.1:$PORT/up" && { healthy=1; break; }
 done
 if [[ $healthy != 1 ]]; then
     ln -sfn "$CURRENT" "$DIR/current"
+    SWITCHED=0
+    if [[ -n $BACKUP ]] && ! restore_database; then
+        restart
+        die "Version $VERSION did not start; switched back to $INSTALLED, but restoring the database backup $BACKUP failed: Diwan may not work. Ask for help."
+    fi
     restart
-    rm -rf "$NEW"
-    die "Version $VERSION did not start; switched back to $INSTALLED automatically."
+    die "Version $VERSION did not start; switched back to $INSTALLED automatically${BACKUP:+ and restored the database}."
 fi
 
 ls -1d "$DIR/releases"/*/ | sed 's#/$##' | sort -r | tail -n +$((KEEP + 1)) | while read -r old; do

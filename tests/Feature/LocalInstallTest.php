@@ -62,6 +62,20 @@ class LocalInstallTest extends TestCase
         $this->assertSame(1, Company::count());
     }
 
+    public function test_only_the_computer_it_runs_on_can_set_the_company_up(): void
+    {
+        // The server answers the whole office network: another device must not become the owner first.
+        $this->withServerVariables(['REMOTE_ADDR' => '192.168.1.20']);
+        $this->get(route('setup'))->assertForbidden();
+        $this->post(route('setup'), $this->setupPayload())->assertForbidden();
+        $this->assertSame(0, Company::count());
+
+        $this->withServerVariables(['REMOTE_ADDR' => '::1']);
+        $this->get(route('setup'))->assertOk();
+        $this->post(route('setup'), $this->setupPayload())->assertRedirect(route('dashboard'));
+        $this->assertSame(1, Company::count());
+    }
+
     public function test_the_office_devices_find_the_system_address_in_the_settings(): void
     {
         $this->post(route('setup'), $this->setupPayload())->assertRedirect();
