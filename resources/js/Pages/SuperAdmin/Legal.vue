@@ -1,6 +1,7 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/vue3';
 import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
+import { date } from '@/utils/format';
 
 const props = defineProps({ pages: Array });
 
@@ -22,7 +23,7 @@ const save = (slug) => forms[slug].put(route('super-admin.legal.update', slug), 
                 <textarea v-model="forms[p.slug].body" rows="18" class="w-full rounded-xl border-slate-200 text-xs font-mono leading-6" dir="rtl"></textarea>
                 <p v-if="forms[p.slug].errors.body" class="text-rose-600">{{ forms[p.slug].errors.body }}</p>
                 <div class="flex items-center justify-between">
-                    <span class="text-slate-400">{{ p.updated_at ? 'آخر تعديل: ' + p.updated_at.substring(0, 10) : 'النص الافتراضي' }}</span>
+                    <span class="text-slate-400">{{ p.updated_at ? 'آخر تعديل: ' + date(p.updated_at) : 'النص الافتراضي' }}</span>
                     <button @click="save(p.slug)" :disabled="forms[p.slug].processing" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">حفظ</button>
                 </div>
             </section>

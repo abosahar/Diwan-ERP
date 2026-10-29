@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\SerializesLocalDates;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PlatformAuditLog extends Model
 {
+    use SerializesLocalDates;
+
     protected $fillable = ['user_id', 'company_id', 'action', 'details', 'ip'];
 
     protected $casts = ['details' => 'array'];

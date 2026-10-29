@@ -3,6 +3,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
+import { dateTime } from '@/utils/format';
 
 const props = defineProps({ lead: Object, users: Array, statuses: Object, sources: Object });
 const l = props.lead;
@@ -42,7 +43,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                     <button @click="activity.post(route('crm.leads.activities.store', lead.id), { preserveScroll: true, onSuccess: () => activity.reset('notes') })" class="col-span-4 px-3 py-2 rounded-xl bg-slate-800 text-white font-bold">تسجيل نشاط</button>
                 </div>
                 <div v-for="a in lead.activities" :key="a.id" class="bg-white border border-slate-200 rounded-xl p-3">
-                    <div class="flex justify-between text-slate-500"><b class="text-slate-700">{{ types[a.type] }}</b><span>{{ a.user?.name }} · <span class="font-mono">{{ String(a.happened_at).substring(0, 16).replace('T', ' ') }}</span></span></div>
+                    <div class="flex justify-between text-slate-500"><b class="text-slate-700">{{ types[a.type] }}</b><span>{{ a.user?.name }} · <span class="font-mono">{{ dateTime(a.happened_at) }}</span></span></div>
                     <p class="mt-1 whitespace-pre-line">{{ a.notes }}</p>
                 </div>
             </div>

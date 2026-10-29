@@ -4,7 +4,7 @@ import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
-import { money, date } from '@/utils/format';
+import { money, date, dateTime } from '@/utils/format';
 
 const props = defineProps({ company: Object, plan: Object, state: String, usage: Object, plans: Array, modules: Object, invoices: Array, exports: Array, centralDomain: String, payment: { type: Object, default: () => ({}) } });
 const cycle = ref(props.company.billing_cycle || 'monthly');
@@ -51,7 +51,7 @@ const pct = (u) => (u.max && u.max > 0 ? Math.min(100, Math.round((u.used / u.ma
                 <h3 class="font-black text-slate-700 mb-2">نسخة كاملة من بيانات المنشأة</h3>
                 <p class="text-slate-500 mb-2">ملف مضغوط يضم كل جداول المنشأة بصيغة CSV (بدون كلمات المرور والمفاتيح).</p>
                 <button v-if="$can('admin.data.export')" @click="router.post(route('billing.export'), {}, { preserveScroll: true })" class="px-3 py-2 rounded-xl border border-slate-200 font-bold">طلب نسخة</button>
-                <div v-for="e in exports" :key="e.id" class="flex justify-between mt-2"><span class="font-mono">{{ String(e.created_at).substring(0, 16).replace('T', ' ') }}</span><a v-if="e.status === 'ready'" :href="route('billing.export.download', e.id)" class="text-indigo-600 font-bold">تنزيل</a><span v-else>{{ e.status === 'failed' ? 'فشل' : 'قيد التجهيز' }}</span></div>
+                <div v-for="e in exports" :key="e.id" class="flex justify-between mt-2"><span class="font-mono">{{ dateTime(e.created_at) }}</span><a v-if="e.status === 'ready'" :href="route('billing.export.download', e.id)" class="text-indigo-600 font-bold">تنزيل</a><span v-else>{{ e.status === 'failed' ? 'فشل' : 'قيد التجهيز' }}</span></div>
             </div>
         </div>
 

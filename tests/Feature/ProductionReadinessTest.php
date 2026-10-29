@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\BackupRun;
 use App\Models\Company;
 use App\Models\Customer;
+use App\Models\PlatformAuditLog;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Models\ZatcaDevice;
@@ -191,6 +192,22 @@ class ProductionReadinessTest extends TestCase
         $this->assertSame('Asia/Riyadh', config('app.timezone'));
         Carbon::setTestNow(Carbon::parse('2026-06-15 22:30:00', 'UTC')); // 01:30 on the 16th in Riyadh
         $this->assertSame('2026-06-16', now()->toDateString());
+        Carbon::setTestNow();
+    }
+
+    public function test_pages_receive_the_business_time_zone(): void
+    {
+        // Notifications and other timestamps Laravel sends in UTC are shown in this zone.
+        config(['app.timezone' => 'Africa/Cairo']);
+        $props = $this->actingAs($this->owner)->get(route('notifications.index'))->assertOk()->viewData('page')['props'];
+        $this->assertSame('Africa/Cairo', $props['timezone']);
+    }
+
+    public function test_platform_records_reach_the_browser_in_business_time(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-28 23:49:31', 'UTC')); // 02:49 on the 29th in Riyadh
+        $this->assertSame('2026-10-29T02:49:31+03:00', BackupRun::create(['status' => 'ok'])->toArray()['created_at']);
+        $this->assertSame('2026-10-29T02:49:31+03:00', PlatformAuditLog::create(['action' => 'backup_requested'])->toArray()['created_at']);
         Carbon::setTestNow();
     }
 

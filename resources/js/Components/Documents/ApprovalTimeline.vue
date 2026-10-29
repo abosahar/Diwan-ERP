@@ -1,4 +1,6 @@
 <script setup>
+import { dateTime } from '@/utils/format';
+
 defineProps({ approvals: { type: Array, default: () => [] } });
 const label = { submitted: 'أُرسل للاعتماد', approved: 'اعتُمد', rejected: 'رُفض' };
 </script>
@@ -10,7 +12,7 @@ const label = { submitted: 'أُرسل للاعتماد', approved: 'اعتُم�
             <li v-for="a in approvals" :key="a.id" class="flex gap-2">
                 <span class="w-2 h-2 rounded-full mt-1.5" :class="a.action === 'rejected' ? 'bg-rose-500' : a.action === 'approved' ? 'bg-emerald-500' : 'bg-amber-500'"></span>
                 <div>
-                    <div><b>{{ label[a.action] || a.action }}</b> — {{ a.user?.name || 'النظام' }} <span class="text-slate-400 font-mono">{{ String(a.created_at).substring(0, 16).replace('T', ' ') }}</span></div>
+                    <div><b>{{ label[a.action] || a.action }}</b> — {{ a.user?.name || 'النظام' }} <span class="text-slate-400 font-mono">{{ dateTime(a.created_at) }}</span></div>
                     <div v-if="a.comment" class="text-slate-500">{{ a.comment }}</div>
                 </div>
             </li>
