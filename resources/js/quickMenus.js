@@ -49,6 +49,7 @@ export const addMenu = [
 ];
 
 export const viewMenu = [
+    { label: 'عمولات المبيعات', route: 'sales.commissions.index', icon: BanknotesIcon },
     { label: 'العروض والخصومات', route: 'sales.promotions.index', icon: SparklesIcon },
     { label: 'أبرز التحديثات', route: 'whats-new.index', icon: SparklesIcon },
     { label: 'طلبات المميزات', route: 'feature-requests.index', icon: LightBulbIcon },

@@ -122,6 +122,8 @@
         "feature_requests": "Feature Requests",
         "recycle_bin": "Recycle Bin",
         "promotions": "Promotions",
+        "commissions": "Sales Commissions",
+        "commission_plans": "Commission Plans",
         "nationalities": "Nationalities",
         "customer_groups": "Customer groups",
         "self_service": "My Services",

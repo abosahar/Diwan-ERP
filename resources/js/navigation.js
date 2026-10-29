@@ -38,6 +38,8 @@ export default [
             { label: 'nav.clients', route: 'sales.clients.index', path: '/sales/clients' },
             { label: 'nav.customer_groups', route: 'sales.customer-groups.index', path: '/sales/customer-groups' },
             { label: 'nav.promotions', route: 'sales.promotions.index', path: '/sales/promotions' },
+            { label: 'nav.commissions', route: 'sales.commissions.index', path: '/sales/commissions' },
+            { label: 'nav.commission_plans', route: 'sales.commission-plans.index', path: '/sales/commission-plans' },
             { label: 'nav.crm_leads', route: 'crm.leads.index', path: '/crm/leads' },
             { label: 'nav.payments_received', route: 'sales.payments.index', path: '/sales/payments' },
             { label: 'nav.debit_notes', route: 'sales.debit-notes.index', path: '/sales/debit-notes' },
