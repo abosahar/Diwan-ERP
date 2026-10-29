@@ -9,6 +9,7 @@ use App\Models\Quotation;
 use App\Rules\AllowedBranch;
 use App\Services\RecycleBin;
 use App\Services\Sales\InvoiceService;
+use App\Services\Sales\PromotionEngine;
 use App\Services\Sales\QuotationService;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
@@ -117,10 +118,11 @@ class QuotationController extends Controller
             'items.*.tax_rate' => 'nullable|numeric|min:0',
         ]);
 
+        [$validated['items'], $promotions] = app(PromotionEngine::class)->apply($validated['items'], (int) $validated['customer_id'], 'quotation', $validated['quotation_date'] ?? null);
         $quotation = app(QuotationService::class)->create($validated);
 
         return redirect()->route('sales.quotations.show', $quotation->id)
-            ->with('success', 'تم إنشاء عرض السعر بنجاح');
+            ->with('success', 'تم إنشاء عرض السعر بنجاح'.($promotions ? ' (طُبِّق عرض: '.implode('، ', $promotions).')' : ''));
     }
 
     /**

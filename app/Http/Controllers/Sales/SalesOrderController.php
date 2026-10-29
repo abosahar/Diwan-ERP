@@ -8,6 +8,7 @@ use App\Models\SalesOrder;
 use App\Models\Warehouse;
 use App\Rules\AllowedBranch;
 use App\Services\RecycleBin;
+use App\Services\Sales\PromotionEngine;
 use App\Services\Sales\SalesCycleService;
 use App\Services\Workflow\ApprovalService;
 use App\Support\BranchOptions;
@@ -62,11 +63,13 @@ class SalesOrderController extends Controller
             'items.*.tax_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
+        [$validated['items'], $promotions] = app(PromotionEngine::class)->apply($validated['items'], (int) $validated['customer_id'], 'order', $validated['order_date'] ?? null);
         $order = $this->cycle->createOrder($validated, $validated['items']);
+        $note = $promotions ? ' (طُبِّق عرض: '.implode('، ', $promotions).')' : '';
 
         return redirect()->route('sales.orders.show', $order->id)->with('success', $order->status === 'pending_approval'
-            ? "تم إنشاء أمر البيع {$order->order_number} وإرساله للاعتماد"
-            : "تم إنشاء أمر البيع {$order->order_number} واعتماده");
+            ? "تم إنشاء أمر البيع {$order->order_number} وإرساله للاعتماد{$note}"
+            : "تم إنشاء أمر البيع {$order->order_number} واعتماده{$note}");
     }
 
     public function show(SalesOrder $order)

@@ -37,6 +37,7 @@ export default [
             { label: 'nav.credit_notes', route: 'sales.returns.index', path: '/sales/returns' },
             { label: 'nav.clients', route: 'sales.clients.index', path: '/sales/clients' },
             { label: 'nav.customer_groups', route: 'sales.customer-groups.index', path: '/sales/customer-groups' },
+            { label: 'nav.promotions', route: 'sales.promotions.index', path: '/sales/promotions' },
             { label: 'nav.crm_leads', route: 'crm.leads.index', path: '/crm/leads' },
             { label: 'nav.payments_received', route: 'sales.payments.index', path: '/sales/payments' },
             { label: 'nav.debit_notes', route: 'sales.debit-notes.index', path: '/sales/debit-notes' },

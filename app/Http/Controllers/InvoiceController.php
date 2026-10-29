@@ -15,6 +15,7 @@ use App\Rules\AllowedBranch;
 use App\Services\Accounting\ExchangeRates;
 use App\Services\Documents\FreeformTemplates;
 use App\Services\Sales\InvoiceService;
+use App\Services\Sales\PromotionEngine;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
 use App\Services\ZatcaService;
@@ -208,12 +209,14 @@ class InvoiceController extends Controller
             'items.*.tax_rate' => 'nullable|numeric|min:0',
         ] + ExchangeRates::rules());
 
+        [$validated['items'], $promotions] = app(PromotionEngine::class)->apply($validated['items'], (int) $validated['customer_id'], 'invoice', $validated['invoice_date'] ?? null);
+
         $invoice = app(InvoiceService::class)->create(
             collect($validated)->except('items')->all(),
             $validated['items'],
         );
 
-        return redirect()->route('sales.invoices.show', $invoice->id)->with('success', 'تم إنشاء الفاتورة الضريبية بنجاح وفق متطلبات هيئة الزكاة');
+        return redirect()->route('sales.invoices.show', $invoice->id)->with('success', 'تم إنشاء الفاتورة الضريبية بنجاح وفق متطلبات هيئة الزكاة'.($promotions ? ' (طُبِّق عرض: '.implode('، ', $promotions).')' : ''));
     }
 
     /**
