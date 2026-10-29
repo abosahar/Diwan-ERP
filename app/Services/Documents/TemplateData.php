@@ -206,7 +206,7 @@ class TemplateData
                     'doc.reference' => $invoice->reference_number, 'doc.payment_method' => self::METHODS[$invoice->payment_method] ?? $invoice->payment_method,
                     'doc.payment_type' => in_array($invoice->payment_method, ['credit'], true) || (float) $invoice->remaining_amount > 0 ? 'آجل' : 'نقدي',
                     'doc.salesperson' => $invoice->user?->name, 'doc.notes' => $invoice->notes, 'doc.terms' => $invoice->terms, 'doc.branch' => $invoice->branch?->name_ar,
-                ] + $this->customer($invoice->customer) + $this->totals($invoice->items, $invoice->discount_amount, $invoice->tax_amount, $invoice->total, $invoice->paid_amount, $invoice->remaining_amount),
+                ] + $this->customer($invoice->buyer ?? $invoice->customer) + $this->totals($invoice->items, $invoice->discount_amount, $invoice->tax_amount, $invoice->total, $invoice->paid_amount, $invoice->remaining_amount),
         ];
     }
 
@@ -251,7 +251,7 @@ class TemplateData
             'items' => $this->items($note->items),
             'fields' => $this->doc('إشعار دائن', 'Credit Note', $note->credit_note_number, $note->credit_note_date, $note->created_at) + [
                 'doc.original_number' => $note->invoice?->invoice_number, 'doc.reason' => $note->reason,
-            ] + $this->customer($note->customer) + $this->totals($note->items, 0, $note->tax_amount, $note->total),
+            ] + $this->customer($note->buyer ?? $note->customer) + $this->totals($note->items, 0, $note->tax_amount, $note->total),
         ];
     }
 
@@ -268,7 +268,7 @@ class TemplateData
             'items' => [$row],
             'fields' => $this->doc('إشعار مدين', 'Debit Note', $note->debit_note_number, $note->debit_note_date, $note->created_at) + [
                 'doc.original_number' => $note->invoice?->invoice_number, 'doc.reason' => $note->reason,
-            ] + $this->customer($note->customer) + [
+            ] + $this->customer($note->buyer ?? $note->customer) + [
                 'totals.gross' => $this->money($note->subtotal), 'totals.discount' => $this->money(0), 'totals.net' => $this->money($note->subtotal),
                 'totals.vat_rate' => $this->qty($rate).'%', 'totals.vat' => $this->money($note->tax_amount), 'totals.total' => $this->money($note->total),
                 'totals.paid' => $this->money(0), 'totals.remaining' => $this->money($note->total), 'totals.items_count' => '1', 'totals.quantity' => '1',

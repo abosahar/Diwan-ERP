@@ -5,12 +5,13 @@ namespace App\Models;
 use App\Traits\Auditable;
 use App\Traits\BelongsToCompany;
 use App\Traits\BranchScoped;
+use App\Traits\SnapshotsCustomer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DebitNote extends Model
 {
-    use Auditable, BelongsToCompany, BranchScoped;
+    use Auditable, BelongsToCompany, BranchScoped, SnapshotsCustomer;
 
     protected $fillable = [
         'branch_id', 'company_id', 'customer_id', 'invoice_id', 'debit_note_number', 'debit_note_date', 'reason', 'subtotal', 'tax_rate', 'tax_amount', 'total', 'status', 'zatca_uuid', 'zatca_qr', 'created_by', 'currency_code', 'exchange_rate'];

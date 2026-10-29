@@ -7,6 +7,7 @@ use App\Models\BankAccount;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
+use App\Models\Invoice;
 use App\Models\JournalEntryLine;
 use App\Models\Warehouse;
 use App\Services\Accounting\AccountingReports;
@@ -116,5 +117,25 @@ class CustomerGroupTest extends TestCase
 
         $this->post(route('accounting.journals.store'), $lines(['party_type' => 'customer', 'party_id' => $customer->id], ['party_type' => 'bank', 'party_id' => $box->id]))->assertSessionHasNoErrors();
         $this->assertSame($box->id, (int) JournalEntryLine::where('account_id', $cash->id)->where('party_type', 'bank')->value('party_id'));
+    }
+
+    public function test_an_invoice_keeps_the_customer_data_it_was_issued_with(): void
+    {
+        $customer = Customer::create(['name' => 'شركة الأفق', 'customer_type' => 'commercial', 'status' => 'active', 'tax_number' => '300000000000003', 'building_number' => '4021', 'street_name' => 'الرئيسي', 'district' => 'الصحافة', 'city' => 'الرياض', 'postal_code' => '13315']);
+        $this->invoiceFor($customer);
+        $invoice = Invoice::firstOrFail();
+        $this->assertSame('شركة الأفق', $invoice->customer_snapshot['name']);
+
+        // Editing the customer later does not change the invoice's buyer.
+        $customer->update(['name' => 'اسم جديد', 'tax_number' => '399999999999993', 'city' => 'جدة']);
+        $buyer = $invoice->fresh()->buyer;
+        $this->assertSame('شركة الأفق', $buyer->name);
+        $this->assertSame('300000000000003', $buyer->tax_number);
+        $this->assertSame('الرياض', $buyer->city);
+        $this->assertSame($customer->id, $buyer->id);
+
+        // Documents without a snapshot (made before this existed) read the live customer.
+        $invoice->forceFill(['customer_snapshot' => null])->saveQuietly();
+        $this->assertSame('اسم جديد', $invoice->fresh()->buyer->name);
     }
 }
