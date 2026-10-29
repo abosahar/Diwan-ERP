@@ -402,6 +402,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/orders/{order}/reject', [PurchaseOrderController::class, 'reject'])->name('orders.reject');
         Route::post('/orders/{order}/cancel', [PurchaseOrderController::class, 'cancel'])->name('orders.cancel');
         Route::delete('/orders/{order}', [PurchaseOrderController::class, 'destroy'])->name('orders.destroy');
+        Route::get('/orders/{order}/invoice', [PurchaseOrderController::class, 'invoiceForm'])->name('orders.invoice-form');
         Route::post('/orders/{order}/convert', [PurchaseOrderController::class, 'convertToInvoice'])->name('orders.convert');
         Route::post('/orders/{order}/receive', [P\GoodsReceiptController::class, 'store'])->name('orders.receive');
 

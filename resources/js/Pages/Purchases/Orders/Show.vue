@@ -12,7 +12,7 @@ import ApprovalTimeline from '@/Components/Documents/ApprovalTimeline.vue';
 import { money, date, qty } from '@/utils/format';
 
 const props = defineProps({ order: Object, receipts: Array, invoices: Array, approvals: Array, warehouses: Array });
-const canReceive = computed(() => ['approved', 'pending', 'partially_received'].includes(props.order.status));
+const canReceive = computed(() => ['approved', 'pending', 'partially_received', 'partially_invoiced'].includes(props.order.status));
 const remove = () => { if (confirm('نقل أمر الشراء إلى سلة المحذوفات؟')) router.delete(route('purchases.orders.destroy', props.order.id)); };
 const act = (name, message) => { if (!message || confirm(message)) router.post(route(name, props.order.id)); };
 const printPage = () => window.print();
@@ -46,6 +46,7 @@ const receive = () => form.transform((d) => ({ ...d, lines: d.lines.map(({ name,
                     <button @click="act('purchases.orders.reject', 'رفض أمر الشراء؟')" class="px-3 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold">رفض</button>
                 </template>
                 <button v-if="canReceive && $can('purchases.receipts.create')" @click="open = true" class="px-3 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">استلام بضاعة</button>
+                <Link v-if="['pending', 'approved', 'partially_invoiced'].includes(order.status) && $can('purchases.orders.convert')" :href="route('purchases.orders.invoice-form', order.id)" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold" data-stage-invoice>فوترة الأمر</Link>
                 <Link v-if="['partially_received', 'received'].includes(order.status) && $can('purchases.invoices.create')" :href="route('purchases.invoices.from-receipts', { supplier_id: order.supplier_id })" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">فاتورة المورد</Link>
                 <button v-if="['draft', 'pending_approval', 'approved', 'rejected'].includes(order.status) && $can('purchases.orders.cancel')" @click="act('purchases.orders.cancel', 'إلغاء أمر الشراء؟')" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">إلغاء</button>
                 <button v-if="['draft', 'pending_approval', 'approved', 'rejected', 'cancelled'].includes(order.status) && $can('purchases.orders.cancel')" @click="remove" class="px-3 py-2 rounded-xl border border-rose-200 text-rose-600 text-xs font-bold">حذف</button>

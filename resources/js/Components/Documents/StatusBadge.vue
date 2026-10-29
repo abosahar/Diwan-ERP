@@ -16,6 +16,7 @@ const map = {
     partially_received: ['مستلم جزئياً', 'bg-sky-50 text-sky-700'],
     received: ['مستلم', 'bg-sky-50 text-sky-700'],
     invoiced: ['مفوتر', 'bg-indigo-50 text-indigo-700'],
+    partially_invoiced: ['مفوتر جزئياً', 'bg-indigo-50 text-indigo-700'],
     converted_to_invoice: ['مفوتر', 'bg-indigo-50 text-indigo-700'],
     ordered: ['تم الطلب', 'bg-indigo-50 text-indigo-700'],
     refunded: ['مسترد', 'bg-indigo-50 text-indigo-700'],

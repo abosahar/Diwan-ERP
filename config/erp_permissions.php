@@ -743,6 +743,7 @@ return [
         'purchases.invoices.destroy' => 'purchases.invoices.delete',
         'purchases.orders.index' => 'purchases.orders.view',
         'purchases.orders.convert' => 'purchases.orders.convert',
+        'purchases.orders.invoice-form' => 'purchases.orders.convert',
         'purchases.payments.index' => 'purchases.payments.view',
         'purchases.payments.store' => 'purchases.payments.create',
         'purchases.payments.create' => 'purchases.payments.create',

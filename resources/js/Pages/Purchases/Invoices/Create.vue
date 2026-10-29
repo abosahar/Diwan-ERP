@@ -38,6 +38,7 @@ const props = defineProps({
     products: Array,
     categories: Array,
     units: Array,
+    bankAccounts: { type: Array, default: () => [] },
     suggestedNumber: String,
     defaultTaxRate: Number,
     defaultBranchId: Number,
@@ -69,6 +70,7 @@ const form = useForm({
     exchange_rate: '',
     payment_status: 'unpaid',
     paid_amount: 0,
+    payments: [],
     notes: '',
     items: [
         {
@@ -403,8 +405,12 @@ const total = computed(() => {
     return subtotal.value + taxAmount.value;
 });
 
+const addPayment = () => form.payments.push({ method: 'cash', bank_account_id: '', amount: Math.max(0, remainingNow.value) || '' });
+const paidNow = computed(() => form.payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0));
+const remainingNow = computed(() => Math.round((total.value - paidNow.value) * 100) / 100);
 const submit = () => {
-    form.post(route('purchases.invoices.store'));
+    form.transform((d) => ({ ...d, payments: d.payments.map((p) => ({ ...p, amount: Number(p.amount) || 0, bank_account_id: p.bank_account_id || null })), payment_method: d.payments.length ? d.payments[0].method : 'credit', payment_status: 'unpaid' }))
+        .post(route('purchases.invoices.store'));
 };
 
 const formatCurrency = (val) => {
@@ -836,41 +842,26 @@ const importLines = (lines, replace) => {
 
                         <!-- Payment Status & Method -->
                         <div class="pt-4 border-t border-slate-100 space-y-3 text-xs">
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">حالة السداد للمورد</label>
-                                <select 
-                                    v-model="form.payment_status" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-medium"
-                                >
-                                    <option value="unpaid">غير مدفوعة (مستحقة لاحقاً / آجل)</option>
-                                    <option value="partially_paid">مدفوعة جزئياً (دفعة مقدمة)</option>
-                                    <option value="paid">مدفوعة بالكامل الآن</option>
-                                </select>
+                            <div class="flex items-center justify-between">
+                                <label class="block font-bold text-slate-700">الدفعات عند الإصدار</label>
+                                <button type="button" @click="addPayment" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold" data-add-payment>+ دفعة</button>
                             </div>
-
-                            <div v-if="form.payment_status === 'partially_paid'">
-                                <label class="block font-bold text-slate-700 mb-1">المبلغ المدفوع مقدماً</label>
-                                <input 
-                                    v-model.number="form.paid_amount" 
-                                    type="text" inputmode="decimal" data-num 
-                                    step="0.01" 
-                                    :max="total"
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-mono font-bold text-emerald-600"
-                                />
-                            </div>
-
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">طريقة السداد</label>
-                                <select 
-                                    v-model="form.payment_method" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-medium"
-                                >
-                                    <option value="bank_transfer">تحويل بنكي</option>
+                            <p v-if="!form.payments.length" class="text-slate-500">الفاتورة آجلة بالكامل. أضف دفعة (أو أكثر: نقد وتحويل مثلًا) لتسجيل ما دُفع الآن.</p>
+                            <div v-for="(p, i) in form.payments" :key="i" class="grid grid-cols-12 gap-2 items-end p-2 rounded-xl bg-slate-50 border border-slate-100" data-payment-row>
+                                <select v-model="p.method" class="col-span-4 rounded-lg border border-slate-200 px-2 py-1.5 font-medium">
                                     <option value="cash">نقداً</option>
+                                    <option value="bank_transfer">تحويل بنكي</option>
                                     <option value="card">بطاقة / مدى</option>
-                                    <option value="credit">آجل</option>
                                 </select>
+                                <div class="col-span-4"><SelectCreate v-model="p.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الصندوق / البنك" /></div>
+                                <input v-model="p.amount" type="text" inputmode="decimal" data-num class="col-span-3 rounded-lg border border-slate-200 px-2 py-1.5 font-mono font-bold text-emerald-600" />
+                                <button type="button" @click="form.payments.splice(i, 1)" class="col-span-1 text-rose-500 font-bold">×</button>
                             </div>
+                            <div v-if="form.payments.length" class="flex justify-between text-slate-600">
+                                <span>المدفوع: <b class="font-mono text-emerald-600">{{ formatCurrency(paidNow) }}</b></span>
+                                <span>المتبقي للمورد: <b class="font-mono" :class="remainingNow < 0 ? 'text-rose-600' : 'text-slate-800'">{{ formatCurrency(remainingNow) }}</b></span>
+                            </div>
+                            <p v-if="form.errors.payments" class="text-rose-600 font-bold">{{ form.errors.payments }}</p>
                         </div>
 
                         <div class="pt-2">

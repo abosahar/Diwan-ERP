@@ -202,7 +202,15 @@ class DocumentPoster
             $lines[] = ['role' => 'payables', 'credit' => $total - $paid, 'description' => "مستحق للمورد {$supplier}", 'party_type' => 'supplier', 'party_id' => $invoice->supplier_id];
         }
         if ($paid > 0) {
-            $lines[] = ['account_id' => $this->cashAccount($invoice->bank_account_id, $invoice->payment_method), 'credit' => $paid, 'description' => "سداد فاتورة شراء {$invoice->invoice_number}"];
+            // Several payment rows (cash + transfer ...) each credit their own cash / bank account.
+            $rows = SupplierPayment::withoutGlobalScopes()->where('purchase_invoice_id', $invoice->id)->get();
+            if ($rows->count() > 1 && abs($rows->sum('amount') - $paid) < 0.01) {
+                foreach ($rows as $row) {
+                    $lines[] = ['account_id' => $this->cashAccount($row->bank_account_id, $row->payment_method), 'credit' => (float) $row->amount, 'description' => "سداد فاتورة شراء {$invoice->invoice_number}"];
+                }
+            } else {
+                $lines[] = ['account_id' => $this->cashAccount($invoice->bank_account_id, $invoice->payment_method), 'credit' => $paid, 'description' => "سداد فاتورة شراء {$invoice->invoice_number}"];
+            }
         }
 
         return $this->posting->post([
