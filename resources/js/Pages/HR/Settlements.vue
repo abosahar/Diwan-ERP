@@ -54,8 +54,8 @@ const approve = (s) => { if (confirm('اعتماد المخالصة وإنهاء
                 <SelectCreate v-model="form.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
                 <select v-model="form.reason" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in reasons" :key="k" :value="k">{{ l }}</option></select>
                 <label class="block">تاريخ آخر يوم عمل<input v-model="form.termination_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
-                <label class="block">أيام راتب مستحقة لم تُصرف<input v-model="form.salary_days" type="number" step="1" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
-                <div class="grid grid-cols-2 gap-2"><label>مستحقات أخرى<input v-model="form.other_dues" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label><label>استقطاعات أخرى<input v-model="form.other_deductions" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label></div>
+                <label class="block">أيام راتب مستحقة لم تُصرف<input v-model.number="form.salary_days" type="text" inputmode="decimal" data-num step="1" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
+                <div class="grid grid-cols-2 gap-2"><label>مستحقات أخرى<input v-model.number="form.other_dues" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label><label>استقطاعات أخرى<input v-model.number="form.other_deductions" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label></div>
                 <p class="text-slate-500">يُحتسب رصيد الإجازات وأرصدة السلف آلياً.</p>
                 <p v-for="(m, k) in form.errors" :key="k" class="text-rose-600">{{ m }}</p>
                 <button @click="form.post(route('hr.settlements.store'), { preserveScroll: true })" class="w-full px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">احتساب</button>

@@ -77,8 +77,8 @@ const destroy = (list) => { if (confirm(`حذف قائمة "${list.name}"؟`)) r
                 <tr v-for="(i, idx) in form.items" :key="idx" class="border-t border-slate-100">
                     <td class="py-1.5">{{ i.name }}</td>
                     <td class="text-center font-mono">{{ money(i.base) }}</td>
-                    <td><input v-model="i.min_quantity" type="number" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
-                    <td><input v-model="i.price" type="number" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td><input v-model.number="i.min_quantity" type="text" inputmode="decimal" data-num step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td><input v-model.number="i.price" type="text" inputmode="decimal" data-num step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td class="text-center"><button @click="form.items.splice(idx, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td>
                 </tr>
             </table></div>

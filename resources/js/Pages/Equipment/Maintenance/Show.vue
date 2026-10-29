@@ -86,7 +86,7 @@ const remove = () => confirm('حذف أمر الصيانة؟') && router.delete(
                     </div>
                     <div v-for="(l, i) in issueForm.lines" :key="i" class="grid grid-cols-12 gap-2 items-start">
                         <div class="col-span-7"><ProductPicker v-model="l.product_id" :initial="products[l.product_id] || null" @select="onPick(i, $event)" /></div>
-                        <div class="col-span-3"><input v-model="l.quantity" type="number" min="0.001" step="0.001" :aria-label="`كمية السطر ${i + 1}`" :class="['w-full rounded-xl text-xs font-mono', issueForm.errors[`lines.${i}.quantity`] ? 'border-rose-400' : 'border-slate-200']" />
+                        <div class="col-span-3"><input v-model.number="l.quantity" type="text" inputmode="decimal" data-num min="0.001" step="0.001" :aria-label="`كمية السطر ${i + 1}`" :class="['w-full rounded-xl text-xs font-mono', issueForm.errors[`lines.${i}.quantity`] ? 'border-rose-400' : 'border-slate-200']" />
                             <div v-if="l.product_id" :class="['text-[10px] mt-0.5', onHand(l.product_id) < Number(l.quantity) ? 'text-rose-600 font-bold' : 'text-slate-400']">المتوفر: {{ qty(onHand(l.product_id)) }}</div></div>
                         <button type="button" @click="issueForm.lines.splice(i, 1)" class="col-span-2 py-2 text-rose-600 font-bold">حذف</button>
                     </div>
@@ -116,8 +116,8 @@ const remove = () => confirm('حذف أمر الصيانة؟') && router.delete(
                 </div>
 
                 <div v-if="isOpen && $can('equipment.maintenance.complete')" class="border-t border-dashed border-slate-200 pt-3 grid grid-cols-2 gap-3">
-                    <Field v-if="usesHours" label="عداد الساعات عند الإكمال" :error="completeForm.errors.hours_reading"><input v-model="completeForm.hours_reading" type="number" min="0" step="0.1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field v-if="usesKm" label="الكيلومترات عند الإكمال" :error="completeForm.errors.km_reading"><input v-model="completeForm.km_reading" type="number" min="0" step="0.1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field v-if="usesHours" label="عداد الساعات عند الإكمال" :error="completeForm.errors.hours_reading"><input v-model.number="completeForm.hours_reading" type="text" inputmode="decimal" data-num min="0" step="0.1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field v-if="usesKm" label="الكيلومترات عند الإكمال" :error="completeForm.errors.km_reading"><input v-model.number="completeForm.km_reading" type="text" inputmode="decimal" data-num min="0" step="0.1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="تاريخ الإكمال"><input v-model="completeForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="ملاحظات الفني" class="col-span-2"><textarea v-model="completeForm.notes" rows="2" class="w-full rounded-xl border-slate-200 text-xs"></textarea></Field>
                     <p v-if="completeForm.errors.status" class="col-span-2 text-rose-600">{{ completeForm.errors.status }}</p>

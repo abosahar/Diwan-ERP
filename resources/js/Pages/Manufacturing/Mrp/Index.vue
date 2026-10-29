@@ -24,7 +24,7 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
         <PageHeader title="تخطيط الاحتياجات من المواد (MRP)" subtitle="يقارن الطلب بالمخزون والمشتريات والإنتاج المفتوح ويقترح ما يُشترى وما يُصنَّع" :crumbs="[{ label: 'التصنيع' }, { label: 'تخطيط الاحتياجات' }]" />
 
         <div v-if="$can('manufacturing.mrp.manage')" :class="[card, 'mb-6 flex flex-wrap items-end gap-3']">
-            <div><label class="block text-xs font-bold text-slate-600 mb-1">أفق التخطيط (أيام)</label><input v-model="form.horizon_days" type="number" min="1" max="365" class="text-xs rounded-xl border-slate-200 w-32" /></div>
+            <div><label class="block text-xs font-bold text-slate-600 mb-1">أفق التخطيط (أيام)</label><input v-model.number="form.horizon_days" type="text" inputmode="decimal" data-num min="1" max="365" class="text-xs rounded-xl border-slate-200 w-32" /></div>
             <button type="button" :disabled="form.processing" @click="form.post(route('manufacturing.mrp.run'))" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">تشغيل التخطيط</button>
             <p class="text-3xs text-slate-500 flex-1 min-w-60">الطلب: أوامر البيع المؤكدة غير المسلَّمة، ومواد أوامر الإنتاج المفتوحة، وحدود إعادة الطلب للأصناف. تتفكك المنتجات المصنَّعة إلى مكوناتها عبر قوائم المواد على كل المستويات.</p>
             <p v-if="run" class="text-3xs text-slate-400">آخر تشغيل: {{ String(run.run_date).slice(0, 10) }} (أفق {{ run.horizon_days }} يوماً)</p>

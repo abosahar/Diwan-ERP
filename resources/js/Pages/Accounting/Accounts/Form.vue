@@ -115,8 +115,8 @@ const submitEditAccount = () => (editing
                                 <div>
                                     <label class="block font-medium text-slate-700 mb-1">الرصيد الحسابي (﷼)</label>
                                     <input 
-                                        v-model="editForm.balance" 
-                                        type="number" 
+                                        v-model.number="editForm.balance" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01" 
                                         class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500 text-end" 
                                     />

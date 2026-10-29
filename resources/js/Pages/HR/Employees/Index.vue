@@ -16,7 +16,7 @@ const columns = [
     { key: 'department_ref.name', label: 'الإدارة' },
     { key: 'nationality', label: 'الجنسية' },
     { key: 'hire_date', label: 'المباشرة', type: 'date' },
-    { key: 'status', label: 'الحالة' },
+    { key: 'status', label: 'الحالة', type: 'status' },
 ];
 const statuses = [{ value: 'active', label: 'على رأس العمل' }, { value: 'on_leave', label: 'في إجازة' }, { value: 'suspended', label: 'موقوف' }, { value: 'terminated', label: 'منتهية خدمته' }];
 const docLabel = { national_id: 'الهوية', iqama: 'الإقامة', border_number: 'رقم الحدود', passport: 'الجواز', contract: 'العقد', medical_insurance: 'التأمين الطبي', driving_license: 'الرخصة', certificate: 'شهادة', other: 'وثيقة' };

@@ -15,7 +15,7 @@ const apply = () => router.get(route('inventory.reports.slow-moving'), { days: d
     <AppLayout>
         <Head title="الأصناف الراكدة" />
         <PageHeader title="الأصناف الراكدة" :subtitle="`أصناف لها رصيد ولم تُصرف منذ ${days} يوماً`" :crumbs="[{ label: 'المستودعات' }, { label: 'الأصناف الراكدة' }]">
-            <template #actions><form @submit.prevent="apply" class="flex gap-2 text-xs"><input v-model="days" type="number" min="1" class="w-24 rounded-xl border-slate-200 text-xs" /><button class="px-4 rounded-xl bg-indigo-600 text-white font-bold">{{ $t('ui.apply') }}</button></form></template>
+            <template #actions><form @submit.prevent="apply" class="flex gap-2 text-xs"><input v-model.number="days" type="text" inputmode="decimal" data-num min="1" class="w-24 rounded-xl border-slate-200 text-xs" /><button class="px-4 rounded-xl bg-indigo-600 text-white font-bold">{{ $t('ui.apply') }}</button></form></template>
         </PageHeader>
         <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
             <table class="w-full text-xs">

@@ -65,10 +65,10 @@ const trackingLabel = { none: 'بدون', batch: 'تشغيلات وتواريخ 
                 </table></div>
                 <form v-if="$can('inventory.products.edit')" @submit.prevent="addUnit" class="grid grid-cols-2 md:grid-cols-6 gap-2 items-end">
                     <Field label="الوحدة" :error="unitForm.errors.unit_id"><SelectCreate v-model="unitForm.unit_id" :options="units" entity="unit" label="name_ar" :allow-empty="false" /></Field>
-                    <Field label="عدد الوحدات الأساسية" :error="unitForm.errors.factor"><input v-model="unitForm.factor" type="number" step="0.000001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="عدد الوحدات الأساسية" :error="unitForm.errors.factor"><input v-model.number="unitForm.factor" type="text" inputmode="decimal" data-num step="0.000001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="الباركود"><input v-model="unitForm.barcode" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="سعر البيع"><input v-model="unitForm.selling_price" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="سعر الشراء"><input v-model="unitForm.purchase_price" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="سعر البيع"><input v-model.number="unitForm.selling_price" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="سعر الشراء"><input v-model.number="unitForm.purchase_price" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <button class="rounded-xl bg-indigo-600 text-white font-bold py-2">{{ $t('ui.add') }}</button>
                 </form>
             </div>
@@ -78,7 +78,7 @@ const trackingLabel = { none: 'بدون', batch: 'تشغيلات وتواريخ 
                 <template v-if="kitForm.is_kit">
                     <input v-model="lookup" @input="search" placeholder="إضافة مكوّن..." class="w-full rounded-xl border-slate-200 text-xs mb-2" />
                     <div v-if="results.length" class="border rounded-xl max-h-40 overflow-y-auto mb-2"><button type="button" v-for="p in results" :key="p.id" @mousedown.prevent="addComponent(p)" @keydown.enter.prevent="addComponent(p)" class="block w-full text-start px-3 py-2 hover:bg-indigo-50">{{ p.name_ar }}</button></div>
-                    <table class="w-full"><tr v-for="(item, i) in kitForm.items" :key="i" class="border-t border-slate-100"><td class="py-1.5">{{ item.name }}</td><td class="py-1.5 w-32"><input v-model="item.quantity" type="number" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs" /></td><td class="w-8"><button @click="kitForm.items.splice(i, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td></tr></table>
+                    <table class="w-full"><tr v-for="(item, i) in kitForm.items" :key="i" class="border-t border-slate-100"><td class="py-1.5">{{ item.name }}</td><td class="py-1.5 w-32"><input v-model.number="item.quantity" type="text" inputmode="decimal" data-num step="0.0001" class="w-full rounded-lg border-slate-200 text-xs" /></td><td class="w-8"><button @click="kitForm.items.splice(i, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td></tr></table>
                 </template>
                 <p v-for="(msg, key) in kitForm.errors" :key="key" class="text-rose-600 mt-1">{{ msg }}</p>
                 <button v-if="$can('inventory.products.edit')" @click="saveKit" :disabled="kitForm.processing" class="mt-3 px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">{{ $t('ui.save') }}</button>

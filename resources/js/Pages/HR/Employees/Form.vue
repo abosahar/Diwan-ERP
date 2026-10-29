@@ -72,10 +72,10 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
             <div v-if="$can('hr.salaries.view')" class="bg-white border border-slate-200 rounded-2xl p-4">
                 <h3 class="text-xs font-black text-slate-700 mb-3">الراتب والتأمينات والبنك</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <Field label="الراتب الأساسي" :error="form.errors.basic_salary"><input v-model="form.basic_salary" type="number" step="0.01" :class="input" class="font-mono" /></Field>
-                    <Field label="بدل السكن"><input v-model="form.housing_allowance" type="number" step="0.01" :class="input" class="font-mono" /></Field>
-                    <Field label="بدل النقل"><input v-model="form.transport_allowance" type="number" step="0.01" :class="input" class="font-mono" /></Field>
-                    <Field label="بدلات أخرى" :hint="`الإجمالي: ${money(total())}`"><input v-model="form.other_allowances" type="number" step="0.01" :class="input" class="font-mono" /></Field>
+                    <Field label="الراتب الأساسي" :error="form.errors.basic_salary"><input v-model.number="form.basic_salary" type="text" inputmode="decimal" data-num step="0.01" :class="input" class="font-mono" /></Field>
+                    <Field label="بدل السكن"><input v-model.number="form.housing_allowance" type="text" inputmode="decimal" data-num step="0.01" :class="input" class="font-mono" /></Field>
+                    <Field label="بدل النقل"><input v-model.number="form.transport_allowance" type="text" inputmode="decimal" data-num step="0.01" :class="input" class="font-mono" /></Field>
+                    <Field label="بدلات أخرى" :hint="`الإجمالي: ${money(total())}`"><input v-model.number="form.other_allowances" type="text" inputmode="decimal" data-num step="0.01" :class="input" class="font-mono" /></Field>
                     <template v-if="payChanged()">
                         <Field label="تاريخ سريان تعديل الراتب" :error="form.errors.salary_effective_date" hint="يُجزّأ المسير إن كان التاريخ في منتصف الشهر"><input v-model="form.salary_effective_date" type="date" :class="input" /></Field>
                         <Field label="سبب التعديل" class="md:col-span-3"><input v-model="form.salary_change_reason" placeholder="زيادة سنوية، ترقية..." :class="input" /></Field>
@@ -83,8 +83,8 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
                     <label v-if="$feature('gosi')" class="text-xs flex items-center gap-2"><input v-model="form.gosi_registered" type="checkbox" class="rounded" /> مسجل في التأمينات</label>
                     <Field v-if="$feature('gosi')" label="رقم التأمينات"><input v-model="form.gosi_number" :class="input" /></Field>
                     <Field v-if="$feature('gosi')" label="تاريخ أول تسجيل" hint="من 3 يوليو 2024 تُطبّق نسب النظام الجديد"><input v-model="form.gosi_join_date" type="date" :class="input" /></Field>
-                    <Field label="أيام الإجازة السنوية"><input v-model="form.annual_leave_days" type="number" min="21" :class="input" /></Field>
-                    <Field label="رصيد إجازات افتتاحي"><input v-model="form.leave_opening_balance" type="number" step="0.5" :class="input" /></Field>
+                    <Field label="أيام الإجازة السنوية"><input v-model.number="form.annual_leave_days" type="text" inputmode="decimal" data-num min="21" :class="input" /></Field>
+                    <Field label="رصيد إجازات افتتاحي"><input v-model.number="form.leave_opening_balance" type="text" inputmode="decimal" data-num step="0.5" :class="input" /></Field>
                     <Field label="البنك"><input v-model="form.bank_name" :class="input" /></Field>
                     <Field v-if="$feature('wps')" label="رمز البنك (WPS)"><input v-model="form.bank_code" :class="input" /></Field>
                     <Field label="الآيبان" :error="form.errors.iban"><input v-model="form.iban" :class="input" class="font-mono uppercase" placeholder="SA..." /></Field>

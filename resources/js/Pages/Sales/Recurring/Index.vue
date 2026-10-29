@@ -113,11 +113,11 @@ onMounted(() => { if (props.prefill) create(props.prefill); });
                     <Field label="التكرار" :error="form.errors.frequency">
                         <select v-model="form.frequency" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in frequencies" :key="k" :value="k">{{ l }}</option></select>
                     </Field>
-                    <Field label="كل (عدد الفترات)" :error="form.errors.interval"><input v-model="form.interval" type="number" min="1" max="12" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="كل (عدد الفترات)" :error="form.errors.interval"><input v-model.number="form.interval" type="text" inputmode="decimal" data-num min="1" max="12" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="تاريخ أول إصدار" :error="form.errors.start_date" hint="يتكرر الإصدار في نفس اليوم من الشهر"><input v-model="form.start_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="مهلة السداد (أيام)" :error="form.errors.due_days" hint="فارغ = شروط العميل"><input v-model="form.due_days" type="number" min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="مهلة السداد (أيام)" :error="form.errors.due_days" hint="فارغ = شروط العميل"><input v-model.number="form.due_days" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="ينتهي في (اختياري)" :error="form.errors.end_date"><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="أو بعد عدد إصدارات" :error="form.errors.max_count"><input v-model="form.max_count" type="number" min="1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="أو بعد عدد إصدارات" :error="form.errors.max_count"><input v-model.number="form.max_count" type="text" inputmode="decimal" data-num min="1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="نوع الفاتورة">
                         <select v-model="form.invoice_type" class="w-full rounded-xl border-slate-200 text-xs"><option value="standard">ضريبية (منشآت)</option><option value="simplified">مبسطة (أفراد)</option></select>
                     </Field>

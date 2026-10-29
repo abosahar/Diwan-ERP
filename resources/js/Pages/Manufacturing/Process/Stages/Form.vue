@@ -24,7 +24,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
             <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                 <Field label="الرمز *" :error="form.errors.code"><input v-model="form.code" :class="input" class="font-mono" required /></Field>
                 <Field label="الاسم *" :error="form.errors.name"><input v-model="form.name" :class="input" required /></Field>
-                <Field label="التسلسل *"><input v-model="form.sequence" type="number" :class="input" /></Field>
+                <Field label="التسلسل *"><input v-model.number="form.sequence" type="text" inputmode="decimal" data-num :class="input" /></Field>
                 <Field label="ناتج المرحلة *" hint="للمرحلة الأخيرة: المنتج التام الذي يدخل المخزون" :error="form.errors.product_id"><SelectCreate v-model="form.product_id" :options="products" entity="product" label="name_ar" placeholder="— اختر —" required /></Field>
                 <Field label="تستلم من مرحلة" hint="تنتقل تكلفة المرحلة السابقة إليها"><select v-model="form.previous_stage_id" :class="input"><option value="">— أول مرحلة —</option><option v-for="x in stages" :key="x.id" :value="x.id">{{ x.code }} — {{ x.name }}</option></select></Field>
                 <Field label="المستودع *" :error="form.errors.warehouse_id"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required /></Field>

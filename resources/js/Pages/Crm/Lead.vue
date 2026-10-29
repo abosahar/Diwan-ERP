@@ -28,7 +28,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <Field label="الاسم"><input v-model="form.name" :class="inp" /></Field>
                 <Field label="الشركة"><input v-model="form.company_name" :class="inp" /></Field>
                 <div class="grid grid-cols-2 gap-2"><Field label="الجوال"><input v-model="form.phone" :class="inp" /></Field><Field label="البريد"><input v-model="form.email" :class="inp" /></Field></div>
-                <div class="grid grid-cols-2 gap-2"><Field label="القيمة المتوقعة"><input v-model="form.expected_value" type="number" :class="inp" /></Field><Field label="المتابعة"><input v-model="form.next_follow_up" type="date" :class="inp" /></Field></div>
+                <div class="grid grid-cols-2 gap-2"><Field label="القيمة المتوقعة"><input v-model.number="form.expected_value" type="text" inputmode="decimal" data-num :class="inp" /></Field><Field label="المتابعة"><input v-model="form.next_follow_up" type="date" :class="inp" /></Field></div>
                 <Field label="المسؤول"><select v-model="form.assigned_to" :class="inp"><option value="">—</option><option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option></select></Field>
                 <Field label="المصدر"><select v-model="form.source" :class="inp"><option v-for="(lb, k) in sources" :key="k" :value="k">{{ lb }}</option></select></Field>
                 <Field label="ملاحظات"><textarea v-model="form.notes" rows="3" :class="inp"></textarea></Field>

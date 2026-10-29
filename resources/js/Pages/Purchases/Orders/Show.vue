@@ -98,7 +98,7 @@ const receive = () => form.transform((d) => ({ ...d, lines: d.lines.map(({ name,
                 <tr v-for="l in form.lines" :key="l.purchase_order_item_id" class="border-t border-slate-100">
                     <td class="py-1.5">{{ l.name }}</td>
                     <td class="text-center font-mono">{{ qty(l.open) }}</td>
-                    <td><input v-model="l.quantity" type="number" min="0" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td><input v-model.number="l.quantity" type="text" inputmode="decimal" data-num min="0" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td><input v-model="l.batch_number" class="w-full rounded-lg border-slate-200 text-xs" /></td>
                     <td><input v-model="l.expiry_date" type="date" class="w-full rounded-lg border-slate-200 text-xs" /></td>
                 </tr>

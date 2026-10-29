@@ -19,7 +19,7 @@ const start = () => form.post(route('accounting.reconciliations.store'));
         <form v-if="$can('accounting.reconciliation.create')" @submit.prevent="start" class="bg-white border border-slate-200 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3 text-xs mb-4">
             <Field label="الحساب البنكي" :error="form.errors.bank_account_id"><select v-model="form.bank_account_id" required class="w-full rounded-xl border-slate-200 text-xs"><option v-for="b in bankAccounts" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
             <Field label="تاريخ كشف البنك"><input v-model="form.statement_date" type="date" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-            <Field label="الرصيد حسب كشف البنك" :error="form.errors.statement_balance"><input v-model="form.statement_balance" type="number" step="0.01" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+            <Field label="الرصيد حسب كشف البنك" :error="form.errors.statement_balance"><input v-model.number="form.statement_balance" type="text" inputmode="decimal" data-num step="0.01" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             <div class="flex items-end"><button class="w-full rounded-xl bg-indigo-600 text-white font-bold py-2">بدء تسوية</button></div>
         </form>
 

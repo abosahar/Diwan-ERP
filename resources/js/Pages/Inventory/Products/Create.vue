@@ -164,8 +164,8 @@ const submit = () => {
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">سعر الشراء (التكلفة) <span class="text-rose-500">*</span></label>
                             <input 
-                                v-model="form.purchase_price"
-                                type="number" 
+                                v-model.number="form.purchase_price"
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01" 
                                 min="0"
                                 required
@@ -177,8 +177,8 @@ const submit = () => {
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">سعر البيع (قبل الضريبة) <span class="text-rose-500">*</span></label>
                             <input 
-                                v-model="form.selling_price"
-                                type="number" 
+                                v-model.number="form.selling_price"
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01" 
                                 min="0"
                                 required
@@ -190,8 +190,8 @@ const submit = () => {
                         <div v-if="form.type === 'product'">
                             <label class="block text-xs font-bold text-slate-700 mb-1">الرصيد الافتتاحي للمخزون</label>
                             <input 
-                                v-model="form.initial_stock"
-                                type="number" 
+                                v-model.number="form.initial_stock"
+                                type="text" inputmode="decimal" data-num 
                                 step="1" 
                                 min="0"
                                 class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 font-mono font-bold"

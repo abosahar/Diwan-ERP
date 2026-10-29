@@ -239,26 +239,26 @@ const saveSupplier = () => supplierForm.post(route('equipment.supplier.bill', e.
                     <Field label="اسم البند" :error="scheduleForm.errors.name" class="md:col-span-2"><input v-model="scheduleForm.name" placeholder="مثال: تغيير زيت المحرك" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="مفعّل"><label class="flex items-center gap-2 mt-2"><input v-model="scheduleForm.is_active" type="checkbox" class="rounded border-slate-300" /> يُتابع ويُنبَّه عليه</label></Field>
                     <Field label="الصنف المستخدم من المستودع (اختياري)" :error="scheduleForm.errors.product_id" class="md:col-span-2"><ProductPicker v-model="scheduleForm.product_id" :initial="scheduleProduct" /></Field>
-                    <Field label="الكمية المعتادة" :error="scheduleForm.errors.default_quantity"><input v-model="scheduleForm.default_quantity" type="number" min="0" step="0.001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="الكمية المعتادة" :error="scheduleForm.errors.default_quantity"><input v-model.number="scheduleForm.default_quantity" type="text" inputmode="decimal" data-num min="0" step="0.001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
                 <p class="font-bold text-slate-700">يستحق كل… (أيّها يأتي أولاً)</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Field v-if="usesHours" label="ساعات تشغيل" :error="scheduleForm.errors.interval_hours"><input v-model="scheduleForm.interval_hours" type="number" min="1" placeholder="250" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field v-if="usesKm" label="كيلومترات" :error="scheduleForm.errors.interval_km"><input v-model="scheduleForm.interval_km" type="number" min="1" placeholder="10000" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="أيام" :error="scheduleForm.errors.interval_days || (!usesHours && !usesKm ? scheduleForm.errors.interval_hours : '')"><input v-model="scheduleForm.interval_days" type="number" min="1" placeholder="90" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field v-if="usesHours" label="ساعات تشغيل" :error="scheduleForm.errors.interval_hours"><input v-model.number="scheduleForm.interval_hours" type="text" inputmode="decimal" data-num min="1" placeholder="250" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field v-if="usesKm" label="كيلومترات" :error="scheduleForm.errors.interval_km"><input v-model.number="scheduleForm.interval_km" type="text" inputmode="decimal" data-num min="1" placeholder="10000" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="أيام" :error="scheduleForm.errors.interval_days || (!usesHours && !usesKm ? scheduleForm.errors.interval_hours : '')"><input v-model.number="scheduleForm.interval_days" type="text" inputmode="decimal" data-num min="1" placeholder="90" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
                 <p v-if="scheduleForm.errors.interval_hours && !usesHours" class="text-rose-600">{{ scheduleForm.errors.interval_hours }}</p>
                 <p class="font-bold text-slate-700">التنبيه المبكر قبل الموعد بـ <span class="font-normal text-slate-400">(فارغ = 10% من الفترة)</span></p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Field v-if="usesHours" label="ساعات"><input v-model="scheduleForm.warn_hours" type="number" min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field v-if="usesKm" label="كيلومترات"><input v-model="scheduleForm.warn_km" type="number" min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="أيام"><input v-model="scheduleForm.warn_days" type="number" min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field v-if="usesHours" label="ساعات"><input v-model.number="scheduleForm.warn_hours" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field v-if="usesKm" label="كيلومترات"><input v-model.number="scheduleForm.warn_km" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="أيام"><input v-model.number="scheduleForm.warn_days" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
                 <p class="font-bold text-slate-700">آخر تنفيذ <span class="font-normal text-slate-400">(فارغ = القراءة الحالية واليوم)</span></p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <Field label="التاريخ"><input v-model="scheduleForm.last_done_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field v-if="usesHours" label="عند قراءة ساعات"><input v-model="scheduleForm.last_done_hours" type="number" min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field v-if="usesKm" label="عند قراءة كم"><input v-model="scheduleForm.last_done_km" type="number" min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field v-if="usesHours" label="عند قراءة ساعات"><input v-model.number="scheduleForm.last_done_hours" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field v-if="usesKm" label="عند قراءة كم"><input v-model.number="scheduleForm.last_done_km" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
             </div>
             <template #footer>
@@ -272,8 +272,8 @@ const saveSupplier = () => supplierForm.post(route('equipment.supplier.bill', e.
                 <div class="grid grid-cols-2 gap-3">
                     <Field label="من" :error="supplierForm.errors.period_from"><input v-model="supplierForm.period_from" @change="loadSupplierPreview" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="إلى" :error="supplierForm.errors.period_to"><input v-model="supplierForm.period_to" @change="loadSupplierPreview" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field :label="`الكمية (${lookups.bases[e.supplier_rate_basis] || ''})`" :error="supplierForm.errors.quantity" hint="فارغ = المحسوب أدناه"><input v-model="supplierForm.quantity" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="نسبة الضريبة %"><input v-model="supplierForm.tax_rate" @change="loadSupplierPreview" type="number" min="0" max="100" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field :label="`الكمية (${lookups.bases[e.supplier_rate_basis] || ''})`" :error="supplierForm.errors.quantity" hint="فارغ = المحسوب أدناه"><input v-model.number="supplierForm.quantity" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="نسبة الضريبة %"><input v-model.number="supplierForm.tax_rate" @change="loadSupplierPreview" type="text" inputmode="decimal" data-num min="0" max="100" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="رقم فاتورة المورد" class="col-span-2"><input v-model="supplierForm.reference" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
                 <div v-if="supplierPreview" class="rounded-xl bg-slate-50 border border-slate-200 p-3">

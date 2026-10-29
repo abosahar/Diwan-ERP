@@ -345,7 +345,7 @@ const importLines = (lines, replace) => {
                                     <td class="py-3 px-4 align-top">
                                         <input 
                                             v-model.number="item.quantity"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="0.01" 
                                             step="0.01"
                                             class="w-full font-mono text-xs rounded-lg border-slate-200 focus:border-indigo-500 py-1.5"
@@ -355,7 +355,7 @@ const importLines = (lines, replace) => {
                                     <td class="py-3 px-4 align-top">
                                         <input 
                                             v-model.number="item.unit_price"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="0" 
                                             step="0.01"
                                             class="w-full font-mono text-xs rounded-lg border-slate-200 focus:border-indigo-500 py-1.5"
@@ -365,7 +365,7 @@ const importLines = (lines, replace) => {
                                     <td class="py-3 px-4 align-top">
                                         <input 
                                             v-model.number="item.discount"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="0" 
                                             step="0.01"
                                             class="w-full font-mono text-xs rounded-lg border-slate-200 focus:border-indigo-500 py-1.5"
@@ -374,7 +374,7 @@ const importLines = (lines, replace) => {
                                     <td class="py-3 px-4 align-top">
                                         <input 
                                             v-model.number="item.tax_rate"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="0" 
                                             step="0.01"
                                             class="w-full font-mono text-xs rounded-lg border-slate-200 focus:border-indigo-500 py-1.5"

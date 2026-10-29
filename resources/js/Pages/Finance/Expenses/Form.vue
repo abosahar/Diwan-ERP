@@ -80,9 +80,9 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                 <div>
                                     <label class="block font-medium text-slate-700 mb-1">المبلغ (غير شامل الضريبة) <span class="text-rose-500">*</span></label>
                                     <input 
-                                        v-model="form.amount" 
+                                        v-model.number="form.amount" 
                                         @input="onAmountChange"
-                                        type="number" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01" 
                                         required 
                                         placeholder="0.00"
@@ -92,9 +92,9 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                 <div>
                                     <label class="flex items-center gap-2 font-medium text-slate-700 mb-1"><input v-model="form.taxable" type="checkbox" @change="onAmountChange" class="rounded border-slate-300" /> خاضع لـ{{ $taxLabel() }}</label>
                                     <input 
-                                        v-model="form.tax_amount" 
+                                        v-model.number="form.tax_amount" 
                                         :disabled="!form.taxable"
-                                        type="number" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01" 
                                         placeholder="0.00"
                                         class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-rose-500 focus:border-rose-500 text-end" 

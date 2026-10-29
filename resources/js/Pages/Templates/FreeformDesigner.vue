@@ -427,8 +427,8 @@ const typeLabel = { text: 'نص', box: 'مستطيل', line: 'خط', image: 'ص�
                                 <select :value="page.orientation" @change="setOrientation($event.target.value)" class="mt-1 w-full rounded-lg border-slate-200 text-xs"><option value="portrait">طولي</option><option value="landscape">عرضي</option></select>
                             </label>
                             <template v-if="page.size === 'custom'">
-                                <label class="font-bold text-slate-500">العرض (مم)<input v-model.number="page.width" type="number" min="50" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
-                                <label class="font-bold text-slate-500">الطول (مم)<input v-model.number="page.height" type="number" min="50" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                                <label class="font-bold text-slate-500">العرض (مم)<input v-model.number="page.width" type="text" inputmode="decimal" data-num min="50" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                                <label class="font-bold text-slate-500">الطول (مم)<input v-model.number="page.height" type="text" inputmode="decimal" data-num min="50" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
                             </template>
                             <label class="font-bold text-slate-500 col-span-2">خط الصفحة
                                 <select v-model="page.font" class="mt-1 w-full rounded-lg border-slate-200 text-xs"><option v-for="f in fonts" :key="f.key" :value="f.key">{{ f.label }}</option></select>
@@ -439,7 +439,7 @@ const typeLabel = { text: 'نص', box: 'مستطيل', line: 'خط', image: 'ص�
                         <h3 class="font-black">الشبكة والمحاذاة</h3>
                         <label class="flex items-center gap-2"><input v-model="showGrid" type="checkbox" class="rounded border-slate-300" /> إظهار الشبكة</label>
                         <label class="flex items-center gap-2"><input v-model="snap" type="checkbox" class="rounded border-slate-300" /> الالتصاق بالشبكة والعناصر الأخرى</label>
-                        <label class="flex items-center gap-2 text-slate-500">خطوة الشبكة (مم)<input v-model.number="layout.grid" type="number" min="0.5" max="10" step="0.5" class="w-20 rounded-lg border-slate-200 text-xs" /></label>
+                        <label class="flex items-center gap-2 text-slate-500">خطوة الشبكة (مم)<input v-model.number="layout.grid" type="text" inputmode="decimal" data-num min="0.5" max="10" step="0.5" class="w-20 rounded-lg border-slate-200 text-xs" /></label>
                     </section>
                     <section class="space-y-2">
                         <h3 class="font-black">صورة خلفية</h3>

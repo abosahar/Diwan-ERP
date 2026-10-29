@@ -43,7 +43,7 @@ const tenant = computed(() => page.props.tenant);
 
 // Current date formatted in Arabic
 const currentDate = computed(() => {
-    return new Date().toLocaleDateString('ar-SA', {
+    return new Date().toLocaleDateString('ar-SA-u-nu-latn', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',

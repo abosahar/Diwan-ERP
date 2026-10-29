@@ -74,7 +74,7 @@ const importLines = (lines, replace) => {
             <div class="overflow-x-auto"><table class="w-full text-xs">
                 <tr v-for="(item, i) in form.items" :key="i" class="border-t border-slate-100">
                     <td class="py-1.5">{{ item.name }}</td>
-                    <td class="py-1.5 w-32"><input v-model="item.quantity" type="number" step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td class="py-1.5 w-32"><input v-model.number="item.quantity" type="text" inputmode="decimal" data-num step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td class="py-1.5 w-8 text-center"><button @click="form.items.splice(i, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td>
                 </tr>
             </table></div>

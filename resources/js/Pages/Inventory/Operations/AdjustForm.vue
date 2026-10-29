@@ -51,8 +51,8 @@ const submitAdjust = () => adjustForm.post(route('inventory.operations.adjust'))
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">الكمية *</label>
                                     <input 
-                                        v-model="adjustForm.quantity" 
-                                        type="number" 
+                                        v-model.number="adjustForm.quantity" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01"
                                         min="0"
                                         required

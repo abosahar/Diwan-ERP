@@ -546,7 +546,7 @@ const removeLogo = async () => {
                                     <label class="block text-xs font-bold text-slate-700 mb-1">نسبة ضريبة القيمة المضافة (%)</label>
                                     <input 
                                         :value="15"
-                                        type="number" 
+                                        type="text" inputmode="decimal" data-num 
                                         readonly
                                         disabled
                                         class="w-full text-xs rounded-xl border-slate-200 bg-slate-50 font-mono font-bold"

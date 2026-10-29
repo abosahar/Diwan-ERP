@@ -92,9 +92,9 @@ const zakatRows = [
                     <Field label="أساس السنة">
                         <select v-model="filters.calendar" @change="reload" class="w-full rounded-xl border-slate-200 text-xs"><option value="gregorian">ميلادية (2.5776%)</option><option value="hijri">هجرية (2.5%)</option></select>
                     </Field>
-                    <Field label="حصة الملكية السعودية/الخليجية %"><input v-model.number="filters.saudi_share" type="number" min="0" max="100" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="إضافات أخرى"><input v-model.number="filters.additions" type="number" min="0" step="0.01" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="حسميات أخرى"><input v-model.number="filters.deductions" type="number" min="0" step="0.01" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="حصة الملكية السعودية/الخليجية %"><input v-model.number="filters.saudi_share" type="text" inputmode="decimal" data-num min="0" max="100" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="إضافات أخرى"><input v-model.number="filters.additions" type="text" inputmode="decimal" data-num min="0" step="0.01" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="حسميات أخرى"><input v-model.number="filters.deductions" type="text" inputmode="decimal" data-num min="0" step="0.01" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
 
                 <div class="overflow-x-auto" v-if="zakat"><table class="w-full text-xs">

@@ -34,8 +34,8 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                 <Field label="اسم القائمة *" :error="form.errors.name"><input v-model="form.name" :class="input" required /></Field>
                 <Field label="الرمز"><input v-model="form.code" :class="input" class="font-mono" /></Field>
                 <Field label="الإصدار *"><input v-model="form.version" :class="input" class="font-mono" /></Field>
-                <Field label="كمية الناتج لكل دفعة *" :error="form.errors.output_quantity"><input v-model="form.output_quantity" type="number" step="0.0001" :class="input" /></Field>
-                <Field label="هالك القائمة %" hint="يُضاف على كل المكونات"><input v-model="form.scrap_percent" type="number" step="0.01" :class="input" /></Field>
+                <Field label="كمية الناتج لكل دفعة *" :error="form.errors.output_quantity"><input v-model.number="form.output_quantity" type="text" inputmode="decimal" data-num step="0.0001" :class="input" /></Field>
+                <Field label="هالك القائمة %" hint="يُضاف على كل المكونات"><input v-model.number="form.scrap_percent" type="text" inputmode="decimal" data-num step="0.01" :class="input" /></Field>
                 <Field label="مسار التشغيل"><select v-model="form.routing_id" :class="input"><option value="">— بلا مسار —</option><option v-for="r in routings" :key="r.id" :value="r.id">{{ r.code }} — {{ r.name }}</option></select></Field>
                 <div class="flex items-center gap-6"><label class="inline-flex items-center gap-2 text-xs"><input v-model="form.is_default" type="checkbox" class="rounded" /> الإصدار الافتراضي للمنتج</label><label class="inline-flex items-center gap-2 text-xs"><input v-model="form.is_active" type="checkbox" class="rounded" /> نشطة</label></div>
             </div>
@@ -48,8 +48,8 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                         <tbody>
                             <tr v-for="(it, i) in form.items" :key="i" class="border-t border-slate-100">
                                 <td class="p-2"><SelectCreate v-model="it.component_id" :options="products" entity="product" :label="(p) => `${p.name_ar} (${p.sku})`" placeholder="— اختر —" required /></td>
-                                <td class="p-2"><input v-model="it.quantity" type="number" step="0.0001" :class="input" /></td>
-                                <td class="p-2"><input v-model="it.scrap_percent" type="number" step="0.01" :class="input" /></td>
+                                <td class="p-2"><input v-model.number="it.quantity" type="text" inputmode="decimal" data-num step="0.0001" :class="input" /></td>
+                                <td class="p-2"><input v-model.number="it.scrap_percent" type="text" inputmode="decimal" data-num step="0.01" :class="input" /></td>
                                 <td class="p-2"><button type="button" :disabled="form.items.length <= 1" @click="form.items.splice(i, 1)" class="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20"><TrashIcon class="w-4 h-4" /></button></td>
                             </tr>
                         </tbody>

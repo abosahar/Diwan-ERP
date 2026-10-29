@@ -45,8 +45,8 @@ const decide = async (loan, approve) => {
                 <h3 class="font-black text-slate-700">سلفة جديدة</h3>
                 <SelectCreate v-model="form.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
                 <label class="block">التاريخ<input v-model="form.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
-                <label class="block">المبلغ<input v-model="form.amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
-                <label class="block">القسط الشهري<input v-model="form.monthly_installment" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
+                <label class="block">المبلغ<input v-model.number="form.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
+                <label class="block">القسط الشهري<input v-model.number="form.monthly_installment" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
                 <label class="block">أول شهر استقطاع<input v-model="form.first_deduction_month" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
                 <input v-model="form.reason" placeholder="السبب" class="w-full rounded-xl border-slate-200 text-xs" />
                 <p v-for="(m, k) in form.errors" :key="k" class="text-rose-600">{{ m }}</p>

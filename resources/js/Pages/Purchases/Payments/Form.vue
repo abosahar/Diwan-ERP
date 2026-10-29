@@ -64,8 +64,8 @@ const submitPayment = () => form.post(route('purchases.payments.store'));
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1">المبلغ المصروف <span class="text-rose-500">*</span></label>
                                     <input 
-                                        v-model="form.amount" 
-                                        type="number" 
+                                        v-model.number="form.amount" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01" 
                                         min="0.01" 
                                         required 

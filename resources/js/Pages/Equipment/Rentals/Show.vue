@@ -110,7 +110,7 @@ const close = () => closeForm.post(route('equipment.rentals.close', r.id), { pre
                     </template>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <Field :label="`تعديل الكمية (${unit})`" :error="billForm.errors.quantity" hint="اتركه فارغاً لاعتماد المحسوب"><input v-model="billForm.quantity" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field :label="`تعديل الكمية (${unit})`" :error="billForm.errors.quantity" hint="اتركه فارغاً لاعتماد المحسوب"><input v-model.number="billForm.quantity" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="تاريخ المستند" hint="فارغ = نهاية الفترة"><input v-model="billForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
             </div>
@@ -122,8 +122,8 @@ const close = () => closeForm.post(route('equipment.rentals.close', r.id), { pre
 
         <Dialog :show="editOpen" title="تعديل العقد" size="md" @close="editOpen = false">
             <div class="grid grid-cols-2 gap-3 text-xs">
-                <Field :label="`السعر لكل ${unit}`" :error="editForm.errors.rate" hint="ينطبق على الفترات التي لم تُفوتر"><input v-model="editForm.rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field v-if="r.billing_basis === 'hourly'" label="حد أدنى ساعات/يوم" :error="editForm.errors.min_hours_per_day"><input v-model="editForm.min_hours_per_day" type="number" min="0" max="24" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field :label="`السعر لكل ${unit}`" :error="editForm.errors.rate" hint="ينطبق على الفترات التي لم تُفوتر"><input v-model.number="editForm.rate" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field v-if="r.billing_basis === 'hourly'" label="حد أدنى ساعات/يوم" :error="editForm.errors.min_hours_per_day"><input v-model.number="editForm.min_hours_per_day" type="text" inputmode="decimal" data-num min="0" max="24" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="تاريخ النهاية" :error="editForm.errors.end_date"><input v-model="editForm.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الموقع"><input v-model="editForm.site" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <label class="col-span-2 flex items-center gap-2 font-bold"><input v-model="editForm.with_operator" type="checkbox" class="rounded border-slate-300" /> مع مشغّل</label>

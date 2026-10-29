@@ -47,7 +47,7 @@ onMounted(() => {
         </div>
         <div v-if="foreign">
             <label :for="`${id}-rate`" class="block text-xs font-bold text-slate-700 mb-1">سعر الصرف (1 {{ code }} = ؟ {{ base }})</label>
-            <input :id="`${id}-rate`" v-model="rate" type="number" step="0.000001" min="0" dir="ltr" :required="noRate" :placeholder="noRate ? 'أدخل سعر الصرف' : `تلقائي حسب التاريخ (${Number(selected?.exchange_rate || 0).toFixed(4)})`" class="w-full rounded-xl border-slate-200 text-xs font-mono" />
+            <input :id="`${id}-rate`" v-model.number="rate" type="text" inputmode="decimal" data-num step="0.000001" min="0" dir="ltr" :required="noRate" :placeholder="noRate ? 'أدخل سعر الصرف' : `تلقائي حسب التاريخ (${Number(selected?.exchange_rate || 0).toFixed(4)})`" class="w-full rounded-xl border-slate-200 text-xs font-mono" />
             <span v-if="noRate && !errors.exchange_rate" class="block text-[11px] text-amber-600 mt-1">لا يوجد سعر صرف محفوظ لهذه العملة؛ أدخله هنا أو من الإعدادات ← العملات.</span>
             <span v-if="errors.exchange_rate" class="block text-[11px] text-rose-600 mt-1">{{ errors.exchange_rate }}</span>
         </div>

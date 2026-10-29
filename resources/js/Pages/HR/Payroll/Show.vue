@@ -85,7 +85,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
             <div v-if="payroll.status === 'draft' && $can('hr.payroll.create')" class="grid grid-cols-6 gap-2 mt-3">
                 <SelectCreate v-model="adjForm.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
                 <select v-model="adjForm.type" class="rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in typeLabel" :key="k" :value="k">{{ l }}</option></select>
-                <input v-model="adjForm.amount" type="number" step="0.01" class="rounded-xl border-slate-200 text-xs font-mono" />
+                <input v-model.number="adjForm.amount" type="text" inputmode="decimal" data-num step="0.01" class="rounded-xl border-slate-200 text-xs font-mono" />
                 <input v-model="adjForm.description" placeholder="ملاحظة" class="rounded-xl border-slate-200 text-xs" />
                 <button @click="adjForm.post(route('hr.payroll.adjustments.store', payroll.id), { preserveScroll: true, onSuccess: () => adjForm.reset('amount', 'description') })" class="rounded-xl bg-indigo-600 text-white font-bold">إضافة</button>
             </div>

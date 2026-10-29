@@ -39,7 +39,7 @@ const loan = useForm({ amount: 0, monthly_installment: 0, reason: '' });
                 <p v-for="(m, k) in leave.errors" :key="k" class="text-rose-600">{{ m }}</p>
                 <button @click="leave.post(route('hr.me.leaves'), { preserveScroll: true, onSuccess: () => leave.reset('start_date', 'end_date', 'reason') })" class="w-full px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">إرسال</button>
                 <h3 class="font-black text-slate-700 pt-3">طلب سلفة</h3>
-                <div class="grid grid-cols-2 gap-2"><label>المبلغ<input v-model="loan.amount" type="number" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label><label>القسط<input v-model="loan.monthly_installment" type="number" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label></div>
+                <div class="grid grid-cols-2 gap-2"><label>المبلغ<input v-model.number="loan.amount" type="text" inputmode="decimal" data-num class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label><label>القسط<input v-model.number="loan.monthly_installment" type="text" inputmode="decimal" data-num class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label></div>
                 <p v-for="(m, k) in loan.errors" :key="k" class="text-rose-600">{{ m }}</p>
                 <button @click="loan.post(route('hr.me.loans'), { preserveScroll: true, onSuccess: () => loan.reset() })" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold">إرسال طلب السلفة</button>
             </div>

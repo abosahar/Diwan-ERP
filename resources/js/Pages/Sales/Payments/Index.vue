@@ -172,7 +172,7 @@ const formatCurrency = (val) => {
                     </select>
                 </Field>
                 <div class="grid grid-cols-2 gap-2">
-                    <Field label="المبلغ" :error="form.errors.amount"><input v-model="form.amount" type="number" step="0.01" min="0" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                    <Field label="المبلغ" :error="form.errors.amount"><input v-model.number="form.amount" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                     <Field label="التاريخ" :error="form.errors.payment_date"><input v-model="form.payment_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="طريقة الدفع" :error="form.errors.payment_method">
                         <select v-model="form.payment_method" class="w-full rounded-xl border-slate-200 text-xs">

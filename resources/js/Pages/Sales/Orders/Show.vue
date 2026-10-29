@@ -100,7 +100,7 @@ const act = (name, message) => { if (!message || confirm(message)) router.post(r
                 <tr v-for="l in deliverForm.lines" :key="l.sales_order_item_id" class="border-t border-slate-100">
                     <td class="py-1.5">{{ l.name }}</td>
                     <td class="text-center font-mono">{{ qty(l.open) }}</td>
-                    <td><input v-model="l.quantity" type="number" min="0" :max="l.open" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td><input v-model.number="l.quantity" type="text" inputmode="decimal" data-num min="0" :max="l.open" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                 </tr>
             </table></div>
             <p v-for="(msg, key) in deliverForm.errors" :key="key" class="text-xs text-rose-600 mt-1">{{ msg }}</p>

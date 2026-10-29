@@ -137,7 +137,7 @@ const submit = () => {
                                 <td class="px-3 py-2">{{ i.name }}</td>
                                 <td class="px-3 py-2 text-center font-mono">{{ i.returnable }}</td>
                                 <td class="px-3 py-2 text-center font-mono">{{ formatCurrency(i.unit_net) }}</td>
-                                <td class="px-3 py-2"><input v-model="i.quantity" type="number" min="0" :max="i.returnable" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                                <td class="px-3 py-2"><input v-model.number="i.quantity" type="text" inputmode="decimal" data-num min="0" :max="i.returnable" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                                 <td class="px-3 py-2 text-center"><input v-model="i.return_to_stock" type="checkbox" class="rounded" /></td>
                             </tr>
                         </tbody>
@@ -276,7 +276,7 @@ const submit = () => {
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">المبلغ قبل الضريبة (﷼) *</label>
                                 <input 
                                     v-model.number="form.subtotal"
-                                    type="number"
+                                    type="text" inputmode="decimal" data-num
                                     min="0.01"
                                     step="0.01"
                                     @input="onSubtotalChange"
@@ -290,7 +290,7 @@ const submit = () => {
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">{{ $taxLabel() }}</label>
                                 <input 
                                     v-model.number="form.tax_amount"
-                                    type="number"
+                                    type="text" inputmode="decimal" data-num
                                     min="0"
                                     step="0.01"
                                     class="w-full font-mono text-xs rounded-xl border-slate-200 focus:border-rose-500 focus:ring-rose-500 py-2.5 bg-slate-50/50"
@@ -302,7 +302,7 @@ const submit = () => {
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">الإجمالي المسترد شامل الضريبة (﷼) *</label>
                             <input 
                                 v-model.number="form.total"
-                                type="number"
+                                type="text" inputmode="decimal" data-num
                                 min="0.01"
                                 step="0.01"
                                 @input="onTotalChange"

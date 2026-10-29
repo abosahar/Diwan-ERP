@@ -57,7 +57,7 @@ const printReport = () => {
                         <div>
                             <div class="text-xs font-bold text-slate-400">إجمالي الإيرادات</div>
                             <div class="text-2xl font-black text-slate-900 mt-1">
-                                {{ Number(incomeStatement.total_revenue).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼
+                                {{ Number(incomeStatement.total_revenue).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼
                             </div>
                             <div class="text-xs text-emerald-600 font-semibold mt-1">المبيعات والإيرادات الأخرى</div>
                         </div>
@@ -72,7 +72,7 @@ const printReport = () => {
                         <div>
                             <div class="text-xs font-bold text-slate-400">مجمل الربح</div>
                             <div class="text-2xl font-black text-indigo-700 mt-1">
-                                {{ Number(incomeStatement.gross_profit).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼
+                                {{ Number(incomeStatement.gross_profit).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼
                             </div>
                             <div class="text-xs text-indigo-500 font-semibold mt-1">بعد خصم تكلفة البضاعة المباعة</div>
                         </div>
@@ -87,7 +87,7 @@ const printReport = () => {
                         <div>
                             <div class="text-xs font-bold text-slate-400">المصروفات التشغيلية</div>
                             <div class="text-2xl font-black text-rose-600 mt-1">
-                                {{ Number(incomeStatement.operating_expenses).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼
+                                {{ Number(incomeStatement.operating_expenses).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼
                             </div>
                             <div class="text-xs text-rose-500 font-semibold mt-1">مصاريف التشغيل والإدارة</div>
                         </div>
@@ -102,7 +102,7 @@ const printReport = () => {
                         <div>
                             <div class="text-xs font-bold text-slate-400">صافي الربح</div>
                             <div :class="['text-2xl font-black mt-1', incomeStatement.net_profit >= 0 ? 'text-emerald-600' : 'text-rose-600']">
-                                {{ Number(incomeStatement.net_profit).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼
+                                {{ Number(incomeStatement.net_profit).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼
                             </div>
                             <div class="text-xs font-semibold mt-1" :class="incomeStatement.net_profit >= 0 ? 'text-emerald-600' : 'text-rose-600'">
                                 هامش صافي الربح: {{ incomeStatement.net_margin }}%
@@ -137,18 +137,18 @@ const printReport = () => {
                             </tr>
                             <tr class="border-b border-slate-100 hover:bg-slate-50">
                                 <td class="py-3 px-8 text-sm text-slate-700">إيرادات المبيعات والخدمات</td>
-                                <td class="py-3 px-4 text-sm font-semibold text-slate-800">{{ Number(incomeStatement.sales_revenue).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼</td>
+                                <td class="py-3 px-4 text-sm font-semibold text-slate-800">{{ Number(incomeStatement.sales_revenue).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼</td>
                                 <td class="py-3 px-4"></td>
                             </tr>
                             <tr class="border-b border-slate-100 hover:bg-slate-50">
                                 <td class="py-3 px-8 text-sm text-slate-700">إيرادات أخرى متنوعة</td>
-                                <td class="py-3 px-4 text-sm font-semibold text-slate-800">{{ Number(incomeStatement.other_revenue).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼</td>
+                                <td class="py-3 px-4 text-sm font-semibold text-slate-800">{{ Number(incomeStatement.other_revenue).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼</td>
                                 <td class="py-3 px-4"></td>
                             </tr>
                             <tr class="border-b-2 border-slate-300 bg-emerald-50/50 font-bold text-emerald-900">
                                 <td class="py-3 px-6 text-sm">إجمالي الإيرادات</td>
                                 <td class="py-3 px-4 text-sm"></td>
-                                <td class="py-3 px-4 text-left text-base font-black text-emerald-800">{{ Number(incomeStatement.total_revenue).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼</td>
+                                <td class="py-3 px-4 text-left text-base font-black text-emerald-800">{{ Number(incomeStatement.total_revenue).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼</td>
                             </tr>
 
                             <!-- COGS Section -->
@@ -158,20 +158,20 @@ const printReport = () => {
                             </tr>
                             <tr class="border-b border-slate-100 hover:bg-slate-50">
                                 <td class="py-3 px-8 text-sm text-slate-700">تكلفة المشتريات والمخزون المنصرف</td>
-                                <td class="py-3 px-4 text-sm font-semibold text-rose-700">({{ Number(incomeStatement.cogs).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}) ﷼</td>
+                                <td class="py-3 px-4 text-sm font-semibold text-rose-700">({{ Number(incomeStatement.cogs).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}) ﷼</td>
                                 <td class="py-3 px-4"></td>
                             </tr>
                             <tr class="border-b-2 border-slate-300 bg-rose-50/30 font-bold text-rose-900">
                                 <td class="py-3 px-6 text-sm">إجمالي تكلفة المبيعات</td>
                                 <td class="py-3 px-4 text-sm"></td>
-                                <td class="py-3 px-4 text-left text-base font-black text-rose-700">({{ Number(incomeStatement.cogs).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}) ﷼</td>
+                                <td class="py-3 px-4 text-left text-base font-black text-rose-700">({{ Number(incomeStatement.cogs).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}) ﷼</td>
                             </tr>
 
                             <!-- Gross Profit -->
                             <tr class="bg-indigo-50/70 border-b-2 border-indigo-200 font-black text-indigo-950 text-base">
                                 <td class="py-4 px-6">مجمل الربح (Gross Profit)</td>
                                 <td class="py-4 px-4 text-sm font-semibold text-indigo-700">{{ incomeStatement.total_revenue > 0 ? Math.round((incomeStatement.gross_profit / incomeStatement.total_revenue) * 100) : 0 }}% من الإيرادات</td>
-                                <td class="py-4 px-4 text-left text-lg font-black text-indigo-900">{{ Number(incomeStatement.gross_profit).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼</td>
+                                <td class="py-4 px-4 text-left text-lg font-black text-indigo-900">{{ Number(incomeStatement.gross_profit).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼</td>
                             </tr>
 
                             <!-- Expenses Section -->
@@ -181,13 +181,13 @@ const printReport = () => {
                             </tr>
                             <tr class="border-b border-slate-100 hover:bg-slate-50">
                                 <td class="py-3 px-8 text-sm text-slate-700">مصاريف التشغيل والإيجارات والمنافع</td>
-                                <td class="py-3 px-4 text-sm font-semibold text-rose-700">({{ Number(incomeStatement.operating_expenses).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}) ﷼</td>
+                                <td class="py-3 px-4 text-sm font-semibold text-rose-700">({{ Number(incomeStatement.operating_expenses).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}) ﷼</td>
                                 <td class="py-3 px-4"></td>
                             </tr>
                             <tr class="border-b-2 border-slate-300 bg-rose-50/30 font-bold text-rose-900">
                                 <td class="py-3 px-6 text-sm">إجمالي المصروفات التشغيلية</td>
                                 <td class="py-3 px-4 text-sm"></td>
-                                <td class="py-3 px-4 text-left text-base font-black text-rose-700">({{ Number(incomeStatement.operating_expenses).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}) ﷼</td>
+                                <td class="py-3 px-4 text-left text-base font-black text-rose-700">({{ Number(incomeStatement.operating_expenses).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}) ﷼</td>
                             </tr>
 
                             <!-- Net Profit -->
@@ -195,7 +195,7 @@ const printReport = () => {
                                 <td class="py-5 px-6">صافي الربح التشغيلي للفترة (Net Profit)</td>
                                 <td class="py-5 px-4 text-sm font-bold text-emerald-700">هامش صافي الربح: {{ incomeStatement.net_margin }}%</td>
                                 <td class="py-5 px-4 text-left text-2xl font-black text-emerald-700">
-                                    {{ Number(incomeStatement.net_profit).toLocaleString(undefined, { minimumFractionDigits: 2 }) }} ﷼
+                                    {{ Number(incomeStatement.net_profit).toLocaleString('en-US', { minimumFractionDigits: 2 }) }} ﷼
                                 </td>
                             </tr>
                         </tbody>

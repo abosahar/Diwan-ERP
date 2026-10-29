@@ -36,11 +36,11 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <h3 class="font-black">{{ editing ? 'تعديل باقة' : 'باقة جديدة' }}</h3>
                 <div class="grid grid-cols-2 gap-2">
                     <label>الاسم<input v-model="form.name_ar" :class="inp" /></label><label>Name<input v-model="form.name_en" :class="inp" /></label>
-                    <label>slug<input v-model="form.slug" :class="inp" /></label><label>ترتيب<input v-model="form.sort" type="number" :class="inp" /></label>
-                    <label>شهري<input v-model="form.price_monthly" type="number" :class="inp" /></label><label>سنوي<input v-model="form.price_yearly" type="number" :class="inp" /></label>
-                    <label>مستخدمون<input v-model="form.max_users" type="number" :class="inp" /></label><label>فروع<input v-model="form.max_branches" type="number" :class="inp" /></label>
-                    <label>مستودعات<input v-model="form.max_warehouses" type="number" :class="inp" /></label><label>موظفون<input v-model="form.max_employees" type="number" :class="inp" /></label>
-                    <label>فواتير/شهر<input v-model="form.max_invoices_per_month" type="number" :class="inp" /></label><label>أيام التجربة<input v-model="form.trial_days" type="number" :class="inp" /></label>
+                    <label>slug<input v-model="form.slug" :class="inp" /></label><label>ترتيب<input v-model.number="form.sort" type="text" inputmode="decimal" data-num :class="inp" /></label>
+                    <label>شهري<input v-model.number="form.price_monthly" type="text" inputmode="decimal" data-num :class="inp" /></label><label>سنوي<input v-model.number="form.price_yearly" type="text" inputmode="decimal" data-num :class="inp" /></label>
+                    <label>مستخدمون<input v-model.number="form.max_users" type="text" inputmode="decimal" data-num :class="inp" /></label><label>فروع<input v-model.number="form.max_branches" type="text" inputmode="decimal" data-num :class="inp" /></label>
+                    <label>مستودعات<input v-model.number="form.max_warehouses" type="text" inputmode="decimal" data-num :class="inp" /></label><label>موظفون<input v-model.number="form.max_employees" type="text" inputmode="decimal" data-num :class="inp" /></label>
+                    <label>فواتير/شهر<input v-model.number="form.max_invoices_per_month" type="text" inputmode="decimal" data-num :class="inp" /></label><label>أيام التجربة<input v-model.number="form.trial_days" type="text" inputmode="decimal" data-num :class="inp" /></label>
                 </div>
                 <p class="text-slate-400">-1 = غير محدود</p>
                 <label class="block">الوصف<textarea v-model="form.description_ar" rows="2" :class="inp"></textarea></label>

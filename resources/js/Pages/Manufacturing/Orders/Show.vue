@@ -59,7 +59,7 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
                     <tr v-for="m in o.materials" :key="m.id" class="border-t border-slate-100">
                         <td class="p-2 font-bold">{{ m.product?.name_ar }}</td><td class="p-2 font-mono">{{ num(m.planned_quantity) }}</td><td class="p-2 font-mono">{{ num(m.issued_quantity) }}</td><td class="p-2 font-mono">{{ num(m.returned_quantity) }}</td><td class="p-2 font-mono">{{ money(m.cost) }}</td>
                         <td v-if="live && $can('manufacturing.orders.post')" class="p-2 whitespace-nowrap">
-                            <input v-model="qty[m.id]" type="number" step="0.0001" placeholder="الكمية" class="w-24 text-xs rounded-lg border-slate-200 me-1" />
+                            <input v-model.number="qty[m.id]" type="text" inputmode="decimal" data-num step="0.0001" placeholder="الكمية" class="w-24 text-xs rounded-lg border-slate-200 me-1" />
                             <button type="button" @click="material(m, 'issue')" class="px-2 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold">صرف</button>
                             <button type="button" @click="material(m, 'return')" class="px-2 py-1 rounded-lg bg-slate-100 text-slate-600 font-bold ms-1">إرجاع</button>
                         </td>
@@ -79,8 +79,8 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
                     <select v-model="time.operation_id" @change="pickOp" :class="input"><option value="">عملية (اختياري)</option><option v-for="op in o.operations" :key="op.id" :value="op.id">{{ op.seq }} {{ op.name }}</option></select>
                     <SelectCreate v-model="time.work_center_id" :options="workCenters" entity="work_center" label="name" :allow-empty="false" required />
                     <SelectCreate v-model="time.employee_id" :options="employees" entity="employee" label="name" placeholder="عامل (اختياري)" />
-                    <input v-model="time.minutes" type="number" step="0.01" placeholder="الدقائق *" :class="input" required />
-                    <input v-model="time.quantity" type="number" step="0.0001" placeholder="الكمية المنجزة" :class="input" />
+                    <input v-model.number="time.minutes" type="text" inputmode="decimal" data-num step="0.01" placeholder="الدقائق *" :class="input" required />
+                    <input v-model.number="time.quantity" type="text" inputmode="decimal" data-num step="0.0001" placeholder="الكمية المنجزة" :class="input" />
                     <button type="submit" :disabled="time.processing" class="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">تسجيل الوقت</button>
                     <p v-if="time.errors.minutes" class="col-span-full text-xs text-rose-600">{{ time.errors.minutes }}</p>
                 </form>
@@ -95,8 +95,8 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
                     <tr v-if="!o.receipts.length"><td colspan="5" class="p-4 text-center text-slate-400">لا استلامات بعد.</td></tr></tbody></table>
                 <form v-if="live || o.status === 'completed'" @submit.prevent="receive" class="grid grid-cols-2 gap-2 border-t border-slate-100 pt-3">
                     <template v-if="$can('manufacturing.orders.post')">
-                        <input v-model="rec.quantity" type="number" step="0.0001" placeholder="الكمية السليمة *" :class="input" />
-                        <input v-model="rec.scrap_quantity" type="number" step="0.0001" placeholder="الهالك" :class="input" />
+                        <input v-model.number="rec.quantity" type="text" inputmode="decimal" data-num step="0.0001" placeholder="الكمية السليمة *" :class="input" />
+                        <input v-model.number="rec.scrap_quantity" type="text" inputmode="decimal" data-num step="0.0001" placeholder="الهالك" :class="input" />
                         <input v-model="rec.batch_number" placeholder="رقم الدفعة" :class="input" />
                         <input v-model="rec.date" type="date" :class="input" />
                         <label class="col-span-2 inline-flex items-center gap-2 text-xs"><input v-model="rec.scrap_abnormal" type="checkbox" class="rounded" /> الهالك غير طبيعي (يُحمَّل خسارة لا على التكلفة)</label>

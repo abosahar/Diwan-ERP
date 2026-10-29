@@ -36,7 +36,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                     <tbody><tr v-for="(c, i) in form.checks" :key="i" class="border-t border-slate-100">
                         <td class="p-2"><input v-model="c.name" :class="input" placeholder="الطول، اللون، الشكل..." required /></td>
                         <td class="p-2"><select v-model="c.type" :class="input"><option value="passfail">سليم / معيب</option><option value="numeric">قياس رقمي</option></select></td>
-                        <td class="p-2"><input v-model="c.min" :disabled="c.type !== 'numeric'" type="number" step="any" :class="input" /></td><td class="p-2"><input v-model="c.max" :disabled="c.type !== 'numeric'" type="number" step="any" :class="input" /></td>
+                        <td class="p-2"><input v-model.number="c.min" :disabled="c.type !== 'numeric'" type="text" inputmode="decimal" data-num step="any" :class="input" /></td><td class="p-2"><input v-model.number="c.max" :disabled="c.type !== 'numeric'" type="text" inputmode="decimal" data-num step="any" :class="input" /></td>
                         <td class="p-2"><button type="button" :disabled="form.checks.length <= 1" @click="form.checks.splice(i, 1)" class="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20"><TrashIcon class="w-4 h-4" /></button></td></tr></tbody>
                 </table></div>
             </div>

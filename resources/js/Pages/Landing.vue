@@ -32,7 +32,7 @@ const features = [
 ];
 
 const modules = { sales: 'المبيعات', pos: 'نقاط البيع', inventory: 'المخزون', purchases: 'المشتريات', accounting: 'المحاسبة', hr: 'الموارد البشرية والرواتب', crm: 'إدارة العملاء', zatca: 'الفوترة الإلكترونية', projects: 'المقاولات والمشاريع', equipment: 'المعدات' };
-const price = (p) => Number(yearly.value ? p.price_yearly : p.price_monthly).toLocaleString('ar-SA');
+const price = (p) => Number(yearly.value ? p.price_yearly : p.price_monthly).toLocaleString('ar-SA-u-nu-latn');
 const limit = (n, unit) => (n && n < 9999 ? `${n} ${unit}` : `${unit} بلا حد`);
 
 const faqs = [

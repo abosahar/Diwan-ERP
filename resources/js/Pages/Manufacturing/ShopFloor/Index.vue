@@ -31,8 +31,8 @@ const save = (op) => {
                 <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500" :style="{ width: Math.min(100, op.planned_minutes ? op.actual_minutes / op.planned_minutes * 100 : 0) + '%' }"></div></div>
                 <p class="text-3xs text-slate-500">{{ num(op.actual_minutes) }} / {{ num(op.planned_minutes) }} دقيقة — أنجز {{ num(op.completed) }}</p>
                 <div class="grid grid-cols-3 gap-2">
-                    <input v-model="entry(op.id).minutes" type="number" step="0.01" placeholder="دقائق" class="text-xs rounded-xl border-slate-200" />
-                    <input v-model="entry(op.id).quantity" type="number" step="0.0001" placeholder="كمية" class="text-xs rounded-xl border-slate-200" />
+                    <input v-model.number="entry(op.id).minutes" type="text" inputmode="decimal" data-num step="0.01" placeholder="دقائق" class="text-xs rounded-xl border-slate-200" />
+                    <input v-model.number="entry(op.id).quantity" type="text" inputmode="decimal" data-num step="0.0001" placeholder="كمية" class="text-xs rounded-xl border-slate-200" />
                     <SelectCreate v-model="entry(op.id).employee_id" :options="employees" entity="employee" label="name" placeholder="عامل" />
                 </div>
                 <button type="button" :disabled="!entry(op.id).minutes" @click="save(op)" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold disabled:opacity-40">تسجيل</button>

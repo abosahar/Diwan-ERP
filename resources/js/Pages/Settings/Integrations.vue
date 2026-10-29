@@ -29,7 +29,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
                 <div class="space-y-2 mt-3">
                     <input v-model="tokenForm.name" placeholder="اسم الرمز (مثال: متجر إلكتروني)" class="w-full rounded-xl border-slate-200 text-xs" />
                     <div class="flex flex-wrap gap-2"><label v-for="a in abilities" :key="a" class="flex items-center gap-1 font-mono"><input v-model="tokenForm.abilities" :value="a" type="checkbox" class="rounded" /> {{ a }}</label></div>
-                    <label class="block">الصلاحية (يوم)<input v-model="tokenForm.expires_in_days" type="number" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+                    <label class="block">الصلاحية (يوم)<input v-model.number="tokenForm.expires_in_days" type="text" inputmode="decimal" data-num class="w-full rounded-xl border-slate-200 text-xs" /></label>
                     <p v-for="(m, k) in tokenForm.errors" :key="k" class="text-rose-600">{{ m }}</p>
                     <button @click="tokenForm.post(route('integrations.tokens.store'), { ...opts, onSuccess: () => tokenForm.reset('name') })" class="w-full px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">إنشاء رمز</button>
                 </div>

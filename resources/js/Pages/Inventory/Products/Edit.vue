@@ -30,13 +30,13 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <Field label="التصنيف"><SelectCreate v-model="form.category_id" :options="categories" entity="category" label="name_ar" placeholder="—" /></Field>
                 <Field label="الوحدة الأساسية"><SelectCreate v-model="form.unit_id" :options="units" entity="unit" label="name_ar" placeholder="—" /></Field>
                 <Field label="النوع"><select v-model="form.type" :class="inp"><option value="product">صنف مخزني</option><option value="service">خدمة</option></select></Field>
-                <Field label="سعر الشراء" :error="form.errors.purchase_price"><input v-model="form.purchase_price" type="number" step="0.01" :class="inp" /></Field>
-                <Field label="سعر البيع" :error="form.errors.selling_price"><input v-model="form.selling_price" type="number" step="0.01" :class="inp" /></Field>
-                <Field label="نسبة الضريبة %"><input v-model="form.tax_rate" type="number" step="0.01" :disabled="form.vat_category !== 'S'" :class="inp" /></Field>
+                <Field label="سعر الشراء" :error="form.errors.purchase_price"><input v-model.number="form.purchase_price" type="text" inputmode="decimal" data-num step="0.01" :class="inp" /></Field>
+                <Field label="سعر البيع" :error="form.errors.selling_price"><input v-model.number="form.selling_price" type="text" inputmode="decimal" data-num step="0.01" :class="inp" /></Field>
+                <Field label="نسبة الضريبة %"><input v-model.number="form.tax_rate" type="text" inputmode="decimal" data-num step="0.01" :disabled="form.vat_category !== 'S'" :class="inp" /></Field>
                 <Field label="التتبع" :error="form.errors.tracking"><select v-model="form.tracking" :class="inp"><option value="none">بدون</option><option value="batch">دفعات وتواريخ انتهاء</option><option value="serial">أرقام تسلسلية</option></select></Field>
-                <Field label="تنبيه انخفاض الكمية"><input v-model="form.min_stock_alert" type="number" :class="inp" /></Field>
-                <Field label="حد إعادة الطلب"><input v-model="form.reorder_level" type="number" :class="inp" /></Field>
-                <Field label="كمية إعادة الطلب"><input v-model="form.reorder_quantity" type="number" :class="inp" /></Field>
+                <Field label="تنبيه انخفاض الكمية"><input v-model.number="form.min_stock_alert" type="text" inputmode="decimal" data-num :class="inp" /></Field>
+                <Field label="حد إعادة الطلب"><input v-model.number="form.reorder_level" type="text" inputmode="decimal" data-num :class="inp" /></Field>
+                <Field label="كمية إعادة الطلب"><input v-model.number="form.reorder_quantity" type="text" inputmode="decimal" data-num :class="inp" /></Field>
                 <label class="flex items-center gap-2 pt-5"><input v-model="form.track_inventory" type="checkbox" class="rounded" /> تتبع المخزون</label>
             </div>
             <VatFields v-model:category="form.vat_category" v-model:code="form.vat_exemption_code" v-model:tax-rate="form.tax_rate" :categories="vatCategories" :reasons="exemptionReasons" :errors="form.errors" />

@@ -61,7 +61,7 @@ const submit = () => {
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5 text-center">العهدة الافتتاحية في الدرج ({{ $cur() }})</label>
-                    <input v-model.number="form.opening_cash" type="number" step="0.01" min="0" class="w-full text-center text-sm rounded-xl border border-slate-200 px-4 py-2.5 font-mono" />
+                    <input v-model.number="form.opening_cash" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-full text-center text-sm rounded-xl border border-slate-200 px-4 py-2.5 font-mono" />
                 </div>
                 <div v-if="registers?.length && form.opening_cash > 0">
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5 text-center">صُرفت العهدة من (اختياري)</label>

@@ -39,7 +39,7 @@ const formatDateArabic = (dateStr) => {
     if (!dateStr) return '-';
     try {
         const d = new Date(dateStr);
-        return d.toLocaleDateString('ar-SA', {
+        return d.toLocaleDateString('ar-SA-u-nu-latn', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'

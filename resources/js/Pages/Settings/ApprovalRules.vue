@@ -32,7 +32,7 @@ const actions = { submitted: 'أُرسل', approved: 'اعتُمد', rejected: '
                 </table>
                 <div v-if="$can('admin.approvals.manage')" class="grid grid-cols-4 gap-3 p-4 border-t border-slate-100 items-end">
                     <Field label="نوع المستند"><select v-model="form.document_type" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(label, key) in types" :key="key" :value="key">{{ label }}</option></select></Field>
-                    <Field label="من مبلغ" :error="form.errors.min_amount"><input v-model="form.min_amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                    <Field label="من مبلغ" :error="form.errors.min_amount"><input v-model.number="form.min_amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                     <label class="text-xs flex items-center gap-2 pb-2"><input v-model="form.is_active" type="checkbox" class="rounded" /> فعالة</label>
                     <button @click="save" :disabled="form.processing" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">إضافة</button>
                 </div>

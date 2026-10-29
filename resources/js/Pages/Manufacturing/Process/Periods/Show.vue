@@ -55,7 +55,7 @@ const els = [['ti', 'محوّل من مرحلة سابقة'], ['mat', 'مواد 
                 <form @submit.prevent="sendIssue" class="space-y-2">
                     <div v-for="(l, i) in issue.lines" :key="i" class="grid grid-cols-[1fr_8rem_2rem] gap-2">
                         <SelectCreate v-model="l.product_id" :options="products" entity="product" label="name_ar" placeholder="— مادة —" required />
-                        <input v-model="l.quantity" type="number" step="0.0001" placeholder="الكمية" :class="input" required />
+                        <input v-model.number="l.quantity" type="text" inputmode="decimal" data-num step="0.0001" placeholder="الكمية" :class="input" required />
                         <button type="button" :disabled="issue.lines.length <= 1" @click="issue.lines.splice(i, 1)" class="text-slate-400 hover:text-rose-600 disabled:opacity-20"><TrashIcon class="w-4 h-4" /></button>
                     </div>
                     <p v-if="issue.errors.lines || issue.errors.quantity" class="text-xs text-rose-600">{{ issue.errors.lines || issue.errors.quantity }}</p>
@@ -64,7 +64,7 @@ const els = [['ti', 'محوّل من مرحلة سابقة'], ['mat', 'مواد 
                 <h2 class="font-black text-slate-800 text-sm mt-6 mb-3">تكلفة التحويل (وقت التشغيل)</h2>
                 <form @submit.prevent="sendConv" class="grid grid-cols-[1fr_8rem_auto] gap-2">
                     <SelectCreate v-model="conv.work_center_id" :options="workCenters" entity="work_center" label="name" :allow-empty="false" />
-                    <input v-model="conv.minutes" type="number" step="0.01" placeholder="دقائق" :class="input" required />
+                    <input v-model.number="conv.minutes" type="text" inputmode="decimal" data-num step="0.01" placeholder="دقائق" :class="input" required />
                     <button type="submit" :disabled="conv.processing" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">إضافة</button>
                     <p v-if="conv.errors.work_center_id" class="col-span-3 text-xs text-rose-600">{{ conv.errors.work_center_id }}</p>
                 </form>
@@ -72,11 +72,11 @@ const els = [['ti', 'محوّل من مرحلة سابقة'], ['mat', 'مواد 
             <div :class="card">
                 <h2 class="font-black text-slate-800 text-sm mb-3">إغلاق الفترة</h2>
                 <form @submit.prevent="sendClose" class="grid grid-cols-2 gap-3">
-                    <Field label="وحدات بدأت هذه الفترة"><input v-model="close.units_started" type="number" step="0.0001" :class="input" /></Field>
-                    <Field label="وحدات مكتملة *" :error="close.errors.units_completed"><input v-model="close.units_completed" type="number" step="0.0001" :class="input" required /></Field>
-                    <Field label="وحدات تحت التشغيل آخر الفترة"><input v-model="close.units_closing_wip" type="number" step="0.0001" :class="input" /></Field>
-                    <Field label="نسبة إنجاز المواد %"><input v-model="close.closing_material_pct" type="number" step="1" :class="input" /></Field>
-                    <Field label="نسبة إنجاز التحويل %"><input v-model="close.closing_conversion_pct" type="number" step="1" :class="input" /></Field>
+                    <Field label="وحدات بدأت هذه الفترة"><input v-model.number="close.units_started" type="text" inputmode="decimal" data-num step="0.0001" :class="input" /></Field>
+                    <Field label="وحدات مكتملة *" :error="close.errors.units_completed"><input v-model.number="close.units_completed" type="text" inputmode="decimal" data-num step="0.0001" :class="input" required /></Field>
+                    <Field label="وحدات تحت التشغيل آخر الفترة"><input v-model.number="close.units_closing_wip" type="text" inputmode="decimal" data-num step="0.0001" :class="input" /></Field>
+                    <Field label="نسبة إنجاز المواد %"><input v-model.number="close.closing_material_pct" type="text" inputmode="decimal" data-num step="1" :class="input" /></Field>
+                    <Field label="نسبة إنجاز التحويل %"><input v-model.number="close.closing_conversion_pct" type="text" inputmode="decimal" data-num step="1" :class="input" /></Field>
                     <p class="col-span-2 text-3xs text-slate-500">{{ isFinal ? 'مرحلة أخيرة: تُستلم الوحدات المكتملة في المخزون بتكلفتها.' : 'تنتقل تكلفة الوحدات المكتملة إلى المرحلة التالية (افتح لها فترة أولاً).' }}</p>
                     <p v-if="close.errors.stage" class="col-span-2 text-xs text-rose-600">{{ close.errors.stage }}</p>
                     <button type="submit" :disabled="close.processing" class="col-span-2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">إغلاق وحساب التكلفة</button>

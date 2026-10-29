@@ -140,8 +140,8 @@ const importLines = (lines, replace) => {
                                         </td>
                                         <td class="p-2">
                                             <input 
-                                                v-model="line.debit" 
-                                                type="number" 
+                                                v-model.number="line.debit" 
+                                                type="text" inputmode="decimal" data-num 
                                                 step="0.01" 
                                                 min="0"
                                                 @focus="line.credit = 0"
@@ -150,8 +150,8 @@ const importLines = (lines, replace) => {
                                         </td>
                                         <td class="p-2">
                                             <input 
-                                                v-model="line.credit" 
-                                                type="number" 
+                                                v-model.number="line.credit" 
+                                                type="text" inputmode="decimal" data-num 
                                                 step="0.01" 
                                                 min="0"
                                                 @focus="line.debit = 0"

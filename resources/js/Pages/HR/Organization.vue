@@ -43,7 +43,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <div v-if="$can('hr.organization.manage')" class="space-y-2 mt-3">
                     <input v-model="shift.name" placeholder="اسم الوردية" :class="inp" />
                     <div class="grid grid-cols-2 gap-2"><input v-model="shift.start_time" type="time" :class="inp" /><input v-model="shift.end_time" type="time" :class="inp" /></div>
-                    <div class="grid grid-cols-2 gap-2"><label>استراحة (د)<input v-model="shift.break_minutes" type="number" :class="inp" /></label><label>سماحية التأخير (د)<input v-model="shift.grace_minutes" type="number" :class="inp" /></label></div>
+                    <div class="grid grid-cols-2 gap-2"><label>استراحة (د)<input v-model.number="shift.break_minutes" type="text" inputmode="decimal" data-num :class="inp" /></label><label>سماحية التأخير (د)<input v-model.number="shift.grace_minutes" type="text" inputmode="decimal" data-num :class="inp" /></label></div>
                     <div class="flex flex-wrap gap-2"><label v-for="[n, l] in days" :key="n" class="flex items-center gap-1"><input v-model="shift.work_days" :value="n" type="checkbox" class="rounded" /> {{ l }}</label></div>
                     <label class="flex items-center gap-1"><input v-model="shift.is_default" type="checkbox" class="rounded" /> الوردية الافتراضية</label>
                     <p v-for="(m, k) in shift.errors" :key="k" class="text-rose-600">{{ m }}</p>

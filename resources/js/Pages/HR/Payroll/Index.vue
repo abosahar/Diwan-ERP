@@ -21,8 +21,8 @@ const form = useForm({ month: now.getMonth() + 1, year: now.getFullYear(), notes
             <StatCard label="الأجور الشهرية الثابتة" :value="money(stats.monthly_wages)" />
             <StatCard label="صافي آخر مسير" :value="money(stats.last_net)" tone="indigo" />
             <div v-if="$can('hr.payroll.create')" class="bg-white border border-slate-200 rounded-2xl p-3 flex items-end gap-2 text-xs">
-                <input v-model="form.month" type="number" min="1" max="12" class="w-16 rounded-xl border-slate-200 text-xs font-mono" />
-                <input v-model="form.year" type="number" class="w-20 rounded-xl border-slate-200 text-xs font-mono" />
+                <input v-model.number="form.month" type="text" inputmode="decimal" data-num min="1" max="12" class="w-16 rounded-xl border-slate-200 text-xs font-mono" />
+                <input v-model.number="form.year" type="text" inputmode="decimal" data-num class="w-20 rounded-xl border-slate-200 text-xs font-mono" />
                 <button @click="form.post(route('hr.payroll.store'))" :disabled="form.processing" class="flex-1 px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">إعداد مسير</button>
             </div>
         </div>

@@ -10,6 +10,9 @@ import i18n from './i18n';
 import VueApexCharts from 'vue3-apexcharts';
 import { PermissionsPlugin } from './permissions';
 import PromptDialog from './Components/UI/PromptDialog.vue';
+import { installLatinDigits } from './utils/latinDigits';
+
+installLatinDigits();
 
 // Replaced at boot by the server's configured product name (page.props.brand).
 let appName = import.meta.env.VITE_APP_NAME || 'الديوان';

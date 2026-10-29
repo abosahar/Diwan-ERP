@@ -49,7 +49,7 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.filter((i) => N
                         <td class="px-3 py-2">{{ i.name }}</td>
                         <td class="px-3 py-2 text-center font-mono">{{ qty(i.returnable) }}</td>
                         <td class="px-3 py-2 text-end font-mono">{{ money(i.unit_net) }}</td>
-                        <td class="px-3 py-2"><input v-model="i.quantity" type="number" min="0" :max="i.returnable" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                        <td class="px-3 py-2"><input v-model.number="i.quantity" type="text" inputmode="decimal" data-num min="0" :max="i.returnable" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     </tr>
                 </tbody>
             </table></div>

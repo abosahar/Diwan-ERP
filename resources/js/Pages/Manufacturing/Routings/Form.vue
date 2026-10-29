@@ -38,11 +38,11 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                         <thead class="text-slate-500"><tr><th class="text-start p-2 w-20">التسلسل</th><th class="text-start p-2">العملية</th><th class="text-start p-2">مركز العمل</th><th class="text-start p-2 w-32">تجهيز (دقيقة)</th><th class="text-start p-2 w-32">تشغيل/وحدة (دقيقة)</th><th class="w-10"></th></tr></thead>
                         <tbody>
                             <tr v-for="(op, i) in form.operations" :key="i" class="border-t border-slate-100">
-                                <td class="p-2"><input v-model="op.seq" type="number" :class="input" /></td>
+                                <td class="p-2"><input v-model.number="op.seq" type="text" inputmode="decimal" data-num :class="input" /></td>
                                 <td class="p-2"><input v-model="op.name" :class="input" placeholder="قص، كبس، طلاء..." required /></td>
                                 <td class="p-2"><SelectCreate v-model="op.work_center_id" :options="workCenters" entity="work_center" :label="(w) => `${w.code} — ${w.name}`" :allow-empty="false" /></td>
-                                <td class="p-2"><input v-model="op.setup_minutes" type="number" step="0.01" :class="input" /></td>
-                                <td class="p-2"><input v-model="op.run_minutes" type="number" step="0.0001" :class="input" /></td>
+                                <td class="p-2"><input v-model.number="op.setup_minutes" type="text" inputmode="decimal" data-num step="0.01" :class="input" /></td>
+                                <td class="p-2"><input v-model.number="op.run_minutes" type="text" inputmode="decimal" data-num step="0.0001" :class="input" /></td>
                                 <td class="p-2"><button type="button" :disabled="form.operations.length <= 1" @click="form.operations.splice(i, 1)" class="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20"><TrashIcon class="w-4 h-4" /></button></td>
                             </tr>
                         </tbody>

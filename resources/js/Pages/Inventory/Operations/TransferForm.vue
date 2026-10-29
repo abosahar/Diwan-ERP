@@ -47,8 +47,8 @@ const submitTransfer = () => transferForm.post(route('inventory.operations.trans
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">الكمية المحولة *</label>
                                 <input 
-                                    v-model="transferForm.quantity" 
-                                    type="number" 
+                                    v-model.number="transferForm.quantity" 
+                                    type="text" inputmode="decimal" data-num 
                                     step="0.01"
                                     min="0.01"
                                     required

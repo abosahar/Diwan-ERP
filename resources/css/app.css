@@ -9,3 +9,18 @@
 }
 .form-grid > :is([class*="justify-end"], [class*="border-t"], [class*="bg-amber"], [class*="bg-rose"], [class*="bg-emerald"], [class*="bg-slate-50"], table, .span-all),
 .form-grid > :has(> textarea, > table) { grid-column: 1 / -1; }
+
+/* Native selects: inherit the app font (Arabic glyphs fall back to a tall system font otherwise) and keep the
+   arrow on the end side so it never covers the text. @tailwindcss/forms only handles left-to-right. */
+select, option { font-family: inherit; }
+select { line-height: 1.4; }
+[dir="rtl"] select:not([multiple]) {
+    background-position: left 0.6rem center;
+    padding-inline-start: 0.75rem;
+    padding-inline-end: 2rem;
+}
+[dir="ltr"] select:not([multiple]) {
+    background-position: right 0.6rem center;
+    padding-inline-start: 0.75rem;
+    padding-inline-end: 2rem;
+}

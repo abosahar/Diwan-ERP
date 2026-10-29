@@ -58,8 +58,8 @@ const freq = { monthly: 'شهري', quarterly: 'ربع سنوي', yearly: 'سن�
                 <tr v-for="(l, i) in form.lines" :key="i">
                     <td class="p-1"><SelectCreate v-model="l.account_id" :options="accounts" entity="account" :label="(a) => `${a.code} - ${a.name_ar}`" :allow-empty="false" /></td>
                     <td class="p-1 w-36"><SelectCreate v-model="l.cost_center_id" :options="costCenters" entity="cost_center" label="name_ar" placeholder="مركز تكلفة" /></td>
-                    <td class="p-1 w-28"><input v-model="l.debit" @focus="l.credit = 0" type="number" step="0.01" placeholder="مدين" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
-                    <td class="p-1 w-28"><input v-model="l.credit" @focus="l.debit = 0" type="number" step="0.01" placeholder="دائن" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td class="p-1 w-28"><input v-model.number="l.debit" @focus="l.credit = 0" type="text" inputmode="decimal" data-num step="0.01" placeholder="مدين" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td class="p-1 w-28"><input v-model.number="l.credit" @focus="l.debit = 0" type="text" inputmode="decimal" data-num step="0.01" placeholder="دائن" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td class="p-1 w-8"><button v-if="form.lines.length > 2" @click="form.lines.splice(i, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td>
                 </tr>
             </table></div>

@@ -46,7 +46,7 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
                     <tbody><tr v-for="r in o.receipts" :key="r.id" class="border-t border-slate-100"><td class="p-2 font-mono">{{ String(r.date).slice(0, 10) }}</td><td class="p-2 font-mono">{{ num(r.quantity) }}</td><td class="p-2 font-mono">{{ money(r.material_cost) }}</td><td class="p-2 font-mono">{{ money(r.service_cost) }}</td><td class="p-2 font-mono font-bold">{{ money(r.total_cost) }}</td></tr>
                     <tr v-if="!o.receipts.length"><td colspan="5" class="p-4 text-center text-slate-400">لا استلامات.</td></tr></tbody></table>
                 <form v-if="['sent', 'partially_received'].includes(o.status) && $can('manufacturing.subcontracting.post')" @submit.prevent="receive" class="grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
-                    <input v-model="rec.quantity" type="number" step="0.0001" :placeholder="`الكمية (المتبقي ${num(left)})`" :class="input" required />
+                    <input v-model.number="rec.quantity" type="text" inputmode="decimal" data-num step="0.0001" :placeholder="`الكمية (المتبقي ${num(left)})`" :class="input" required />
                     <input v-model="rec.date" type="date" :class="input" />
                     <button type="submit" :disabled="rec.processing" class="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">استلام</button>
                     <p v-if="rec.errors.quantity || rec.errors.order" class="col-span-3 text-xs text-rose-600">{{ rec.errors.quantity || rec.errors.order }}</p>
