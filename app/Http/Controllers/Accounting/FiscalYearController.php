@@ -10,6 +10,7 @@ use App\Services\Accounting\YearEndClosing;
 use App\Services\TenantManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,12 +20,16 @@ class FiscalYearController extends Controller
     {
         return Inertia::render('Accounting/FiscalYears/Index', [
             'years' => FiscalYear::with('periods')->orderByDesc('start_date')->get(),
+            'periodTypes' => FiscalYear::PERIOD_TYPES,
         ]);
     }
 
     public function store(Request $request, FiscalCalendar $calendar)
     {
-        $validated = $request->validate(['start_date' => 'required|date']);
+        $validated = $request->validate([
+            'start_date' => 'required|date',
+            'period_type' => ['nullable', Rule::in(array_keys(FiscalYear::PERIOD_TYPES))],
+        ]);
 
         $start = Carbon::parse($validated['start_date'])->startOfMonth();
         $overlap = FiscalYear::where('start_date', '<=', $start->copy()->addYear()->subDay()->toDateString())
@@ -35,13 +40,14 @@ class FiscalYearController extends Controller
             return back()->withErrors(['start_date' => 'السنة المالية تتداخل مع سنة موجودة.']);
         }
 
-        $calendar->createYear($start, app(TenantManager::class)->getTenantId());
+        $type = $validated['period_type'] ?? 'monthly';
+        $calendar->createYear($start, app(TenantManager::class)->getTenantId(), $type);
 
-        return back()->with('success', 'تم إنشاء السنة المالية وفتراتها الشهرية');
+        return back()->with('success', 'تم إنشاء السنة المالية وفتراتها: '.FiscalYear::PERIOD_TYPES[$type]);
     }
 
     /**
-     * Open / close / lock a monthly period.
+     * Open / close / lock a period (whatever the year's period type).
      */
     public function updatePeriod(Request $request, FiscalPeriod $period)
     {

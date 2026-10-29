@@ -56,8 +56,9 @@ class FiscalCalendar
         return $period;
     }
 
-    public function createYear(CarbonInterface $start, int $companyId): FiscalYear
+    public function createYear(CarbonInterface $start, int $companyId, ?string $type = null): FiscalYear
     {
+        $type = array_key_exists((string) $type, FiscalYear::PERIOD_TYPES) ? $type : $this->defaultPeriodType($companyId);
         $start = Carbon::parse($start)->startOfMonth();
         $end = $start->copy()->addYear()->subDay();
 
@@ -71,21 +72,64 @@ class FiscalCalendar
             'name' => $start->month === 1 ? (string) $start->year : $start->year.'/'.$end->year,
             'start_date' => $start->toDateString(),
             'end_date' => $end->toDateString(),
+            'period_type' => $type,
             'status' => 'open',
         ]);
 
-        for ($cursor = $start->copy(); $cursor->lte($end); $cursor->addMonth()) {
+        foreach ($this->periodRanges($start, $type, $year->name) as [$name, $from, $to]) {
             FiscalPeriod::withoutGlobalScopes()->create([
                 'company_id' => $companyId,
                 'fiscal_year_id' => $year->id,
-                'name' => $cursor->format('Y-m'),
-                'start_date' => $cursor->copy()->startOfMonth()->toDateString(),
-                'end_date' => $cursor->copy()->endOfMonth()->toDateString(),
+                'name' => $name,
+                'start_date' => $from->toDateString(),
+                'end_date' => $to->toDateString(),
                 'status' => 'open',
             ]);
         }
 
         return $year;
+    }
+
+    /**
+     * The periods of a year starting on $start: [name, from, to] each.
+     *
+     * @return array<int, array{0: string, 1: Carbon, 2: Carbon}>
+     */
+    public function periodRanges(CarbonInterface $start, string $type, string $yearName): array
+    {
+        $start = Carbon::parse($start)->startOfMonth();
+        $ranges = [];
+
+        if ($type === 'quarterly' || $type === 'semiannual') {
+            $months = $type === 'quarterly' ? 3 : 6;
+            $letter = $type === 'quarterly' ? 'Q' : 'H';
+            for ($i = 0; $i < 12 / $months; $i++) {
+                $from = $start->copy()->addMonths($i * $months);
+                $ranges[] = ["{$yearName}-{$letter}".($i + 1), $from, $from->copy()->addMonths($months)->subDay()];
+            }
+
+            return $ranges;
+        }
+
+        for ($i = 0; $i < 12; $i++) {
+            $month = $start->copy()->addMonths($i);
+            if ($type === 'semimonthly') {
+                $ranges[] = [$month->format('Y-m').'-A', $month->copy(), $month->copy()->day(15)];
+                $ranges[] = [$month->format('Y-m').'-B', $month->copy()->day(16), $month->copy()->endOfMonth()->startOfDay()];
+            } else {
+                $ranges[] = [$month->format('Y-m'), $month->copy(), $month->copy()->endOfMonth()->startOfDay()];
+            }
+        }
+
+        return $ranges;
+    }
+
+    /** Type used when a year is created on demand by a posting (company setting, default monthly). */
+    public function defaultPeriodType(int $companyId): string
+    {
+        $type = CompanySetting::withoutGlobalScopes()->where('company_id', $companyId)->where('key', 'fiscal_period_type')->value('value');
+
+        return array_key_exists((string) $type, FiscalYear::PERIOD_TYPES) ? $type : 'monthly';
     }
 
     /**
