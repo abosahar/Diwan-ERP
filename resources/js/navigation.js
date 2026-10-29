@@ -12,6 +12,7 @@ import {
     BuildingStorefrontIcon,
     PrinterIcon,
     Cog6ToothIcon,
+    SparklesIcon,
     UsersIcon,
     DocumentChartBarIcon,
     BuildingOffice2Icon,
@@ -198,6 +199,13 @@ export default [
             { label: 'nav.billing', route: 'billing.index', path: '/billing' },
             { label: 'nav.integrations', route: 'integrations.index', path: '/integrations' },
             { label: 'nav.data_transfer', route: 'data-transfer.index', path: '/data-transfer' },
+        ],
+    },
+    {
+        key: 'updates', label: 'nav.updates', icon: SparklesIcon, color: 'indigo',
+        children: [
+            { label: 'nav.whats_new', route: 'whats-new.index', path: '/whats-new' },
+            { label: 'nav.feature_requests', route: 'feature-requests.index', path: '/feature-requests' },
         ],
     },
 ];

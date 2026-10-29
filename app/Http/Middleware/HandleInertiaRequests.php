@@ -111,6 +111,7 @@ class HandleInertiaRequests extends Middleware
                 'tagline' => config('app.brand.tagline'),
                 'domain' => config('tenancy.central_domain'),
                 'version' => config('app.version'),
+                'latest_notes' => config('release_notes.0.version'),
                 'local_install' => (bool) config('app.local_install'),
             ],
             'locale' => app()->getLocale(),

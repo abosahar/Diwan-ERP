@@ -26,6 +26,7 @@ use App\Http\Controllers\DataTransferController;
 use App\Http\Controllers\DocumentCancellationController;
 use App\Http\Controllers\DocumentShareController;
 use App\Http\Controllers\Equipment as EQ;
+use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\Finance\BankAccountController;
 use App\Http\Controllers\Finance\ExpenseController;
@@ -58,6 +59,7 @@ use App\Http\Controllers\PurchaseInvoiceController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\Purchases as P;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\ReleaseNotesController;
 use App\Http\Controllers\Reports\InsightsController;
 use App\Http\Controllers\Reports\ReportController;
 use App\Http\Controllers\RoleController;
@@ -756,6 +758,14 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::post('/integrations/webhooks', [IntegrationController::class, 'storeWebhook'])->name('webhooks.store');
     Route::delete('/integrations/webhooks/{webhook}', [IntegrationController::class, 'destroyWebhook'])->name('webhooks.destroy');
     Route::post('/integrations/webhooks/{webhook}/test', [IntegrationController::class, 'testWebhook'])->name('webhooks.test');
+
+    Route::get('/whats-new', [ReleaseNotesController::class, 'index'])->name('whats-new.index');
+    Route::get('/feature-requests', [FeatureRequestController::class, 'index'])->name('feature-requests.index');
+    Route::get('/feature-requests/create', [FeatureRequestController::class, 'create'])->name('feature-requests.create');
+    Route::post('/feature-requests', [FeatureRequestController::class, 'store'])->name('feature-requests.store');
+    Route::get('/feature-requests/{featureRequest}', [FeatureRequestController::class, 'show'])->name('feature-requests.show');
+    Route::post('/feature-requests/{featureRequest}/vote', [FeatureRequestController::class, 'vote'])->name('feature-requests.vote');
+    Route::put('/feature-requests/{featureRequest}', [FeatureRequestController::class, 'update'])->name('feature-requests.update');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');

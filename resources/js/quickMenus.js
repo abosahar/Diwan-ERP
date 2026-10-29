@@ -2,7 +2,7 @@ import {
     BuildingOffice2Icon, TruckIcon, UserCircleIcon, BuildingLibraryIcon, DocumentTextIcon, ClipboardDocumentListIcon,
     ShoppingCartIcon, ArrowUturnLeftIcon, DocumentPlusIcon, CreditCardIcon, BookOpenIcon, ArrowsRightLeftIcon,
     CubeIcon, BuildingStorefrontIcon, ArchiveBoxIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, BriefcaseIcon,
-    BanknotesIcon, ListBulletIcon,
+    BanknotesIcon, ListBulletIcon, SparklesIcon, LightBulbIcon,
 } from '@heroicons/vue/24/outline';
 
 /**
@@ -49,6 +49,8 @@ export const addMenu = [
 ];
 
 export const viewMenu = [
+    { label: 'أبرز التحديثات', route: 'whats-new.index', icon: SparklesIcon },
+    { label: 'طلبات المميزات', route: 'feature-requests.index', icon: LightBulbIcon },
     { label: 'العملاء', route: 'sales.clients.index', icon: BuildingOffice2Icon },
     { label: 'الموردون', route: 'purchases.suppliers.index', icon: TruckIcon },
     { label: 'الموظفون', route: 'hr.employees.index', icon: UserCircleIcon },
