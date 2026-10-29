@@ -26,6 +26,7 @@ use App\Http\Controllers\DataTransferController;
 use App\Http\Controllers\DocumentCancellationController;
 use App\Http\Controllers\DocumentShareController;
 use App\Http\Controllers\Equipment as EQ;
+use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\Finance\BankAccountController;
 use App\Http\Controllers\Finance\ExpenseController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\HR\EmployeeController;
 use App\Http\Controllers\HR\HrOperationsController;
 use App\Http\Controllers\HR\HrReportController;
 use App\Http\Controllers\HR\HrSettingsController;
+use App\Http\Controllers\HR\NationalityController;
 use App\Http\Controllers\HR\PayrollController;
 use App\Http\Controllers\HR\SelfServiceController;
 use App\Http\Controllers\IntegrationController;
@@ -57,10 +59,16 @@ use App\Http\Controllers\PurchaseInvoiceController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\Purchases as P;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\RecycleBinController;
+use App\Http\Controllers\ReleaseNotesController;
 use App\Http\Controllers\Reports\InsightsController;
 use App\Http\Controllers\Reports\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Sales as S;
+use App\Http\Controllers\Sales\CommissionController;
+use App\Http\Controllers\Sales\CommissionPlanController;
+use App\Http\Controllers\Sales\CustomerGroupController;
+use App\Http\Controllers\Sales\PromotionController;
 use App\Http\Controllers\Sales\RecurringInvoiceController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SelfUpdateController;
@@ -232,9 +240,29 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::get('/quotations/create', [QuotationController::class, 'create'])->name('quotations.create');
         Route::post('/quotations', [QuotationController::class, 'store'])->name('quotations.store');
         Route::get('/quotations/{quotation}', [QuotationController::class, 'show'])->name('quotations.show');
+        Route::delete('/quotations/{quotation}', [QuotationController::class, 'destroy'])->name('quotations.destroy');
         Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convertToInvoice'])->name('quotations.convert');
 
         // Clients (Customers)
+        Route::get('/customer-groups', [CustomerGroupController::class, 'index'])->name('customer-groups.index');
+        Route::get('/customer-groups/create', [CustomerGroupController::class, 'create'])->name('customer-groups.create');
+        Route::post('/customer-groups', [CustomerGroupController::class, 'store'])->name('customer-groups.store');
+        Route::get('/customer-groups/{group}/edit', [CustomerGroupController::class, 'edit'])->name('customer-groups.edit');
+        Route::put('/customer-groups/{group}', [CustomerGroupController::class, 'update'])->name('customer-groups.update');
+        Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions.index');
+        Route::get('/promotions/create', [PromotionController::class, 'create'])->name('promotions.create');
+        Route::post('/promotions', [PromotionController::class, 'store'])->name('promotions.store');
+        Route::get('/promotions/{promotion}/edit', [PromotionController::class, 'edit'])->name('promotions.edit');
+        Route::put('/promotions/{promotion}', [PromotionController::class, 'update'])->name('promotions.update');
+        Route::delete('/promotions/{promotion}', [PromotionController::class, 'destroy'])->name('promotions.destroy');
+        Route::get('/commissions', [CommissionController::class, 'index'])->name('commissions.index');
+        Route::post('/commissions/post', [CommissionController::class, 'post'])->name('commissions.post');
+        Route::get('/commission-plans', [CommissionPlanController::class, 'index'])->name('commission-plans.index');
+        Route::get('/commission-plans/create', [CommissionPlanController::class, 'create'])->name('commission-plans.create');
+        Route::post('/commission-plans', [CommissionPlanController::class, 'store'])->name('commission-plans.store');
+        Route::get('/commission-plans/{plan}/edit', [CommissionPlanController::class, 'edit'])->name('commission-plans.edit');
+        Route::put('/commission-plans/{plan}', [CommissionPlanController::class, 'update'])->name('commission-plans.update');
+        Route::delete('/commission-plans/{plan}', [CommissionPlanController::class, 'destroy'])->name('commission-plans.destroy');
         Route::get('/clients', [CustomerController::class, 'index'])->name('clients.index');
         Route::get('/clients/create', [CustomerController::class, 'create'])->name('clients.create');
         Route::post('/clients', [CustomerController::class, 'store'])->name('clients.store');
@@ -271,6 +299,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/orders/{order}/approve', [S\SalesOrderController::class, 'approve'])->name('orders.approve');
         Route::post('/orders/{order}/reject', [S\SalesOrderController::class, 'reject'])->name('orders.reject');
         Route::post('/orders/{order}/cancel', [S\SalesOrderController::class, 'cancel'])->name('orders.cancel');
+        Route::delete('/orders/{order}', [S\SalesOrderController::class, 'destroy'])->name('orders.destroy');
         Route::post('/orders/{order}/deliver', [S\SalesOrderController::class, 'deliver'])->name('orders.deliver');
         Route::post('/orders/{order}/invoice', [S\SalesOrderController::class, 'invoice'])->name('orders.invoice');
         Route::get('/deliveries', [S\DeliveryNoteController::class, 'index'])->name('deliveries.index');
@@ -389,6 +418,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/orders/{order}/approve', [PurchaseOrderController::class, 'approve'])->name('orders.approve');
         Route::post('/orders/{order}/reject', [PurchaseOrderController::class, 'reject'])->name('orders.reject');
         Route::post('/orders/{order}/cancel', [PurchaseOrderController::class, 'cancel'])->name('orders.cancel');
+        Route::delete('/orders/{order}', [PurchaseOrderController::class, 'destroy'])->name('orders.destroy');
+        Route::get('/orders/{order}/invoice', [PurchaseOrderController::class, 'invoiceForm'])->name('orders.invoice-form');
         Route::post('/orders/{order}/convert', [PurchaseOrderController::class, 'convertToInvoice'])->name('orders.convert');
         Route::post('/orders/{order}/receive', [P\GoodsReceiptController::class, 'store'])->name('orders.receive');
 
@@ -540,14 +571,18 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
 
         // Fiscal years & periods
         Route::get('/fiscal-years', [A\FiscalYearController::class, 'index'])->name('fiscal-years.index');
+        Route::get('/fiscal-years/create', [A\FiscalYearController::class, 'create'])->name('fiscal-years.create');
+        Route::get('/fiscal-years/preview', [A\FiscalYearController::class, 'preview'])->name('fiscal-years.preview');
         Route::post('/fiscal-years', [A\FiscalYearController::class, 'store'])->name('fiscal-years.store');
         Route::put('/fiscal-periods/{period}', [A\FiscalYearController::class, 'updatePeriod'])->name('fiscal-periods.update');
+        Route::get('/fiscal-years/{year}/close', [A\FiscalYearController::class, 'closeForm'])->name('fiscal-years.close-form');
         Route::post('/fiscal-years/{year}/close', [A\FiscalYearController::class, 'close'])->name('fiscal-years.close');
         Route::post('/fiscal-years/{year}/reopen', [A\FiscalYearController::class, 'reopen'])->name('fiscal-years.reopen');
 
         // Account mapping
         Route::get('/mappings', [A\AccountMappingController::class, 'index'])->name('mappings.index');
         Route::put('/mappings', [A\AccountMappingController::class, 'update'])->name('mappings.update');
+        Route::put('/mappings/dimensions', [A\AccountMappingController::class, 'dimensions'])->name('mappings.dimensions');
 
         // Fixed assets
         Route::get('/period-end', [A\PeriodEndController::class, 'index'])->name('period-end.index');
@@ -586,6 +621,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::get('/reports/cash-flow', [A\FinancialReportController::class, 'cashFlow'])->name('reports.cash-flow');
         Route::get('/reports/aging', [A\FinancialReportController::class, 'aging'])->name('reports.aging');
         Route::get('/reports/vat-return', [A\FinancialReportController::class, 'vatReturn'])->name('reports.vat-return');
+        Route::post('/reports/vat-return/settle', [A\FinancialReportController::class, 'settleVat'])->name('reports.vat-return.settle');
+        Route::delete('/reports/vat-settlements/{settlement}', [A\FinancialReportController::class, 'cancelVatSettlement'])->name('reports.vat-settlements.cancel');
 
         // General Ledger
         Route::get('/ledger', [GeneralLedgerController::class, 'index'])->name('ledger.index');
@@ -646,6 +683,12 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::put('/leave-types/{leaveType}', [HrSettingsController::class, 'updateLeaveType'])->name('leave-types.update');
         Route::post('/holidays', [HrSettingsController::class, 'storeHoliday'])->name('holidays.store');
         Route::delete('/holidays/{holiday}', [HrSettingsController::class, 'destroyHoliday'])->name('holidays.destroy');
+
+        Route::get('/nationalities', [NationalityController::class, 'index'])->name('nationalities.index');
+        Route::get('/nationalities/create', [NationalityController::class, 'create'])->name('nationalities.create');
+        Route::post('/nationalities', [NationalityController::class, 'store'])->name('nationalities.store');
+        Route::get('/nationalities/{nationality}/edit', [NationalityController::class, 'edit'])->name('nationalities.edit');
+        Route::put('/nationalities/{nationality}', [NationalityController::class, 'update'])->name('nationalities.update');
 
         Route::get('/organization', [HrOperationsController::class, 'organization'])->name('organization');
         Route::post('/organization/departments', [HrOperationsController::class, 'storeDepartment'])->name('departments.store');
@@ -740,6 +783,12 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::post('/integrations/webhooks', [IntegrationController::class, 'storeWebhook'])->name('webhooks.store');
     Route::delete('/integrations/webhooks/{webhook}', [IntegrationController::class, 'destroyWebhook'])->name('webhooks.destroy');
     Route::post('/integrations/webhooks/{webhook}/test', [IntegrationController::class, 'testWebhook'])->name('webhooks.test');
+
+    Route::get('/recycle-bin', [RecycleBinController::class, 'index'])->name('recycle-bin.index');
+    Route::post('/recycle-bin/{type}/{id}/restore', [RecycleBinController::class, 'restore'])->name('recycle-bin.restore');
+    Route::delete('/recycle-bin/{type}/{id}', [RecycleBinController::class, 'purge'])->name('recycle-bin.purge');
+    Route::get('/whats-new', [ReleaseNotesController::class, 'index'])->name('whats-new.index');
+    Route::get('/feature-requests', [FeatureRequestController::class, 'index'])->name('feature-requests.index');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');

@@ -539,7 +539,7 @@ onMounted(() => {
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">المبلغ المستلم من العميل</label>
                     <input 
                         v-model.number="tenderAmount"
-                        type="number" 
+                        type="text" inputmode="decimal" data-num 
                         step="1" 
                         class="w-full text-center text-xl font-black font-mono rounded-xl border border-slate-200 py-3 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                     />
@@ -613,7 +613,7 @@ onMounted(() => {
 
                     <div class="border-t border-slate-200 pt-2 text-3xs text-start space-y-0.5">
                         <p>رقم الفاتورة: <strong>{{ latestOrder.order_number }}</strong></p>
-                        <p>التاريخ: {{ new Date(latestOrder.created_at).toLocaleString('ar-SA', { timeZone: timeZone() }) }}</p>
+                        <p>التاريخ: {{ new Date(latestOrder.created_at).toLocaleString('ar-SA-u-nu-latn', { timeZone: timeZone() }) }}</p>
                         <p>طريقة الدفع: {{ ({ cash: 'نقداً', card: 'بطاقة مدى', multiple: 'مجزأ (نقد + بطاقة)' })[latestOrder.payment_method] || latestOrder.payment_method }}</p>
                     </div>
 
@@ -687,9 +687,9 @@ onMounted(() => {
                     <button @click="isSplitModalOpen = false" class="text-slate-400 hover:text-slate-600"><XMarkIcon class="w-4 h-4" /></button>
                 </div>
                 <label class="block font-bold text-slate-700">بطاقة / مدى</label>
-                <input v-model.number="splitCard" type="number" step="0.01" min="0" :max="cartTotal" @input="splitCash = Math.max(0, Math.round((cartTotal - (Number(splitCard) || 0)) * 100) / 100)" class="w-full text-center text-lg font-mono font-bold rounded-xl border border-slate-200 py-2" />
+                <input v-model.number="splitCard" type="text" inputmode="decimal" data-num step="0.01" min="0" :max="cartTotal" @input="splitCash = Math.max(0, Math.round((cartTotal - (Number(splitCard) || 0)) * 100) / 100)" class="w-full text-center text-lg font-mono font-bold rounded-xl border border-slate-200 py-2" />
                 <label class="block font-bold text-slate-700">نقداً</label>
-                <input v-model.number="splitCash" type="number" step="0.01" min="0" class="w-full text-center text-lg font-mono font-bold rounded-xl border border-slate-200 py-2" />
+                <input v-model.number="splitCash" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-full text-center text-lg font-mono font-bold rounded-xl border border-slate-200 py-2" />
                 <p class="text-slate-500">الباقي للعميل: <strong class="font-mono">{{ formatCurrency(Math.max(0, (Number(splitCash) || 0) + (Number(splitCard) || 0) - cartTotal)) }}</strong> ﷼</p>
                 <button @click="submitSplit" :disabled="(Number(splitCash) || 0) + (Number(splitCard) || 0) < cartTotal - 0.001 || (Number(splitCard) || 0) > cartTotal" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-40">إتمام الدفع</button>
             </div>
@@ -713,7 +713,7 @@ onMounted(() => {
                         <label class="block font-bold text-slate-700 mb-1">المبلغ الفعلي الموجود في الدرج ({{ $cur() }})</label>
                         <input 
                             v-model.number="closeSessionForm.closing_cash"
-                            type="number" 
+                            type="text" inputmode="decimal" data-num 
                             step="0.01" 
                             required
                             class="w-full text-center text-lg font-mono font-bold rounded-xl border border-slate-200 py-2.5 focus:border-indigo-500"

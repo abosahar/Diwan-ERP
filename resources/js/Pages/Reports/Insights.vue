@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { cur } from '@/utils/tax';
 import { computed, ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -70,8 +71,8 @@ const varianceClass = (v) => (v < 0 ? 'text-rose-700' : 'text-emerald-700');
                 <button v-for="t in tabs" :key="t.id" type="button" @click="tab = t.id" :class="['px-3 py-2 rounded-lg font-bold', tab === t.id ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-50']">{{ t.label }}</button>
             </div>
             <div v-if="tab === 'profit'" class="flex items-end gap-2">
-                <label class="block">من<input v-model="from" type="date" class="block rounded-xl border-slate-200 text-xs" /></label>
-                <label class="block">إلى<input v-model="to" type="date" class="block rounded-xl border-slate-200 text-xs" /></label>
+                <label class="block">من<DatePicker v-model="from" class="block rounded-xl border-slate-200 text-xs" /></label>
+                <label class="block">إلى<DatePicker v-model="to" class="block rounded-xl border-slate-200 text-xs" /></label>
                 <button @click="applyPeriod" class="px-3 py-2 rounded-xl bg-slate-800 text-white font-bold">تطبيق</button>
             </div>
         </div>

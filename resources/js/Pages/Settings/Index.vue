@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
@@ -125,6 +126,7 @@ const form = useForm({
     acc_default_cash_id: findDefaultAccountId('default_cash'),
     acc_default_bank_id: findDefaultAccountId('default_bank'),
 });
+useUnsavedGuard(form);
 
 const onboardForm = useForm({
     otp: '',
@@ -546,7 +548,7 @@ const removeLogo = async () => {
                                     <label class="block text-xs font-bold text-slate-700 mb-1">نسبة ضريبة القيمة المضافة (%)</label>
                                     <input 
                                         :value="15"
-                                        type="number" 
+                                        type="text" inputmode="decimal" data-num 
                                         readonly
                                         disabled
                                         class="w-full text-xs rounded-xl border-slate-200 bg-slate-50 font-mono font-bold"

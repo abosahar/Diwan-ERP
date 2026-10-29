@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ask } from '@/composables/useDialog';
 import { ref, reactive } from 'vue';
@@ -127,9 +128,9 @@ const move = async (cheque, status) => {
                     </select>
                 </Field>
                 <Field label="رقم الشيك" :error="form.errors.cheque_number"><input v-model="form.cheque_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="المبلغ" :error="form.errors.amount"><input v-model="form.amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ الإصدار"><input v-model="form.issue_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ الاستحقاق" :error="form.errors.due_date"><input v-model="form.due_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="المبلغ" :error="form.errors.amount"><input v-model.number="form.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الإصدار"><DatePicker v-model="form.issue_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الاستحقاق" :error="form.errors.due_date"><DatePicker v-model="form.due_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="بنك الشيك"><input v-model="form.bank_name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="حسابنا البنكي"><SelectCreate v-model="form.bank_account_id" :options="bankAccounts.filter(x => x.type === 'bank')" entity="bank" label="name" placeholder="—" /></Field>
             </div>

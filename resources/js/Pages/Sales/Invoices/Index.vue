@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -73,7 +74,7 @@ const formatDateArabic = (dateStr) => {
     if (!dateStr) return '-';
     try {
         const d = new Date(dateStr);
-        return d.toLocaleDateString('ar-SA', {
+        return d.toLocaleDateString('ar-SA-u-nu-latn', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
@@ -92,7 +93,7 @@ const formatDateArabic = (dateStr) => {
 
         <div class="space-y-5" @click="closeMenu">
             <!-- Top Breadcrumbs & Action Bar -->
-            <PageHeader title="الفواتير" :crumbs="[{ label: 'المبيعات' }, { label: 'الفواتير' }]">
+            <PageHeader year-scoped title="الفواتير" :crumbs="[{ label: 'المبيعات' }, { label: 'الفواتير' }]">
 <template #actions>
 <button 
                         @click="router.reload()" 
@@ -176,21 +177,17 @@ const formatDateArabic = (dateStr) => {
                         <!-- Date From -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1.5">من تاريخ</label>
-                            <input 
-                                v-model="dateFrom"
-                                type="date" 
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                            />
+                            <DatePicker 
+                                v-model="dateFrom" 
+                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                         </div>
 
                         <!-- Date To -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1.5">إلى تاريخ</label>
-                            <input 
-                                v-model="dateTo"
-                                type="date" 
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                            />
+                            <DatePicker 
+                                v-model="dateTo" 
+                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                         </div>
                     </div>
 

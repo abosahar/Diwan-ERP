@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -20,7 +21,7 @@ const columns = [['current', 'غير مستحق'], ['d30', '1-30 يوم'], ['d60
             <label><span class="block font-bold text-slate-600 mb-1">النوع</span>
                 <select v-model="form.kind" class="rounded-xl border-slate-200 text-xs"><option value="receivables">العملاء</option><option value="payables">الموردون</option></select>
             </label>
-            <label><span class="block font-bold text-slate-600 mb-1">كما في</span><input v-model="form.as_of" type="date" class="rounded-xl border-slate-200 text-xs" /></label>
+            <label><span class="block font-bold text-slate-600 mb-1">كما في</span><DatePicker v-model="form.as_of" class="rounded-xl border-slate-200 text-xs" /></label>
             <button class="rounded-xl bg-indigo-600 text-white font-bold px-5 py-2">{{ $t('ui.apply') }}</button>
         </form>
 

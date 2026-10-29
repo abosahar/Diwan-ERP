@@ -69,7 +69,7 @@ const boxed = computed(() => props.el.type !== 'line');
 
         <section class="grid grid-cols-4 gap-2">
             <label v-for="k in ['x', 'y', 'w', 'h']" :key="k" class="font-bold text-slate-500">{{ { x: 'أفقي', y: 'رأسي', w: 'العرض', h: 'الارتفاع' }[k] }} (مم)
-                <input :value="el[k]" @change="num(el, k, $event.target.value)" type="number" step="0.5" class="mt-1 w-full rounded-lg border-slate-200 text-xs font-mono px-1" />
+                <input :value="el[k]" @change="num(el, k, $event.target.value)" type="text" inputmode="decimal" data-num step="0.5" class="mt-1 w-full rounded-lg border-slate-200 text-xs font-mono px-1" />
             </label>
         </section>
         <div class="grid grid-cols-2 gap-2">
@@ -110,7 +110,7 @@ const boxed = computed(() => props.el.type !== 'line');
             <label class="font-bold text-slate-500">الاتجاه
                 <select v-model="el.orientation" class="mt-1 w-full rounded-lg border-slate-200 text-xs"><option value="h">أفقي</option><option value="v">رأسي</option></select>
             </label>
-            <label class="font-bold text-slate-500">السُمك (مم)<input :value="s.border_width" @change="num(s, 'border_width', $event.target.value)" type="number" step="0.1" min="0.05" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+            <label class="font-bold text-slate-500">السُمك (مم)<input :value="s.border_width" @change="num(s, 'border_width', $event.target.value)" type="text" inputmode="decimal" data-num step="0.1" min="0.05" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
             <label class="font-bold text-slate-500">النمط
                 <select v-model="s.border_style" class="mt-1 w-full rounded-lg border-slate-200 text-xs"><option value="solid">متصل</option><option value="dashed">متقطع</option><option value="dotted">منقط</option><option value="double">مزدوج</option></select>
             </label>
@@ -130,19 +130,19 @@ const boxed = computed(() => props.el.type !== 'line');
                 <div class="grid grid-cols-4 gap-1">
                     <input v-model="c.label" placeholder="العنوان" class="col-span-2 rounded-lg border-slate-200 text-xs" :aria-label="`عنوان العمود ${i + 1}`" />
                     <input v-model="c.label_en" placeholder="English" dir="ltr" class="col-span-2 rounded-lg border-slate-200 text-xs" :aria-label="`العنوان الإنجليزي ${i + 1}`" />
-                    <label class="col-span-2 text-slate-500 flex items-center gap-1">العرض<input :value="c.width" @change="num(c, 'width', $event.target.value)" type="number" min="1" class="w-full rounded-lg border-slate-200 text-xs" /></label>
+                    <label class="col-span-2 text-slate-500 flex items-center gap-1">العرض<input :value="c.width" @change="num(c, 'width', $event.target.value)" type="text" inputmode="decimal" data-num min="1" class="w-full rounded-lg border-slate-200 text-xs" /></label>
                     <select v-model="c.align" class="col-span-2 rounded-lg border-slate-200 text-xs" aria-label="محاذاة العمود"><option value="right">يمين</option><option value="center">وسط</option><option value="left">يسار</option></select>
                 </div>
             </div>
             <button type="button" @click="addColumn" class="w-full py-1.5 rounded-lg border border-dashed border-slate-300 font-bold">+ عمود</button>
             <div class="grid grid-cols-2 gap-2">
-                <label class="font-bold text-slate-500">ارتفاع العنوان (مم)<input :value="el.header_height" @change="num(el, 'header_height', $event.target.value)" type="number" step="0.5" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
-                <label class="font-bold text-slate-500">ارتفاع السطر (مم)<input :value="el.row_height" @change="num(el, 'row_height', $event.target.value)" type="number" step="0.5" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                <label class="font-bold text-slate-500">ارتفاع العنوان (مم)<input :value="el.header_height" @change="num(el, 'header_height', $event.target.value)" type="text" inputmode="decimal" data-num step="0.5" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                <label class="font-bold text-slate-500">ارتفاع السطر (مم)<input :value="el.row_height" @change="num(el, 'row_height', $event.target.value)" type="text" inputmode="decimal" data-num step="0.5" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
                 <label class="font-bold text-slate-500">خلفية العنوان<input :value="el.header_bg || '#ffffff'" @input="el.header_bg = $event.target.value" type="color" class="mt-1 w-full h-8 rounded-lg" /></label>
                 <label class="font-bold text-slate-500">لون نص العنوان<input v-model="el.header_color" type="color" class="mt-1 w-full h-8 rounded-lg" /></label>
-                <label class="font-bold text-slate-500">حجم خط العنوان<input :value="el.header_size" @change="num(el, 'header_size', $event.target.value)" type="number" step="0.5" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                <label class="font-bold text-slate-500">حجم خط العنوان<input :value="el.header_size" @change="num(el, 'header_size', $event.target.value)" type="text" inputmode="decimal" data-num step="0.5" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
                 <label class="font-bold text-slate-500">لون خطوط الجدول<input v-model="el.grid_color" type="color" class="mt-1 w-full h-8 rounded-lg" /></label>
-                <label class="font-bold text-slate-500">سمك خطوط الجدول<input :value="el.grid_width" @change="num(el, 'grid_width', $event.target.value)" type="number" step="0.05" min="0" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                <label class="font-bold text-slate-500">سمك خطوط الجدول<input :value="el.grid_width" @change="num(el, 'grid_width', $event.target.value)" type="text" inputmode="decimal" data-num step="0.05" min="0" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
                 <label class="font-bold text-slate-500">تظليل الأسطر بالتناوب<input :value="el.stripe || '#ffffff'" @input="el.stripe = $event.target.value" type="color" class="mt-1 w-full h-8 rounded-lg" /></label>
             </div>
             <div class="flex flex-wrap gap-3">
@@ -159,7 +159,7 @@ const boxed = computed(() => props.el.type !== 'line');
             <span class="font-black text-slate-700">الخط</span>
             <div class="grid grid-cols-2 gap-2">
                 <select v-model="s.font" class="rounded-lg border-slate-200 text-xs" aria-label="نوع الخط"><option :value="null">خط الصفحة</option><option v-for="f in fonts" :key="f.key" :value="f.key">{{ f.label }}</option></select>
-                <label class="flex items-center gap-1 text-slate-500">الحجم<input :value="s.size" @change="num(s, 'size', $event.target.value)" type="number" step="0.5" min="4" class="w-full rounded-lg border-slate-200 text-xs" aria-label="حجم الخط" /></label>
+                <label class="flex items-center gap-1 text-slate-500">الحجم<input :value="s.size" @change="num(s, 'size', $event.target.value)" type="text" inputmode="decimal" data-num step="0.5" min="4" class="w-full rounded-lg border-slate-200 text-xs" aria-label="حجم الخط" /></label>
             </div>
             <div class="flex flex-wrap items-center gap-1">
                 <button type="button" @click="s.bold = !s.bold" :class="['w-8 h-8 rounded-lg border font-black', s.bold ? 'bg-slate-800 text-white' : 'border-slate-200']" aria-label="عريض">B</button>
@@ -172,7 +172,7 @@ const boxed = computed(() => props.el.type !== 'line');
             <div v-if="el.type === 'text'" class="grid grid-cols-3 gap-2">
                 <select v-model="s.valign" class="rounded-lg border-slate-200 text-xs" aria-label="المحاذاة الرأسية"><option value="top">أعلى</option><option value="middle">منتصف</option><option value="bottom">أسفل</option></select>
                 <select v-model="s.dir" class="rounded-lg border-slate-200 text-xs" aria-label="اتجاه النص"><option value="rtl">عربي ←</option><option value="ltr">→ English</option></select>
-                <label class="flex items-center gap-1 text-slate-500">تباعد<input :value="s.line_height" @change="num(s, 'line_height', $event.target.value)" type="number" step="0.1" min="0.8" class="w-full rounded-lg border-slate-200 text-xs" aria-label="تباعد الأسطر" /></label>
+                <label class="flex items-center gap-1 text-slate-500">تباعد<input :value="s.line_height" @change="num(s, 'line_height', $event.target.value)" type="text" inputmode="decimal" data-num step="0.1" min="0.8" class="w-full rounded-lg border-slate-200 text-xs" aria-label="تباعد الأسطر" /></label>
             </div>
             <select v-else v-model="s.dir" class="w-full rounded-lg border-slate-200 text-xs" aria-label="اتجاه الجدول"><option value="rtl">الجدول من اليمين لليسار</option><option value="ltr">الجدول من اليسار لليمين</option></select>
         </section>
@@ -181,7 +181,7 @@ const boxed = computed(() => props.el.type !== 'line');
         <section v-if="boxed" class="space-y-2">
             <span class="font-black text-slate-700">الإطار والخلفية</span>
             <div class="grid grid-cols-3 gap-2">
-                <label class="text-slate-500">السُمك<input :value="s.border_width" @change="num(s, 'border_width', $event.target.value)" type="number" step="0.1" min="0" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                <label class="text-slate-500">السُمك<input :value="s.border_width" @change="num(s, 'border_width', $event.target.value)" type="text" inputmode="decimal" data-num step="0.1" min="0" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
                 <label class="text-slate-500">النمط<select v-model="s.border_style" class="mt-1 w-full rounded-lg border-slate-200 text-xs"><option value="solid">متصل</option><option value="dashed">متقطع</option><option value="dotted">منقط</option><option value="double">مزدوج</option></select></label>
                 <label class="text-slate-500">اللون<input v-model="s.border_color" type="color" class="mt-1 w-full h-8 rounded-lg" /></label>
             </div>
@@ -191,8 +191,8 @@ const boxed = computed(() => props.el.type !== 'line');
             </div>
             <div class="grid grid-cols-3 gap-2">
                 <label class="text-slate-500">الخلفية<input :value="s.bg || '#ffffff'" @input="s.bg = $event.target.value" type="color" class="mt-1 w-full h-8 rounded-lg" /></label>
-                <label class="text-slate-500">تدوير الزوايا<input :value="s.radius" @change="num(s, 'radius', $event.target.value)" type="number" step="0.5" min="0" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
-                <label v-if="el.type === 'text'" class="text-slate-500">الهامش الداخلي<input :value="s.padding" @change="num(s, 'padding', $event.target.value)" type="number" step="0.5" min="0" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                <label class="text-slate-500">تدوير الزوايا<input :value="s.radius" @change="num(s, 'radius', $event.target.value)" type="text" inputmode="decimal" data-num step="0.5" min="0" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
+                <label v-if="el.type === 'text'" class="text-slate-500">الهامش الداخلي<input :value="s.padding" @change="num(s, 'padding', $event.target.value)" type="text" inputmode="decimal" data-num step="0.5" min="0" class="mt-1 w-full rounded-lg border-slate-200 text-xs" /></label>
             </div>
             <button v-if="s.bg" type="button" @click="s.bg = null" class="text-rose-600">إزالة الخلفية</button>
         </section>

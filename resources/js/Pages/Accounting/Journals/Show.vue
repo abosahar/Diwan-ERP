@@ -11,6 +11,7 @@ import {
 
 const props = defineProps({
     entry: Object,
+    parties: { type: Object, default: () => ({}) },
 });
 
 const formatCurrency = (val) => {
@@ -136,6 +137,7 @@ const deleteDraft = () => {
                                 </td>
                                 <td class="py-3 px-4 font-semibold text-slate-900">
                                     {{ line.account?.name_ar || '-' }}
+                                    <span v-if="line.party_id && parties[line.party_type]?.[line.party_id]" class="block text-3xs font-normal text-slate-500">{{ parties[line.party_type][line.party_id] }}</span>
                                 </td>
                                 <td class="py-3 px-4 text-slate-600 text-3xs">
                                     {{ line.description }}

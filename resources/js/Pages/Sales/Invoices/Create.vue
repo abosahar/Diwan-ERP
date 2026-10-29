@@ -1,4 +1,6 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
@@ -92,6 +94,7 @@ const form = useForm({
         }
     ]
 });
+useUnsavedGuard(form);
 
 // A new branch moves lines still on the old standard rate to the new one (reduced or zero rates stay).
 watch(() => form.branch_id, (id) => {
@@ -592,21 +595,17 @@ const importLines = (lines, replace) => {
                             <!-- Invoice Date -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">تاريخ الإصدار <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.invoice_date"
-                                    type="date" 
-                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                />
+                                <DatePicker 
+                                    v-model="form.invoice_date" 
+                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                             </div>
 
                             <!-- Supply Date -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">تاريخ التوريد (الزكاة والضريبة)</label>
-                                <input 
-                                    v-model="form.supply_date"
-                                    type="date" 
-                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                />
+                                <DatePicker 
+                                    v-model="form.supply_date" 
+                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                             </div>
 
                             <div class="sm:col-span-2">
@@ -686,7 +685,7 @@ const importLines = (lines, replace) => {
                                         <label class="block text-xs font-bold text-amber-900 mb-1.5">المبلغ المدفوع الآن (نقداً / بالحساب)</label>
                                         <input 
                                             v-model.number="form.paid_amount"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             step="0.01" 
                                             min="0" 
                                             :max="grandTotal"
@@ -822,7 +821,7 @@ const importLines = (lines, replace) => {
                                         <td class="py-3 px-2">
                                             <input 
                                                 v-model.number="item.quantity"
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 step="0.01" 
                                                 min="0.01" 
                                                 class="w-full text-xs text-center rounded-xl border border-slate-200 px-2 py-2 focus:border-indigo-500 font-mono font-bold"
@@ -833,7 +832,7 @@ const importLines = (lines, replace) => {
                                         <td class="py-3 px-2">
                                             <input 
                                                 v-model.number="item.unit_price"
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 step="0.01" 
                                                 min="0" 
                                                 class="w-full text-xs text-start rounded-xl border border-slate-200 px-2 py-2 focus:border-indigo-500 font-mono font-bold"
@@ -844,7 +843,7 @@ const importLines = (lines, replace) => {
                                         <td class="py-3 px-2">
                                             <input 
                                                 v-model.number="item.discount"
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 step="0.01" 
                                                 min="0" 
                                                 class="w-full text-xs text-start rounded-xl border border-slate-200 px-2 py-2 focus:border-indigo-500 font-mono"
@@ -1092,7 +1091,7 @@ const importLines = (lines, replace) => {
                             <label class="block text-xs font-bold text-slate-700 mb-1">سعر البيع الافتراضي (﷼) <span class="text-rose-500">*</span></label>
                             <input 
                                 v-model.number="newProductForm.selling_price"
-                                type="number" 
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01"
                                 min="0"
                                 required
@@ -1107,7 +1106,7 @@ const importLines = (lines, replace) => {
                             <label class="block text-xs font-bold text-slate-700 mb-1">سعر الشراء / التكلفة (﷼)</label>
                             <input 
                                 v-model.number="newProductForm.purchase_price"
-                                type="number" 
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01"
                                 min="0"
                                 placeholder="0.00"
@@ -1120,7 +1119,7 @@ const importLines = (lines, replace) => {
                             <label class="block text-xs font-bold text-slate-700 mb-1">نسبة الضريبة (%)</label>
                             <input 
                                 v-model.number="newProductForm.tax_rate"
-                                type="number" 
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01"
                                 min="0"
                                 placeholder="15"
@@ -1157,7 +1156,7 @@ const importLines = (lines, replace) => {
                             <label class="block text-xs font-bold text-slate-700 mb-1">الكمية الافتتاحية للمخزون</label>
                             <input 
                                 v-model.number="newProductForm.initial_stock"
-                                type="number" 
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01"
                                 min="0"
                                 placeholder="0"

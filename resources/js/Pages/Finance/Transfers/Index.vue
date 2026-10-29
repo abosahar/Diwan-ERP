@@ -61,7 +61,7 @@ const props = defineProps({
                     <div>
                         <p class="text-xs text-slate-500 font-semibold mb-1">إجمالي مبالغ التحويلات</p>
                         <h3 class="text-xl font-black text-slate-900 font-sans">
-                            {{ Number(stats?.total_transfers_amount || 0).toLocaleString() }} <span class="text-xs font-normal text-slate-400">{{ $cur() }}</span>
+                            {{ Number(stats?.total_transfers_amount || 0).toLocaleString('en-US') }} <span class="text-xs font-normal text-slate-400">{{ $cur() }}</span>
                         </h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -117,7 +117,7 @@ const props = defineProps({
                                     {{ t.description }}
                                 </td>
                                 <td class="px-6 py-4 text-center font-bold text-slate-900 font-sans">
-                                    {{ Number(t.total_debit).toLocaleString() }} {{ $cur() }}
+                                    {{ Number(t.total_debit).toLocaleString('en-US') }} {{ $cur() }}
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-3">

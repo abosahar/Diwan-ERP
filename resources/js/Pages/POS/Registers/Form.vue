@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -15,6 +16,7 @@ const form = useForm({
     bank_account_id: props.register?.bank_account_id || '',
     is_active: props.register?.is_active ?? true,
 });
+useUnsavedGuard(form);
 
 const submit = () => (editing ? form.put(route('pos.registers.update', props.register.id)) : form.post(route('pos.registers.store')));
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';

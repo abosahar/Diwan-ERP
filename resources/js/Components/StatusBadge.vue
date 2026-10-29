@@ -19,6 +19,7 @@ const getBadgeStyle = (status) => {
             return 'bg-emerald-50 text-emerald-700 border-emerald-200/80 ring-emerald-600/20';
         case 'partially_paid':
         case 'pending':
+        case 'on_leave':
         case 'trial':
             return 'bg-blue-50 text-blue-700 border-blue-200/80 ring-blue-600/20';
         case 'unpaid':
@@ -26,6 +27,7 @@ const getBadgeStyle = (status) => {
             return 'bg-amber-50 text-amber-700 border-amber-200/80 ring-amber-600/20';
         case 'overdue':
         case 'suspended':
+        case 'terminated':
         case 'cancelled':
         case 'rejected':
             return 'bg-red-50 text-red-700 border-red-200/80 ring-red-600/20';
@@ -45,7 +47,13 @@ const getStatusLabel = (status) => {
         case 'draft': return 'مسودة';
         case 'active': return 'نشط';
         case 'trial': return 'فترة تجريبية';
-        case 'suspended': return 'معلق';
+        case 'suspended': return 'موقوف';
+        case 'on_leave': return 'في إجازة';
+        case 'terminated': return 'منتهية خدمته';
+        case 'inactive': return 'غير نشط';
+        case 'approved': return 'معتمد';
+        case 'pending': return 'قيد الانتظار';
+        case 'rejected': return 'مرفوض';
         case 'completed': return 'مكتمل';
         case 'cancelled': return 'ملغاة';
         default: return status;

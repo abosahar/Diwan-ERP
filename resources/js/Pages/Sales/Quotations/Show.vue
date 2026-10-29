@@ -23,6 +23,9 @@ const triggerPrint = () => {
     window.print();
 };
 
+const removeQuotation = () => {
+    if (confirm('نقل عرض السعر إلى سلة المحذوفات؟')) router.delete(route('sales.quotations.destroy', props.quotation.id));
+};
 const convertToInvoice = () => {
     if (confirm(`هل ترغب في تحويل عرض السعر ${props.quotation.quotation_number} إلى فاتورة مبيعات رسمية؟`)) {
         router.post(route('sales.quotations.convert', props.quotation.id));
@@ -40,7 +43,7 @@ const formatDateArabic = (dateStr) => {
     if (!dateStr) return '-';
     try {
         const d = new Date(dateStr);
-        return d.toLocaleDateString('ar-SA', {
+        return d.toLocaleDateString('ar-SA-u-nu-latn', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -98,6 +101,12 @@ const formatDateArabic = (dateStr) => {
                         <ArrowRightCircleIcon class="w-4 h-4" />
                         <span>تحويل إلى فاتورة مبيعات</span>
                     </button>
+
+                    <button
+                        v-if="quotation.status !== 'converted' && $can('sales.quotations.delete')"
+                        @click="removeQuotation"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-rose-200 text-rose-600 font-bold text-xs"
+                    >حذف</button>
 
                     <!-- Print Button -->
                     <button 

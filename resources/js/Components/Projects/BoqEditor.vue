@@ -53,9 +53,9 @@ const cost = computed(() => rows.value.filter((r) => !r.is_group).reduce((s, r) 
                         <td class="px-2 py-1"><input v-model="r.description" class="w-full rounded-lg border-slate-200 text-xs" :class="r.is_group ? 'font-bold' : 'ps-4'" /></td>
                         <template v-if="!r.is_group">
                             <td class="px-2 py-1"><input v-model="r.unit" class="w-full rounded-lg border-slate-200 text-xs" /></td>
-                            <td class="px-2 py-1"><input v-model="r.quantity" type="number" step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
-                            <td class="px-2 py-1"><input v-model="r.unit_price" type="number" step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
-                            <td class="px-2 py-1"><input v-model="r.unit_cost" type="number" step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                            <td class="px-2 py-1"><input v-model.number="r.quantity" type="text" inputmode="decimal" data-num step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                            <td class="px-2 py-1"><input v-model.number="r.unit_price" type="text" inputmode="decimal" data-num step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                            <td class="px-2 py-1"><input v-model.number="r.unit_cost" type="text" inputmode="decimal" data-num step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                             <td class="px-2 py-1 text-end font-mono">{{ money(Number(r.quantity) * Number(r.unit_price)) }}</td>
                         </template>
                         <td v-else colspan="5"></td>

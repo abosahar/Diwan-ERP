@@ -148,6 +148,7 @@ class PurchaseCycleService
         DB::transaction(function () use ($order) {
             $order = PurchaseOrder::whereKey($order->id)->lockForUpdate()->firstOrFail();
             if (GoodsReceipt::where('purchase_order_id', $order->id)->where('status', '!=', 'cancelled')->exists()
+                || $order->items()->where('invoiced_quantity', '>', 0)->exists()
                 || in_array($order->status, ['converted_to_invoice', 'received'], true)) {
                 throw ValidationException::withMessages(['order' => 'لا يمكن إلغاء أمر شراء تم الاستلام عليه.']);
             }
@@ -168,7 +169,7 @@ class PurchaseCycleService
         return DB::transaction(function () use ($order, $data, $lines) {
             if ($order) {
                 $order = PurchaseOrder::whereKey($order->id)->lockForUpdate()->firstOrFail();
-                if (! in_array($order->status, ['approved', 'pending', 'partially_received'], true)) {
+                if (! in_array($order->status, ['approved', 'pending', 'partially_received', 'partially_invoiced'], true)) {
                     throw ValidationException::withMessages(['order' => 'أمر الشراء غير معتمد أو مستلم بالكامل.']);
                 }
             }
@@ -261,6 +262,8 @@ class PurchaseCycleService
         $status = match (true) {
             $invoiced >= $ordered - self::QTY_TOLERANCE => 'converted_to_invoice',
             $received >= $ordered - self::QTY_TOLERANCE => 'received',
+            // Everything received so far was invoiced with it (direct staged invoicing).
+            $invoiced > 0 && $received <= $invoiced + self::QTY_TOLERANCE => 'partially_invoiced',
             $received > 0 => 'partially_received',
             default => $order->status,
         };

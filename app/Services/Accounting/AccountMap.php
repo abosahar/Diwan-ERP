@@ -40,6 +40,7 @@ class AccountMap
         'retention_payable' => ['محتجزات مقاولي الباطن', 'liability'],
         'accrued_expenses' => ['مصروفات مستحقة', 'liability'],
         'workers_fund' => ['صندوق جزاءات العمال', 'liability'],
+        'vat_settlement' => ['ضريبة القيمة المضافة المستحقة للهيئة (التسوية)', 'liability'],
         'zakat_payable' => ['زكاة مستحقة', 'liability'],
         'end_of_service_provision' => ['مخصص نهاية الخدمة', 'liability'],
         'leave_provision' => ['مخصص الإجازات السنوية', 'liability'],

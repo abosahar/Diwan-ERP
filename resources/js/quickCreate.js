@@ -170,6 +170,23 @@ export const quickCreate = {
             { key: 'status', label: 'الحالة', type: 'select', default: 'active', options: [{ value: 'active', label: 'على رأس العمل' }, { value: 'on_leave', label: 'في إجازة' }] },
         ],
     },
+    customer_group: {
+        title: 'مجموعة عملاء جديدة', route: 'sales.customer-groups.store', seed: 'name',
+        fields: () => [
+            text('code', 'رمز المجموعة', { required: true }),
+            text('name', 'اسم المجموعة', { required: true }),
+            { key: 'account_id', label: 'الحساب المحاسبي المرتبط', type: 'select', lookup: 'accounts', query: { type: 'asset' }, entity: 'account', empty: 'الذمم العامة', span: 2 },
+            text('description', 'الوصف', { span: 2 }),
+        ],
+    },
+    nationality: {
+        title: 'جنسية جديدة', route: 'hr.nationalities.store', seed: 'name_ar',
+        fields: () => [
+            text('name_ar', 'الجنسية بالعربي (مثال: مصري)', { required: true }),
+            text('name_en', 'بالإنجليزي (Egyptian)'),
+            text('code', 'رمز الدولة ISO2', { required: true, maxlength: 2, hint: 'حرفان مثل EG' }),
+        ],
+    },
     work_center: {
         title: 'مركز عمل جديد', route: 'manufacturing.work-centers.store', seed: 'name', size: 'lg',
         fields: () => [

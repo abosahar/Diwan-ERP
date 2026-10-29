@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -13,6 +14,7 @@ const form = useForm({
     capacity_hours_per_day: c.capacity_hours_per_day ?? 8, efficiency: c.efficiency ?? 100, labour_rate_per_hour: c.labour_rate_per_hour ?? 0, overhead_rate_per_hour: c.overhead_rate_per_hour ?? 0,
     is_active: c.is_active ?? true, notes: c.notes || '',
 });
+useUnsavedGuard(form);
 const submit = () => (editing ? form.put(route('manufacturing.work-centers.update', c.id)) : form.post(route('manufacturing.work-centers.store')));
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
 </script>
@@ -28,10 +30,10 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                 <Field label="النوع *"><select v-model="form.type" :class="input"><option value="machine">آلة</option><option value="line">خط إنتاج</option><option value="labour">عمالة يدوية</option><option value="workshop">ورشة</option></select></Field>
                 <Field label="المعدة المرتبطة" hint="للربط مع وحدة المعدات"><select v-model="form.equipment_id" :class="input"><option value="">—</option><option v-for="e in equipment" :key="e.id" :value="e.id">{{ e.code }} — {{ e.name }}</option></select></Field>
                 <Field label="مركز التكلفة"><SelectCreate v-model="form.cost_center_id" :options="costCenters" entity="cost_center" :label="(cc) => `${cc.code} — ${cc.name_ar}`" placeholder="—" /></Field>
-                <Field label="الطاقة (ساعات/يوم) *" :error="form.errors.capacity_hours_per_day"><input v-model="form.capacity_hours_per_day" type="number" step="0.1" :class="input" /></Field>
-                <Field label="الكفاءة % *" hint="100 = بلا فاقد" :error="form.errors.efficiency"><input v-model="form.efficiency" type="number" step="1" :class="input" /></Field>
-                <Field label="أجور التشغيل لكل ساعة" :error="form.errors.labour_rate_per_hour"><input v-model="form.labour_rate_per_hour" type="number" step="0.01" :class="input" /></Field>
-                <Field label="مصروفات غير مباشرة لكل ساعة" hint="كهرباء وإهلاك وصيانة" :error="form.errors.overhead_rate_per_hour"><input v-model="form.overhead_rate_per_hour" type="number" step="0.01" :class="input" /></Field>
+                <Field label="الطاقة (ساعات/يوم) *" :error="form.errors.capacity_hours_per_day"><input v-model.number="form.capacity_hours_per_day" type="text" inputmode="decimal" data-num step="0.1" :class="input" /></Field>
+                <Field label="الكفاءة % *" hint="100 = بلا فاقد" :error="form.errors.efficiency"><input v-model.number="form.efficiency" type="text" inputmode="decimal" data-num step="1" :class="input" /></Field>
+                <Field label="أجور التشغيل لكل ساعة" :error="form.errors.labour_rate_per_hour"><input v-model.number="form.labour_rate_per_hour" type="text" inputmode="decimal" data-num step="0.01" :class="input" /></Field>
+                <Field label="مصروفات غير مباشرة لكل ساعة" hint="كهرباء وإهلاك وصيانة" :error="form.errors.overhead_rate_per_hour"><input v-model.number="form.overhead_rate_per_hour" type="text" inputmode="decimal" data-num step="0.01" :class="input" /></Field>
             </div>
             <Field label="ملاحظات"><textarea v-model="form.notes" rows="2" :class="input"></textarea></Field>
             <label class="inline-flex items-center gap-2 text-xs"><input v-model="form.is_active" type="checkbox" class="rounded" /> يعمل</label>

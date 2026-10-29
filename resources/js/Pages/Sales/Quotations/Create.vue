@@ -1,4 +1,6 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate, taxLabel } from '@/utils/tax';
@@ -55,6 +57,7 @@ const form = useForm({
         }
     ]
 });
+useUnsavedGuard(form);
 
 // A new branch moves lines still on the old standard rate to the new one (reduced or zero rates stay).
 watch(() => form.branch_id, (id) => {
@@ -247,22 +250,18 @@ const importLines = (lines, replace) => {
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">تاريخ العرض *</label>
-                                <input 
-                                    v-model="form.quotation_date"
-                                    type="date" 
+                                <DatePicker 
+                                    v-model="form.quotation_date" 
                                     class="w-full font-mono text-xs rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 bg-slate-50/50"
-                                    required
-                                />
+                                    required />
                                 <p v-if="form.errors.quotation_date" class="text-2xs text-rose-500 mt-1">{{ form.errors.quotation_date }}</p>
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">صالح حتى تاريخ</label>
-                                <input 
-                                    v-model="form.valid_until"
-                                    type="date" 
-                                    class="w-full font-mono text-xs rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 bg-slate-50/50"
-                                />
+                                <DatePicker 
+                                    v-model="form.valid_until" 
+                                    class="w-full font-mono text-xs rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 bg-slate-50/50" />
                             </div>
                         </div>
 
@@ -345,7 +344,7 @@ const importLines = (lines, replace) => {
                                     <td class="py-3 px-4 align-top">
                                         <input 
                                             v-model.number="item.quantity"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="0.01" 
                                             step="0.01"
                                             class="w-full font-mono text-xs rounded-lg border-slate-200 focus:border-indigo-500 py-1.5"
@@ -355,7 +354,7 @@ const importLines = (lines, replace) => {
                                     <td class="py-3 px-4 align-top">
                                         <input 
                                             v-model.number="item.unit_price"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="0" 
                                             step="0.01"
                                             class="w-full font-mono text-xs rounded-lg border-slate-200 focus:border-indigo-500 py-1.5"
@@ -365,7 +364,7 @@ const importLines = (lines, replace) => {
                                     <td class="py-3 px-4 align-top">
                                         <input 
                                             v-model.number="item.discount"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="0" 
                                             step="0.01"
                                             class="w-full font-mono text-xs rounded-lg border-slate-200 focus:border-indigo-500 py-1.5"
@@ -374,7 +373,7 @@ const importLines = (lines, replace) => {
                                     <td class="py-3 px-4 align-top">
                                         <input 
                                             v-model.number="item.tax_rate"
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="0" 
                                             step="0.01"
                                             class="w-full font-mono text-xs rounded-lg border-slate-200 focus:border-indigo-500 py-1.5"

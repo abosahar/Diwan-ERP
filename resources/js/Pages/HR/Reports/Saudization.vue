@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -15,7 +16,7 @@ const reload = () => router.get(route('hr.reports.saudization'), filters, { pres
         <Head title="مؤشر السعودة" />
         <PageHeader title="مؤشر السعودة (نطاقات)" subtitle="مؤشر تقديري من بيانات الموظفين؛ النطاق الرسمي يصدر من منصة قوى" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'مؤشر السعودة' }]">
             <template #actions>
-                <input v-model="filters.date" type="date" @change="reload" class="rounded-xl border-slate-200 text-xs" />
+                <DatePicker v-model="filters.date" @change="reload" class="rounded-xl border-slate-200 text-xs" />
                 <a v-if="$can('hr.reports.export')" :href="route('hr.reports.saudization', { date: filters.date, export: 'csv' })" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">تصدير CSV</a>
             </template>
         </PageHeader>

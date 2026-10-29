@@ -6,6 +6,7 @@ import { ChevronDownIcon, ChevronRightIcon, ChevronLeftIcon, XMarkIcon, ShieldCh
 import navigation from '@/navigation';
 import { canRoute } from '@/permissions';
 import { sidebarCollapsed, toggleSidebar } from '@/composables/useSidebar';
+import { useUnreadNotes } from '@/composables/useWhatsNew';
 
 defineProps({
     isOpen: {
@@ -17,6 +18,7 @@ defineProps({
 defineEmits(['closeSidebar']);
 
 const page = usePage();
+const unreadNotes = useUnreadNotes();
 // The text direction the page was actually rendered with (the drawer slides off the start side).
 const isRtl = computed(() => (typeof document !== 'undefined' ? document.documentElement.dir : 'rtl') === 'rtl' || (!document?.documentElement?.dir && (page.props.locale || 'ar') === 'ar'));
 
@@ -130,6 +132,7 @@ const slim = computed(() => sidebarCollapsed.value);
                         <div class="flex items-center gap-3">
                             <component :is="item.icon" :class="[item.color === 'emerald' ? 'text-emerald-400' : 'text-brand-400', 'w-6 h-6 flex-shrink-0 transition-transform group-hover:scale-110']" />
                             <span :class="slim ? 'lg:hidden' : ''" class="font-semibold whitespace-nowrap">{{ $t(item.label) }}</span>
+                            <span v-if="item.key === 'updates' && unreadNotes" class="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0" data-notes-dot></span>
                         </div>
                         <ChevronDownIcon
                             :class="[openMenus[item.key] ? 'rotate-180' : '', slim ? 'lg:hidden' : '', 'w-4 h-4 text-slate-500 transition-transform']"
@@ -174,7 +177,10 @@ const slim = computed(() => sidebarCollapsed.value);
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     {{ $page.props.brand?.local_install ? 'يعمل على هذا الجهاز' : 'الخادم: متصل' }}
                 </span>
-                <span class="text-[10px] text-slate-500 font-mono">v{{ $page.props.brand?.version }}</span>
+                <span class="text-[10px] text-slate-500 font-mono" data-version>
+                    v{{ $page.props.brand?.version }}
+                    <span v-if="$page.props.update?.available && $page.props.update?.latest" class="text-emerald-400" title="يتوفر إصدار أحدث: حدّثه من لوحة التحكم">· متوفر v{{ $page.props.update.latest.version }}</span>
+                </span>
             </div>
             <div :class="slim ? 'lg:flex' : 'hidden'" class="hidden justify-center">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="متصل"></span>

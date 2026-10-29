@@ -77,6 +77,11 @@ class SelfUpdate
     {
         $json = is_file($this->statusFile()) ? json_decode((string) file_get_contents($this->statusFile()), true) : null;
 
+        // A finished update is old news after a few minutes: do not keep announcing it.
+        if (is_array($json) && in_array($json['state'] ?? '', ['done', 'uptodate'], true) && ($json['at'] ?? 0) < time() - 600) {
+            return null;
+        }
+
         return is_array($json) ? $json : null;
     }
 

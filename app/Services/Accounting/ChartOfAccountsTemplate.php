@@ -50,6 +50,7 @@ class ChartOfAccountsTemplate
             ['2110', '21', 'بضاعة مستلمة لم تصل فواتيرها', 'Goods Received Not Invoiced', 'liability', 'credit', false, 'grni', 'operating'],
             ['2112', '21', 'مخصص الإجازات السنوية', 'Annual Leave Provision', 'liability', 'credit', false, 'leave_provision', 'operating'],
             ['2111', '21', 'صندوق جزاءات العمال', 'Workers Fund (Penalties)', 'liability', 'credit', false, 'workers_fund', 'operating'],
+            ['2113', '21', 'ضريبة القيمة المضافة المستحقة للهيئة', 'VAT Payable (Settlement)', 'liability', 'credit', false, 'vat_settlement', 'operating'],
             ['212', '21', 'ضريبة القيمة المضافة المخرجة', 'VAT Output', 'liability', 'credit', false, 'vat_output', 'operating'],
             ['213', '21', 'رواتب مستحقة', 'Salaries Payable', 'liability', 'credit', false, 'salaries_payable', 'operating'],
             ['214', '21', 'التأمينات الاجتماعية المستحقة', 'GOSI Payable', 'liability', 'credit', false, 'gosi_payable', 'operating'],

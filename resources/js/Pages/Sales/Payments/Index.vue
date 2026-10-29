@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import CancelDocument from '@/Components/CancelDocument.vue';
@@ -65,7 +66,7 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Breadcrumbs Ribbon -->
-            <PageHeader title="المدفوعات" :crumbs="[{ label: 'المبيعات' }, { label: 'المدفوعات' }]">
+            <PageHeader year-scoped title="المدفوعات" :crumbs="[{ label: 'المبيعات' }, { label: 'المدفوعات' }]">
 <template #actions>
 <button
                         v-if="$canRoute('sales.payments.store')"
@@ -173,8 +174,8 @@ const formatCurrency = (val) => {
                     </select>
                 </Field>
                 <div class="grid grid-cols-2 gap-2">
-                    <Field label="المبلغ" :error="form.errors.amount"><input v-model="form.amount" type="number" step="0.01" min="0" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                    <Field label="التاريخ" :error="form.errors.payment_date"><input v-model="form.payment_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="المبلغ" :error="form.errors.amount"><input v-model.number="form.amount" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                    <Field label="التاريخ" :error="form.errors.payment_date"><DatePicker v-model="form.payment_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="طريقة الدفع" :error="form.errors.payment_method">
                         <select v-model="form.payment_method" class="w-full rounded-xl border-slate-200 text-xs">
                             <option value="bank_transfer">تحويل بنكي</option><option value="cash">نقداً</option><option value="card">بطاقة / مدى</option><option value="cheque">شيك</option>

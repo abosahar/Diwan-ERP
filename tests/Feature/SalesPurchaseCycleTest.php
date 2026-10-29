@@ -12,8 +12,10 @@ use App\Models\Invoice;
 use App\Models\JournalEntryLine;
 use App\Models\PriceList;
 use App\Models\Product;
+use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
+use App\Models\SupplierPayment;
 use App\Models\Warehouse;
 use App\Services\Accounting\AccountingSetupService;
 use App\Services\Accounting\AccountMap;
@@ -410,5 +412,62 @@ class SalesPurchaseCycleTest extends TestCase
         $clerk->givePermissionTo('admin.data_scope.manage');
         $this->post(route('context.branch'), ['branch_id' => 'all'])->assertSessionHasNoErrors();
         $this->assertCount(2, Invoice::all());
+    }
+
+    public function test_purchase_order_is_invoiced_in_stages_with_split_payments(): void
+    {
+        $this->withoutVite();
+        $p = $this->product();
+        $order = $this->purchaseOrder($p, 10, 50);
+        $item = $order->items->first();
+
+        // Stage 1: 4 of 10, paid half in cash and half by transfer.
+        $this->post(route('purchases.orders.convert', $order->id), [
+            'lines' => [['item_id' => $item->id, 'quantity' => 4]],
+            'payments' => [['method' => 'cash', 'amount' => 100], ['method' => 'bank_transfer', 'amount' => 130]],
+        ])->assertRedirect();
+        $invoice = PurchaseInvoice::firstOrFail();
+        $this->assertEquals(230, $invoice->total);
+        $this->assertEquals(230, $invoice->paid_amount);
+        $this->assertSame('paid', $invoice->payment_status);
+        $this->assertSame(2, SupplierPayment::count());
+        $this->assertSame('partially_invoiced', $order->fresh()->status);
+        $this->assertSame(4.0, app(StockService::class)->onHand($p->id));
+
+        // Over-invoicing the remainder is refused; the rest goes in stage 2.
+        $this->post(route('purchases.orders.convert', $order->id), ['lines' => [['item_id' => $item->id, 'quantity' => 7]]])->assertSessionHasErrors('lines');
+        $this->post(route('purchases.orders.convert', $order->id), ['lines' => [['item_id' => $item->id, 'quantity' => 6]]])->assertRedirect();
+
+        $this->assertSame('converted_to_invoice', $order->fresh()->status);
+        $this->assertSame(10.0, app(StockService::class)->onHand($p->id));
+        $this->assertEquals(575, PurchaseInvoice::sum('total'));
+        $this->assertLedgerBalanced();
+    }
+
+    public function test_purchase_invoice_with_several_payment_rows_credits_each_account(): void
+    {
+        $this->withoutVite();
+        $p = $this->product();
+
+        $this->post(route('purchases.invoices.store'), [
+            'supplier_id' => $this->supplier->id, 'warehouse_id' => $this->warehouse->id, 'invoice_date' => '2026-06-15',
+            'payments' => [['method' => 'cash', 'amount' => 200], ['method' => 'bank_transfer', 'amount' => 150]],
+            'items' => [['product_id' => $p->id, 'item_name' => 'صنف', 'quantity' => 10, 'unit_price' => 50, 'tax_rate' => 15]],
+        ])->assertSessionHasNoErrors();
+
+        $invoice = PurchaseInvoice::firstOrFail();
+        $this->assertEquals(575, $invoice->total);
+        $this->assertEquals(350, $invoice->paid_amount);
+        $this->assertSame('partially_paid', $invoice->payment_status);
+        $this->assertSame(-200.0, $this->balance('default_cash'));
+        $this->assertSame(-150.0, $this->balance('default_bank'));
+        $this->assertSame(225.0, $this->balance('payables'));
+        $this->assertLedgerBalanced();
+
+        $this->post(route('purchases.invoices.store'), [
+            'supplier_id' => $this->supplier->id, 'warehouse_id' => $this->warehouse->id, 'invoice_date' => '2026-06-15',
+            'payments' => [['method' => 'cash', 'amount' => 9999]],
+            'items' => [['product_id' => $p->id, 'item_name' => 'صنف', 'quantity' => 1, 'unit_price' => 50, 'tax_rate' => 15]],
+        ])->assertSessionHasErrors('payments');
     }
 }

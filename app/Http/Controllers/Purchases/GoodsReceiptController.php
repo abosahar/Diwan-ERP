@@ -22,7 +22,7 @@ class GoodsReceiptController extends Controller
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('receipt_number', 'like', "%{$s}%")
                 ->orWhere('supplier_delivery_number', 'like', "%{$s}%")
                 ->orWhereHas('supplier', fn ($c) => $c->where('name', 'like', "%{$s}%"))))
-            ->orderByDesc('receipt_date')->orderByDesc('id')
+            ->inActiveYear('receipt_date')->orderByDesc('receipt_date')->orderByDesc('id')
             ->paginate($this->perPage($request))->withQueryString();
 
         return Inertia::render('Purchases/Receipts/Index', ['receipts' => $receipts, 'filters' => $filters]);

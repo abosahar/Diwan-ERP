@@ -23,6 +23,7 @@ use App\Services\TenantManager;
 use App\Support\BranchOptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class PurchaseInvoiceController extends Controller
@@ -62,13 +63,14 @@ class PurchaseInvoiceController extends Controller
             $query->whereDate('invoice_date', '<=', $dateTo);
         }
 
-        $invoices = $query->orderBy('invoice_date', 'desc')
+        $yearScoped = ! $dateFrom && ! $dateTo;
+        $invoices = $query->inActiveYear('invoice_date', $yearScoped)->orderBy('invoice_date', 'desc')
             ->orderBy('id', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();
 
         // One aggregate query instead of loading every invoice into memory.
-        $totals = PurchaseInvoice::query()
+        $totals = PurchaseInvoice::inActiveYear('invoice_date')
             ->selectRaw('COUNT(*) as cnt, COALESCE(SUM(total), 0) as total, COALESCE(SUM(paid_amount), 0) as paid, COALESCE(SUM(remaining_amount), 0) as due')
             ->first();
         $stats = [
@@ -104,6 +106,7 @@ class PurchaseInvoiceController extends Controller
             ->get(['id', 'name', 'company_name', 'tax_number', 'phone', 'current_balance']);
 
         $branches = Branch::where('is_active', true)->get(['id', 'name_ar', 'name_en']);
+        $bankAccounts = BankAccount::where('is_active', true)->get(['id', 'name', 'type']);
 
         $warehouses = Warehouse::where('is_active', true)->get(['id', 'name_ar', 'name_en', 'branch_id']);
         if ($warehouses->isEmpty() && $company) {
@@ -138,6 +141,7 @@ class PurchaseInvoiceController extends Controller
             'products' => $products,
             'categories' => $categories,
             'units' => $units,
+            'bankAccounts' => $bankAccounts,
             'suggestedNumber' => $suggestedNumber,
             'defaultTaxRate' => TaxProfile::rate(),
         ]);
@@ -157,8 +161,13 @@ class PurchaseInvoiceController extends Controller
             'invoice_date' => 'required|date',
             'due_date' => 'nullable|date',
             'supply_date' => 'nullable|date',
-            'payment_method' => 'required|string|in:cash,card,bank_transfer,credit',
-            'payment_status' => 'required|string|in:paid,partially_paid,unpaid',
+            'payment_method' => 'required_without:payments|nullable|string|in:cash,card,bank_transfer,credit',
+            'payment_status' => 'required_without:payments|nullable|string|in:paid,partially_paid,unpaid',
+            // Several payment rows (cash + transfer ...) settle the bill at once.
+            'payments' => 'nullable|array|max:10',
+            'payments.*.method' => 'required|in:cash,card,bank_transfer',
+            'payments.*.bank_account_id' => 'nullable|tenant_exists:bank_accounts,id',
+            'payments.*.amount' => 'required|numeric|min:0.01',
             'paid_amount' => 'nullable|numeric|min:0',
             'bank_account_id' => 'nullable|tenant_exists:bank_accounts,id',
             'notes' => 'nullable|string',
@@ -221,8 +230,17 @@ class PurchaseInvoiceController extends Controller
             }
 
             $total = $subtotal + $taxAmount;
+            $paymentRows = collect($validated['payments'] ?? [])->values();
             $paidAmount = 0;
-            if ($validated['payment_status'] === 'paid') {
+            if ($paymentRows->isNotEmpty()) {
+                $paidAmount = round($paymentRows->sum(fn ($p) => (float) $p['amount']), 2);
+                if ($paidAmount > round($total, 2) + 0.005) {
+                    throw ValidationException::withMessages(['payments' => 'مجموع الدفعات أكبر من إجمالي الفاتورة.']);
+                }
+                $validated['payment_status'] = $paidAmount >= round($total, 2) - 0.005 ? 'paid' : 'partially_paid';
+                $validated['payment_method'] = $paymentRows->first()['method'];
+                $validated['bank_account_id'] = $paymentRows->first()['bank_account_id'] ?? null;
+            } elseif ($validated['payment_status'] === 'paid') {
                 $paidAmount = $total;
             } elseif ($validated['payment_status'] === 'partially_paid') {
                 $paidAmount = min($total, (float) ($validated['paid_amount'] ?? 0));
@@ -281,17 +299,20 @@ class PurchaseInvoiceController extends Controller
             }
 
             // ⭐ Record Payment if paid or partially paid
-            if ($paidAmount > 0) {
+            $rowsToRecord = $paymentRows->isNotEmpty()
+                ? $paymentRows->map(fn ($p) => ['amount' => (float) $p['amount'], 'method' => $p['method'], 'bank' => $p['bank_account_id'] ?? null])
+                : collect($paidAmount > 0 ? [['amount' => $paidAmount, 'method' => $validated['payment_method'], 'bank' => $validated['bank_account_id'] ?? null]] : []);
+            foreach ($rowsToRecord as $row) {
                 SupplierPayment::create([
                     'company_id' => $companyId,
                     'supplier_id' => $validated['supplier_id'],
                     'purchase_invoice_id' => $purchaseInvoice->id,
                     'payment_number' => $this->nextNumber('supplier_payment', $validated['invoice_date']),
-                    'amount' => $paidAmount,
+                    'amount' => $row['amount'],
                     'payment_date' => $validated['invoice_date'],
-                    'payment_method' => $validated['payment_method'],
+                    'payment_method' => $row['method'],
                     'reference_number' => $validated['supplier_invoice_number'] ?? null,
-                    'bank_account_id' => $validated['bank_account_id'] ?? null,
+                    'bank_account_id' => $row['bank'],
                     'notes' => 'سداد مرتبط بفاتورة الشراء '.$validated['invoice_number'],
                     'currency_code' => $validated['currency_code'],
                     'exchange_rate' => $rate,

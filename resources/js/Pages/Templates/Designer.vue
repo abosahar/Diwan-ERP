@@ -1281,7 +1281,7 @@ const setAsDefault = () => {
                                             <!-- Font Size Stepper -->
                                             <input 
                                                 v-model.number="field.font_size" 
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 min="8" 
                                                 max="24"
                                                 class="w-12 h-7 px-1.5 text-center text-xs font-mono border border-slate-200 rounded-md"
@@ -1400,7 +1400,7 @@ const setAsDefault = () => {
                                     <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-lg border border-slate-200/80">
                                         <input 
                                             v-model.number="layout.header.title.font_size" 
-                                            type="number" 
+                                            type="text" inputmode="decimal" data-num 
                                             min="10" 
                                             max="28"
                                             class="w-12 h-7 px-1.5 text-center text-xs font-mono border border-slate-200 rounded-md"
@@ -1482,7 +1482,7 @@ const setAsDefault = () => {
                                 <label class="block font-bold text-slate-800 mb-1.5">حجم الخط الأساسي (px)</label>
                                 <input 
                                     v-model.number="layout.design.font_size_base" 
-                                    type="number" 
+                                    type="text" inputmode="decimal" data-num 
                                     min="10" 
                                     max="16"
                                     class="w-32 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs"
@@ -1542,7 +1542,7 @@ const setAsDefault = () => {
                                         <div class="flex items-center gap-1">
                                             <input 
                                                 v-model.number="layout.logo.height" 
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 min="30" 
                                                 max="250" 
                                                 class="w-16 h-7 text-center text-xs font-mono font-bold bg-white border border-slate-200 rounded-lg text-indigo-600"
@@ -1604,7 +1604,7 @@ const setAsDefault = () => {
                                         <div class="flex items-center gap-1">
                                             <input 
                                                 v-model.number="layout.logo.max_width" 
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 min="100" 
                                                 max="450" 
                                                 class="w-16 h-7 text-center text-xs font-mono font-bold bg-white border border-slate-200 rounded-lg text-indigo-600"
@@ -1781,7 +1781,7 @@ const setAsDefault = () => {
                                         <div class="flex items-center gap-1">
                                             <input 
                                                 v-model.number="layout.qr.size" 
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 min="60" 
                                                 max="160" 
                                                 class="w-16 h-7 text-center text-xs font-mono font-bold bg-white border border-slate-200 rounded-lg text-indigo-600"

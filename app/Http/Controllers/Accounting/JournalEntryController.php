@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
+use App\Models\BankAccount;
 use App\Models\CostCenter;
 use App\Models\Customer;
 use App\Models\JournalEntry;
+use App\Models\Project;
 use App\Models\Supplier;
 use App\Services\Accounting\AccountMap;
+use App\Services\Accounting\DimensionPolicy;
+use App\Services\Accounting\PartyAccounts;
 use App\Services\Accounting\PostingService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -45,6 +49,7 @@ class JournalEntryController extends Controller
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('reference', 'like', "%{$search}%"));
             })
+            ->inActiveYear('date', ! ($filters['from'] ?? null) && ! ($filters['to'] ?? null))
             ->orderByDesc('date')
             ->orderByDesc('id');
 
@@ -69,9 +74,12 @@ class JournalEntryController extends Controller
         return Inertia::render('Accounting/Journals/Form', [
             'accounts' => Account::where('is_parent', false)->where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar', 'type', 'requires_cost_center']),
             'costCenters' => CostCenter::where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar']),
-            'customers' => Customer::orderBy('name')->get(['id', 'name']),
+            'projects' => Project::orderBy('name')->get(['id', 'name']),
+            'dimensionPolicy' => app(DimensionPolicy::class)->modes(),
+            'customers' => Customer::orderBy('name')->get(['id', 'name', 'code']),
             'suppliers' => Supplier::orderBy('name')->get(['id', 'name']),
-            'partyAccounts' => collect(self::PARTY_ROLES)->mapWithKeys(fn ($type, $role) => [(string) $this->map->find($role) => $type])->except(''),
+            'partyAccounts' => $this->partyAccounts(),
+            'bankAccounts' => BankAccount::where('is_active', true)->whereNotNull('account_id')->orderBy('name')->get(['id', 'name', 'type', 'account_id']),
         ]);
     }
 
@@ -86,10 +94,11 @@ class JournalEntryController extends Controller
             'lines' => 'required|array|min:2|max:500',
             'lines.*.account_id' => 'required|tenant_exists:accounts,id',
             'lines.*.cost_center_id' => 'nullable|tenant_exists:cost_centers,id',
+            'lines.*.project_id' => 'nullable|tenant_exists:projects,id',
             'lines.*.description' => 'nullable|string|max:500',
             'lines.*.debit' => 'required|numeric|min:0',
             'lines.*.credit' => 'required|numeric|min:0',
-            'lines.*.party_type' => 'nullable|in:customer,supplier',
+            'lines.*.party_type' => 'nullable|in:customer,supplier,bank',
             'lines.*.party_id' => 'nullable|integer',
         ]);
         $this->guardControlAccounts($validated['lines'], $request);
@@ -109,6 +118,9 @@ class JournalEntryController extends Controller
             'lines' => collect($validated['lines'])->map(fn ($line) => [
                 'account_id' => (int) $line['account_id'],
                 'cost_center_id' => $line['cost_center_id'] ?? null,
+                'project_id' => $line['project_id'] ?? null,
+                // Hand-made opening entries are exempt from the dimension policy.
+                'dimensions' => ($validated['entry_type'] ?? 'manual') !== 'opening',
                 'description' => $line['description'] ?? $validated['description'],
                 'debit' => (float) $line['debit'],
                 'credit' => (float) $line['credit'],
@@ -127,8 +139,18 @@ class JournalEntryController extends Controller
     {
         $entry->load(['lines.account', 'lines.costCenter', 'creator', 'branch', 'reversalOf:id,entry_number', 'reversedBy:id,entry_number']);
 
+        // Names of the auxiliary accounts (customer / supplier / bank) the lines point at.
+        $names = [];
+        foreach (['customer' => Customer::class, 'supplier' => Supplier::class, 'bank' => BankAccount::class] as $type => $model) {
+            $ids = $entry->lines->where('party_type', $type)->pluck('party_id')->filter()->unique();
+            if ($ids->isNotEmpty()) {
+                $names[$type] = $model::withoutGlobalScopes()->whereIn('id', $ids)->pluck('name', 'id');
+            }
+        }
+
         return Inertia::render('Accounting/Journals/Show', [
             'entry' => $entry,
+            'parties' => $names,
         ]);
     }
 
@@ -186,12 +208,34 @@ class JournalEntryController extends Controller
     }
 
     /**
+     * Control accounts that take an auxiliary account (the customer, supplier, or bank / cash box behind them):
+     * account id => customer | supplier | bank.
+     *
+     * @return array<string, string>
+     */
+    protected function partyAccounts(): array
+    {
+        $map = [];
+        foreach (app(PartyAccounts::class)->receivableAccountIds() as $id) {
+            $map[(string) $id] = 'customer';
+        }
+        if ($payables = $this->map->find('payables')) {
+            $map[(string) $payables] = 'supplier';
+        }
+        foreach (BankAccount::whereNotNull('account_id')->pluck('account_id') as $id) {
+            $map[(string) $id] ??= 'bank';
+        }
+
+        return $map;
+    }
+
+    /**
      * Receivable / payable lines must name their customer / supplier, and
      * inventory / GRNI are only adjusted manually with a dedicated permission.
      */
     protected function guardControlAccounts(array $lines, Request $request): void
     {
-        $parties = collect(self::PARTY_ROLES)->mapWithKeys(fn ($type, $role) => [(int) $this->map->find($role) => $type])->except(0);
+        $parties = collect($this->partyAccounts())->mapWithKeys(fn ($type, $id) => [(int) $id => $type])->reject(fn ($type) => $type === 'bank');
         $documentAccounts = collect(self::DOCUMENT_ROLES)->map(fn ($role) => (int) $this->map->find($role))->filter()->all();
         $errors = [];
 
@@ -205,7 +249,11 @@ class JournalEntryController extends Controller
                     $errors["lines.{$i}.party_id"] = $expected === 'customer' ? 'اختر العميل لسطر حساب العملاء.' : 'اختر المورد لسطر حساب الموردين.';
                 }
             }
-            if ($partyId && ! ($partyType === 'customer' ? Customer::whereKey($partyId)->exists() : Supplier::whereKey($partyId)->exists())) {
+            if ($partyId && $partyType === 'bank') {
+                if (! BankAccount::whereKey($partyId)->where('account_id', $accountId)->exists()) {
+                    $errors["lines.{$i}.party_id"] = 'الحساب المساعد لا يتبع حساب البنك/الصندوق المختار.';
+                }
+            } elseif ($partyId && ! ($partyType === 'customer' ? Customer::whereKey($partyId)->exists() : Supplier::whereKey($partyId)->exists())) {
                 $errors["lines.{$i}.party_id"] = 'الطرف المحدد غير موجود.';
             }
             if (in_array($accountId, $documentAccounts, true) && ! $request->user()->can('accounting.journals.manage')) {

@@ -72,7 +72,7 @@ class MrpService
             $onHand = InventoryStock::select('product_id', DB::raw('SUM(quantity) as q'))->groupBy('product_id')->pluck('q', 'product_id')->map(fn ($v) => (float) $v)->all();
             $supply = [];
             foreach (DB::table('purchase_order_items as i')->join('purchase_orders as o', 'o.id', '=', 'i.purchase_order_id')
-                ->where('o.company_id', $this->companyId())->whereIn('o.status', ['approved', 'pending', 'partially_received'])->whereNotNull('i.product_id')
+                ->where('o.company_id', $this->companyId())->whereIn('o.status', ['approved', 'pending', 'partially_received', 'partially_invoiced'])->whereNotNull('i.product_id')
                 ->get(['i.product_id', 'i.quantity', 'i.received_quantity']) as $i) {
                 $supply[$i->product_id] = ($supply[$i->product_id] ?? 0) + max(0, (float) $i->quantity - (float) $i->received_quantity);
             }

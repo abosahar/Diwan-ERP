@@ -63,7 +63,7 @@ const save = (approve = false) => {
                             <button v-if="mode === 'plan' && editable" @click="spread(row.id)" class="ms-1 text-indigo-500 hover:underline">توزيع</button>
                         </td>
                         <template v-if="mode === 'plan'">
-                            <td v-for="p in months" :key="p" class="px-0.5 py-1"><input v-model="grid[row.id][p]" :disabled="!editable" type="number" step="0.01" class="w-24 rounded-lg border-slate-200 text-[11px] font-mono py-1 px-1.5" /></td>
+                            <td v-for="p in months" :key="p" class="px-0.5 py-1"><input v-model.number="grid[row.id][p]" :disabled="!editable" type="text" inputmode="decimal" data-num step="0.01" class="w-24 rounded-lg border-slate-200 text-[11px] font-mono py-1 px-1.5" /></td>
                             <td class="px-3 py-1.5 text-end font-mono font-bold">{{ money(rowTotal(row.id)) }}</td>
                         </template>
                         <template v-else>

@@ -1,4 +1,6 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -16,6 +18,7 @@ const form = useForm({
     reference: '',
     notes: '',
 });
+useUnsavedGuard(form);
 
 const selectedFromAccount = computed(() => props.accounts?.find((a) => a.id === form.from_account_id));
 
@@ -32,13 +35,13 @@ const submitTransfer = () => form.post(route('finance.transfers.store'));
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">من حساب / خزينة *</label>
-                                    <SelectCreate v-model="form.from_account_id" :options="accounts" entity="account" :label="(a) => `${a.name} (${Number(a.current_balance).toLocaleString()} ${a.currency})`" :allow-empty="false" required />
+                                    <SelectCreate v-model="form.from_account_id" :options="accounts" entity="account" :label="(a) => `${a.name} (${Number(a.current_balance).toLocaleString('en-US')} ${a.currency})`" :allow-empty="false" required />
                                     <p v-if="form.errors.from_account_id" class="text-[11px] text-rose-600 mt-1">{{ form.errors.from_account_id }}</p>
                                 </div>
             
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">إلى حساب / خزينة *</label>
-                                    <SelectCreate v-model="form.to_account_id" :options="accounts" entity="account" :label="(a) => `${a.name} (${Number(a.current_balance).toLocaleString()} ${a.currency})`" :allow-empty="false" required />
+                                    <SelectCreate v-model="form.to_account_id" :options="accounts" entity="account" :label="(a) => `${a.name} (${Number(a.current_balance).toLocaleString('en-US')} ${a.currency})`" :allow-empty="false" required />
                                     <p v-if="form.errors.to_account_id" class="text-[11px] text-rose-600 mt-1">{{ form.errors.to_account_id }}</p>
                                 </div>
                             </div>
@@ -46,7 +49,7 @@ const submitTransfer = () => form.post(route('finance.transfers.store'));
                             <div v-if="selectedFromAccount" class="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 text-xs flex items-center justify-between">
                                 <span class="text-indigo-900 font-medium">الرصيد المتاح في الحساب المصدر:</span>
                                 <span class="font-bold font-mono text-indigo-700">
-                                    {{ Number(selectedFromAccount.current_balance).toLocaleString() }} {{ selectedFromAccount.currency }}
+                                    {{ Number(selectedFromAccount.current_balance).toLocaleString('en-US') }} {{ selectedFromAccount.currency }}
                                 </span>
                             </div>
             
@@ -54,8 +57,8 @@ const submitTransfer = () => form.post(route('finance.transfers.store'));
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">المبلغ المحول *</label>
                                     <input 
-                                        v-model="form.amount" 
-                                        type="number" 
+                                        v-model.number="form.amount" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01"
                                         min="0.01"
                                         required
@@ -67,12 +70,10 @@ const submitTransfer = () => form.post(route('finance.transfers.store'));
             
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ التحويل *</label>
-                                    <input 
+                                    <DatePicker 
                                         v-model="form.transfer_date" 
-                                        type="date" 
                                         required
-                                        class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono"
-                                    />
+                                        class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono" />
                                 </div>
                             </div>
             

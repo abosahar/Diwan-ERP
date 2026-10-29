@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref, computed } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
@@ -50,16 +51,16 @@ const freq = { monthly: 'شهري', quarterly: 'ربع سنوي', yearly: 'سن�
                 <Field label="الاسم" :error="form.errors.name"><input v-model="form.name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <label class="flex items-center gap-2 text-xs col-span-full"><input v-model="form.auto_reverse" type="checkbox" class="rounded" /> قيد استحقاق: يُعكس تلقائياً في اليوم التالي</label>
                 <Field label="التكرار"><select v-model="form.frequency" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in freq" :key="k" :value="k">{{ l }}</option></select></Field>
-                <Field label="أول تشغيل"><input v-model="form.next_run_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="ينتهي في (اختياري)"><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="أول تشغيل"><DatePicker v-model="form.next_run_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="ينتهي في (اختياري)"><DatePicker v-model="form.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <div class="col-span-2 md:col-span-4"><Field label="بيان القيد" :error="form.errors.description"><input v-model="form.description" class="w-full rounded-xl border-slate-200 text-xs" /></Field></div>
             </div>
             <div class="overflow-x-auto"><table class="w-full text-xs">
                 <tr v-for="(l, i) in form.lines" :key="i">
                     <td class="p-1"><SelectCreate v-model="l.account_id" :options="accounts" entity="account" :label="(a) => `${a.code} - ${a.name_ar}`" :allow-empty="false" /></td>
                     <td class="p-1 w-36"><SelectCreate v-model="l.cost_center_id" :options="costCenters" entity="cost_center" label="name_ar" placeholder="مركز تكلفة" /></td>
-                    <td class="p-1 w-28"><input v-model="l.debit" @focus="l.credit = 0" type="number" step="0.01" placeholder="مدين" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
-                    <td class="p-1 w-28"><input v-model="l.credit" @focus="l.debit = 0" type="number" step="0.01" placeholder="دائن" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td class="p-1 w-28"><input v-model.number="l.debit" @focus="l.credit = 0" type="text" inputmode="decimal" data-num step="0.01" placeholder="مدين" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td class="p-1 w-28"><input v-model.number="l.credit" @focus="l.debit = 0" type="text" inputmode="decimal" data-num step="0.01" placeholder="دائن" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td class="p-1 w-8"><button v-if="form.lines.length > 2" @click="form.lines.splice(i, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td>
                 </tr>
             </table></div>

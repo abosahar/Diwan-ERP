@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import { computed, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -19,6 +20,7 @@ const form = useForm({
     role: u?.roles?.[0]?.name || props.roles?.[0]?.name || 'sales',
     status: u?.status || 'active',
 });
+useUnsavedGuard(form);
 
 // The owner role works in every branch; other users work in the ticked ones.
 const isOwnerRole = computed(() => !!props.roles?.find((r) => r.name === form.role)?.is_owner);

@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -45,8 +46,8 @@ const overdue = (d) => d && new Date(d) <= new Date();
                 <Field label="الجوال"><input v-model="form.phone" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="البريد" :error="form.errors.email"><input v-model="form.email" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المصدر"><select v-model="form.source" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in sources" :key="k" :value="k">{{ l }}</option></select></Field>
-                <Field label="القيمة المتوقعة"><input v-model="form.expected_value" type="number" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field label="موعد المتابعة"><input v-model="form.next_follow_up" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="القيمة المتوقعة"><input v-model.number="form.expected_value" type="text" inputmode="decimal" data-num class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field label="موعد المتابعة"><DatePicker v-model="form.next_follow_up" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المسؤول"><select v-model="form.assigned_to" class="w-full rounded-xl border-slate-200 text-xs"><option value="">—</option><option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option></select></Field>
                 <Field label="ملاحظات" class="col-span-2"><textarea v-model="form.notes" rows="2" class="w-full rounded-xl border-slate-200 text-xs"></textarea></Field>
             </div>

@@ -88,10 +88,10 @@ const importLines = (lines, replace) => {
                 <tbody>
                     <tr v-for="(l, i) in items" :key="i" class="border-t border-slate-100">
                         <td class="px-2 py-1.5"><input v-model="l.item_name" :readonly="!!l.product_id" class="w-full rounded-lg border-slate-200 text-xs" :class="l.product_id ? 'bg-slate-50' : ''" /></td>
-                        <td class="px-2 py-1.5"><input v-model="l.quantity" type="number" step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
-                        <td class="px-2 py-1.5"><input v-model="l[priceKey]" type="number" step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
-                        <td v-if="allowDiscount" class="px-2 py-1.5"><input v-model="l.discount" type="number" step="0.01" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
-                        <td class="px-2 py-1.5"><input v-model="l.tax_rate" type="number" step="0.01" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                        <td class="px-2 py-1.5"><input v-model.number="l.quantity" type="text" inputmode="decimal" data-num step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                        <td class="px-2 py-1.5"><input v-model.number="l[priceKey]" type="text" inputmode="decimal" data-num step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                        <td v-if="allowDiscount" class="px-2 py-1.5"><input v-model.number="l.discount" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                        <td class="px-2 py-1.5"><input v-model.number="l.tax_rate" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                         <td class="px-2 py-1.5 text-end font-mono">{{ money(lineNet(l) + lineTax(l)) }}</td>
                         <td class="text-center"><button type="button" @click="items.splice(i, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td>
                     </tr>

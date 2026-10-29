@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -29,14 +30,14 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.map((i) => ({ p
 <template>
     <AppLayout>
         <Head title="طلبات الشراء" />
-        <PageHeader title="طلبات الشراء" subtitle="طلب داخلي ← اعتماد ← أمر شراء للمورد" :crumbs="[{ label: 'المشتريات' }, { label: 'طلبات الشراء' }]">
+        <PageHeader year-scoped title="طلبات الشراء" subtitle="طلب داخلي ← اعتماد ← أمر شراء للمورد" :crumbs="[{ label: 'المشتريات' }, { label: 'طلبات الشراء' }]">
             <template #actions><button v-if="$can('purchases.requests.create')" @click="open = true" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> طلب شراء</button></template>
         </PageHeader>
         <DocumentTable :paginator="requests" :columns="columns" :filters="filters" :statuses="statuses" search-route="purchases.requests.index" :link="(r) => route('purchases.requests.show', r.id)" />
         <Dialog :show="open" title="طلب شراء" size="xl" @close="open = false">
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <Field label="التاريخ"><input v-model="form.request_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="مطلوب بتاريخ"><input v-model="form.required_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="form.request_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="مطلوب بتاريخ"><DatePicker v-model="form.required_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="ملاحظات"><input v-model="form.notes" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <LineItemsEditor v-model="form.items" price-field="purchase_price" price-key="estimated_price" price-label="السعر التقديري" :allow-discount="false" />

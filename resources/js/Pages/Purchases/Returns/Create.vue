@@ -1,4 +1,6 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
@@ -18,6 +20,7 @@ const form = useForm({
     bank_account_id: '',
     items: (props.invoice?.items ?? []).map((i) => ({ purchase_invoice_item_id: i.id, name: i.item_name, returnable: i.returnable_quantity, unit_net: Number(i.quantity) ? (Number(i.quantity) * Number(i.unit_price) - Number(i.discount)) / Number(i.quantity) : 0, tax_rate: Number(i.tax_rate), quantity: 0 })),
 });
+useUnsavedGuard(form);
 const total = computed(() => form.items.reduce((s, i) => s + Number(i.quantity) * i.unit_net * (1 + i.tax_rate / 100), 0));
 const save = () => form.transform((d) => ({ ...d, items: d.items.filter((i) => Number(i.quantity) > 0).map(({ purchase_invoice_item_id, quantity }) => ({ purchase_invoice_item_id, quantity })) }))
     .post(route('purchases.returns.store'));
@@ -35,7 +38,7 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.filter((i) => N
                         <option v-for="inv in recentInvoices" :key="inv.id" :value="inv.id">{{ inv.invoice_number }} — {{ inv.supplier?.name }} ({{ money(inv.total) }})</option>
                     </select>
                 </Field>
-                <Field label="التاريخ"><input v-model="form.return_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="form.return_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="التسوية">
                     <select v-model="form.settlement" class="w-full rounded-xl border-slate-200 text-xs"><option value="credit">تخفيض رصيد المورد</option><option value="cash">استرداد نقدي</option><option value="bank_transfer">استرداد بنكي</option></select>
                 </Field>
@@ -49,7 +52,7 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.filter((i) => N
                         <td class="px-3 py-2">{{ i.name }}</td>
                         <td class="px-3 py-2 text-center font-mono">{{ qty(i.returnable) }}</td>
                         <td class="px-3 py-2 text-end font-mono">{{ money(i.unit_net) }}</td>
-                        <td class="px-3 py-2"><input v-model="i.quantity" type="number" min="0" :max="i.returnable" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                        <td class="px-3 py-2"><input v-model.number="i.quantity" type="text" inputmode="decimal" data-num min="0" :max="i.returnable" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     </tr>
                 </tbody>
             </table></div>

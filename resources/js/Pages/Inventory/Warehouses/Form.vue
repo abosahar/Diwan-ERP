@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -16,6 +17,7 @@ const form = useForm({
     address: props.warehouse?.address || '',
     is_main: !!props.warehouse?.is_main,
 });
+useUnsavedGuard(form);
 
 const submitWarehouse = () => (editingWarehouse
     ? form.put(route('inventory.warehouses.update', editingWarehouse.id))

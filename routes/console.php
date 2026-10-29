@@ -20,6 +20,7 @@ Schedule::command('erp:zatca-submit')->everyTenMinutes()->withoutOverlapping()->
 Schedule::command('erp:hr-provision')->monthlyOn(1, '03:10')->withoutOverlapping()->onOneServer();
 
 // Daily business alerts (overdue invoices, expiring documents, approvals...).
+Schedule::command('erp:purge-recycle-bin')->dailyAt('03:40')->withoutOverlapping()->onOneServer();
 Schedule::command('erp:alerts')->dailyAt('06:50')->withoutOverlapping()->onOneServer();
 
 // Encrypted backups: daily at 02:40, restore test every Sunday.

@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -13,6 +14,7 @@ const form = useForm({
     name: p.name || '', product_id: p.product_id || '', applies_to: p.applies_to || 'production', is_active: p.is_active ?? true,
     checks: p.checks?.length ? p.checks.map((c) => ({ name: c.name, type: c.type, min: c.min ?? '', max: c.max ?? '' })) : [{ name: '', type: 'passfail', min: '', max: '' }],
 });
+useUnsavedGuard(form);
 const submit = () => (editing ? form.put(route('manufacturing.plans.update', p.id)) : form.post(route('manufacturing.plans.store')));
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
 </script>
@@ -36,7 +38,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                     <tbody><tr v-for="(c, i) in form.checks" :key="i" class="border-t border-slate-100">
                         <td class="p-2"><input v-model="c.name" :class="input" placeholder="الطول، اللون، الشكل..." required /></td>
                         <td class="p-2"><select v-model="c.type" :class="input"><option value="passfail">سليم / معيب</option><option value="numeric">قياس رقمي</option></select></td>
-                        <td class="p-2"><input v-model="c.min" :disabled="c.type !== 'numeric'" type="number" step="any" :class="input" /></td><td class="p-2"><input v-model="c.max" :disabled="c.type !== 'numeric'" type="number" step="any" :class="input" /></td>
+                        <td class="p-2"><input v-model.number="c.min" :disabled="c.type !== 'numeric'" type="text" inputmode="decimal" data-num step="any" :class="input" /></td><td class="p-2"><input v-model.number="c.max" :disabled="c.type !== 'numeric'" type="text" inputmode="decimal" data-num step="any" :class="input" /></td>
                         <td class="p-2"><button type="button" :disabled="form.checks.length <= 1" @click="form.checks.splice(i, 1)" class="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20"><TrashIcon class="w-4 h-4" /></button></td></tr></tbody>
                 </table></div>
             </div>

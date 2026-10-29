@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\Accounting\AccountMap;
 use App\Services\ActiveBranch;
+use App\Services\ActiveFiscalYear;
 use App\Services\Saas\PlanGuard;
 use App\Services\TenantManager;
 use Illuminate\Auth\Events\Failed;
@@ -54,6 +55,17 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->arabicAuthMails();
+
+        // Lists show only the documents of the fiscal year chosen in the top bar (an explicit date filter replaces it).
+        Builder::macro('inActiveYear', function (string $column, bool $enabled = true) {
+            /** @var Builder $this */
+            $year = $enabled ? app(ActiveFiscalYear::class)->current() : null;
+
+            return $year
+                ? $this->whereDate($this->getModel()->qualifyColumn($column), '>=', $year->start_date->toDateString())
+                    ->whereDate($this->getModel()->qualifyColumn($column), '<=', $year->end_date->toDateString())
+                : $this;
+        });
 
         // Sum of a money column in base currency (documents with exchange_rate).
         Builder::macro('sumBase', function (string $column) {

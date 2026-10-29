@@ -8,10 +8,11 @@ use App\Traits\BranchScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalesOrder extends Model
 {
-    use Auditable, BelongsToCompany, BranchScoped;
+    use Auditable, BelongsToCompany, BranchScoped, SoftDeletes;
 
     protected $fillable = ['company_id', 'branch_id', 'warehouse_id', 'customer_id', 'quotation_id', 'salesperson_id', 'order_number', 'order_date', 'delivery_date', 'status', 'subtotal', 'discount_amount', 'tax_amount', 'total', 'notes', 'created_by', 'approved_by', 'approved_at'];
 

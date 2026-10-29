@@ -35,7 +35,7 @@ const statusLabel = { draft: 'مسودة', in_transit: 'في الطريق', rece
                         <td class="px-4 py-2 text-end font-mono">{{ qty(item.quantity) }}</td>
                         <td class="px-4 py-2 text-end font-mono">{{ money(item.unit_cost) }}</td>
                         <td class="px-4 py-2 text-center">
-                            <input v-if="transfer.status === 'in_transit'" v-model="received[item.id]" type="number" step="0.0001" min="0" :max="item.quantity" class="w-32 rounded-lg border-slate-200 text-xs font-mono text-center" />
+                            <input v-if="transfer.status === 'in_transit'" v-model.number="received[item.id]" type="text" inputmode="decimal" data-num step="0.0001" min="0" :max="item.quantity" class="w-32 rounded-lg border-slate-200 text-xs font-mono text-center" />
                             <span v-else class="font-mono">{{ item.received_quantity === null ? '—' : qty(item.received_quantity) }}</span>
                         </td>
                     </tr>

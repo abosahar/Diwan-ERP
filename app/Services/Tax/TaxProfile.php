@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Company;
 use App\Services\ActiveBranch;
 use App\Services\TenantManager;
+use App\Support\CurrencyNames;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -248,6 +249,7 @@ class TaxProfile
             'tax_number_label' => $this->taxNumberLabel(),
             'tax_number_example' => $this->country['tax_number']['example'] ?? '',
             'currency' => $this->currency(),
+            'currency_symbol' => CurrencyNames::for($this->currency())[2],
             'einvoicing' => $this->einvoicing(),
             'branch_id' => $this->branch?->id,
         ];

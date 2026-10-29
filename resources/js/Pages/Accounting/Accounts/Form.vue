@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -39,6 +40,7 @@ const editForm = useForm({
     balance: props.account?.balance ?? '0.00',
     is_active: props.account ? Boolean(props.account.is_active) : true,
 });
+useUnsavedGuard(editForm);
 
 const submitEditAccount = () => (editing
     ? editForm.put(route('accounting.accounts.update', props.account.id))
@@ -115,8 +117,8 @@ const submitEditAccount = () => (editing
                                 <div>
                                     <label class="block font-medium text-slate-700 mb-1">الرصيد الحسابي (﷼)</label>
                                     <input 
-                                        v-model="editForm.balance" 
-                                        type="number" 
+                                        v-model.number="editForm.balance" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01" 
                                         class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-indigo-500 focus:border-indigo-500 text-end" 
                                     />

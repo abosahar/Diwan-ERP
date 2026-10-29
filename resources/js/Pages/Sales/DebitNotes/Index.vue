@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { taxRate } from '@/utils/tax';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { ref } from 'vue';
@@ -29,7 +30,7 @@ const save = () => form.post(route('sales.debit-notes.store'), { onSuccess: () =
 <template>
     <AppLayout>
         <Head title="الإشعارات المدينة" />
-        <PageHeader title="الإشعارات المدينة" subtitle="مبالغ إضافية على العميل (فرق سعر، رسوم...) تزيد مديونيته وضريبة المخرجات" :crumbs="[{ label: 'المبيعات' }, { label: 'الإشعارات المدينة' }]">
+        <PageHeader year-scoped title="الإشعارات المدينة" subtitle="مبالغ إضافية على العميل (فرق سعر، رسوم...) تزيد مديونيته وضريبة المخرجات" :crumbs="[{ label: 'المبيعات' }, { label: 'الإشعارات المدينة' }]">
             <template #actions><button v-if="$can('sales.debit_notes.create')" @click="open = true" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> إشعار مدين</button></template>
         </PageHeader>
         <DocumentTable :paginator="notes" :columns="columns" :filters="filters" search-route="sales.debit-notes.index">
@@ -38,10 +39,10 @@ const save = () => form.post(route('sales.debit-notes.store'), { onSuccess: () =
         <Dialog :show="open" title="إشعار مدين" @close="open = false">
             <div class="grid grid-cols-2 gap-3">
                 <Field label="العميل" :error="form.errors.customer_id" class="col-span-2"><PartyPicker v-model="form.customer_id" /></Field>
-                <Field label="التاريخ"><input v-model="form.debit_note_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="رقم الفاتورة المرتبطة (اختياري)" :error="form.errors.invoice_id"><input v-model="form.invoice_id" type="number" placeholder="معرّف الفاتورة" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="المبلغ قبل الضريبة" :error="form.errors.subtotal"><input v-model="form.subtotal" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field label="نسبة الضريبة"><input v-model="form.tax_rate" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="form.debit_note_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="رقم الفاتورة المرتبطة (اختياري)" :error="form.errors.invoice_id"><input v-model.number="form.invoice_id" type="text" inputmode="decimal" data-num placeholder="معرّف الفاتورة" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="المبلغ قبل الضريبة" :error="form.errors.subtotal"><input v-model.number="form.subtotal" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field label="نسبة الضريبة"><input v-model.number="form.tax_rate" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="السبب" :error="form.errors.reason" class="col-span-2"><input v-model="form.reason" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <p class="text-xs mt-3">الإجمالي: <b class="font-mono">{{ money(Number(form.subtotal) * (1 + Number(form.tax_rate) / 100)) }}</b></p>

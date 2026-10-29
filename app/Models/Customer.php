@@ -15,6 +15,7 @@ class Customer extends Model
     use Auditable, BelongsToCompany, HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'customer_group_id',
         'price_list_id',
         'salesperson_id',
         'payment_terms_days',

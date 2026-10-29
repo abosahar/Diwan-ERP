@@ -33,7 +33,7 @@ defineProps({ form: Object, lookups: Object, supplier: { type: Object, default: 
                 </template>
                 <template v-else>
                     <Field label="المورد المؤجّر" :error="form.errors.supplier_id"><PartyPicker v-model="form.supplier_id" route-name="lookup.suppliers" :initial="supplier" placeholder="ابحث عن المورد..." /></Field>
-                    <Field label="سعر الإيجار من المورد" :error="form.errors.supplier_rate"><input v-model="form.supplier_rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="سعر الإيجار من المورد" :error="form.errors.supplier_rate"><input v-model.number="form.supplier_rate" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="لكل" :error="form.errors.supplier_rate_basis">
                         <select v-model="form.supplier_rate_basis" class="w-full rounded-xl border-slate-200 text-xs"><option :value="null">—</option><option v-for="(l, k) in lookups.bases" :key="k" :value="k">{{ l }}</option></select>
                     </Field>
@@ -48,17 +48,17 @@ defineProps({ form: Object, lookups: Object, supplier: { type: Object, default: 
                     <select v-model="form.meter_type" class="w-full rounded-xl border-slate-200 text-xs"><option value="hours">ساعات تشغيل</option><option value="km">كيلومترات</option><option value="both">ساعات وكيلومترات</option><option value="none">بدون عداد</option></select>
                 </Field>
                 <Field v-if="['hours', 'both'].includes(form.meter_type)" label="قراءة الساعات الحالية" :error="form.errors.current_hours" :hint="metersLocked ? 'تتغير من شاشة القراءات' : ''">
-                    <input v-model="form.current_hours" type="number" min="0" step="0.1" :disabled="metersLocked" class="w-full rounded-xl border-slate-200 text-xs disabled:bg-slate-50" />
+                    <input v-model.number="form.current_hours" type="text" inputmode="decimal" data-num min="0" step="0.1" :disabled="metersLocked" class="w-full rounded-xl border-slate-200 text-xs disabled:bg-slate-50" />
                 </Field>
                 <Field v-if="['km', 'both'].includes(form.meter_type)" label="قراءة الكيلومترات الحالية" :error="form.errors.current_km" :hint="metersLocked ? 'تتغير من شاشة القراءات' : ''">
-                    <input v-model="form.current_km" type="number" min="0" step="0.1" :disabled="metersLocked" class="w-full rounded-xl border-slate-200 text-xs disabled:bg-slate-50" />
+                    <input v-model.number="form.current_km" type="text" inputmode="decimal" data-num min="0" step="0.1" :disabled="metersLocked" class="w-full rounded-xl border-slate-200 text-xs disabled:bg-slate-50" />
                 </Field>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
-                <Field label="سعر الساعة" :error="form.errors.hourly_rate"><input v-model="form.hourly_rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="سعر اليوم" :error="form.errors.daily_rate"><input v-model="form.daily_rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="سعر الشهر" :error="form.errors.monthly_rate"><input v-model="form.monthly_rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تكلفة الساعة للمشاريع الداخلية" :error="form.errors.internal_hourly_cost"><input v-model="form.internal_hourly_cost" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="سعر الساعة" :error="form.errors.hourly_rate"><input v-model.number="form.hourly_rate" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="سعر اليوم" :error="form.errors.daily_rate"><input v-model.number="form.daily_rate" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="سعر الشهر" :error="form.errors.monthly_rate"><input v-model.number="form.monthly_rate" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تكلفة الساعة للمشاريع الداخلية" :error="form.errors.internal_hourly_cost"><input v-model.number="form.internal_hourly_cost" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
         </fieldset>
 

@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -69,8 +70,8 @@ const format = (value) => (typeof value === 'object' && value !== null ? JSON.st
                     <option v-for="(label, key) in eventLabels" :key="key" :value="key">{{ label }}</option>
                 </select>
                 <input v-model="filters.type" placeholder="نوع السجل (مثل Invoice)" class="rounded-xl border-slate-200 text-xs" />
-                <input v-model="filters.from" type="date" class="rounded-xl border-slate-200 text-xs" />
-                <input v-model="filters.to" type="date" class="rounded-xl border-slate-200 text-xs" />
+                <DatePicker v-model="filters.from" class="rounded-xl border-slate-200 text-xs" />
+                <DatePicker v-model="filters.to" class="rounded-xl border-slate-200 text-xs" />
                 <button type="submit" class="rounded-xl bg-indigo-600 text-white font-bold px-4 py-2 hover:bg-indigo-700">{{ $t('common.filter') }}</button>
             </form>
 

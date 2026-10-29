@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -59,7 +60,7 @@ const dispose = () => form.transform((d) => ({ ...d, vat_amount: d.taxable ? Mat
                 <form v-if="units && asset.status === 'active' && $can('accounting.fixed_assets.edit')" @submit.prevent="saveUsage" class="pt-2 border-t border-slate-100 space-y-2">
                     <p class="font-bold text-slate-700">استخدام الشهر ({{ asset.unit_label }})</p>
                     <p class="text-slate-400">إن كان الأصل مربوطاً بمعدة تؤخذ ساعات تشغيلها تلقائياً ما لم تُدخل قيمة هنا.</p>
-                    <div class="flex gap-2"><input v-model="usageForm.month" type="month" class="rounded-xl border-slate-200 text-xs" /><input v-model="usageForm.units" type="number" step="0.01" min="0" class="w-24 rounded-xl border-slate-200 text-xs" /><button class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold">حفظ</button></div>
+                    <div class="flex gap-2"><DatePicker v-model="usageForm.month" type="month" class="rounded-xl border-slate-200 text-xs" /><input v-model.number="usageForm.units" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-24 rounded-xl border-slate-200 text-xs" /><button class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold">حفظ</button></div>
                     <p v-if="usageForm.errors.units" class="text-rose-600">{{ usageForm.errors.units }}</p>
                 </form>
             </div>
@@ -95,8 +96,8 @@ const dispose = () => form.transform((d) => ({ ...d, vat_amount: d.taxable ? Mat
         <Dialog :show="impairOpen" title="تسجيل هبوط قيمة الأصل" @close="impairOpen = false">
             <div class="space-y-3 text-xs">
                 <p class="text-slate-500">عندما تقل القيمة القابلة للاسترداد عن القيمة الدفترية (تلف، تقادم، انخفاض السوق). يُرحَّل إهلاك الأشهر السابقة أولاً، ثم يُوزَّع المتبقي على باقي العمر.</p>
-                <Field label="التاريخ" :error="impairForm.errors.date"><input v-model="impairForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="مبلغ الهبوط" :error="impairForm.errors.amount" :hint="`القيمة الدفترية الحالية ${money(asset.book_value)}`"><input v-model="impairForm.amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ" :error="impairForm.errors.date"><DatePicker v-model="impairForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="مبلغ الهبوط" :error="impairForm.errors.amount" :hint="`القيمة الدفترية الحالية ${money(asset.book_value)}`"><input v-model.number="impairForm.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="السبب" :error="impairForm.errors.reason"><input v-model="impairForm.reason" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <template #footer><button @click="impair" :disabled="impairForm.processing" class="px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold">ترحيل هبوط القيمة</button></template>
@@ -104,8 +105,8 @@ const dispose = () => form.transform((d) => ({ ...d, vat_amount: d.taxable ? Mat
 
         <Dialog :show="disposeOpen" title="بيع / استبعاد الأصل" @close="disposeOpen = false">
             <div class="space-y-3 text-xs">
-                <Field label="التاريخ" :error="form.errors.date"><input v-model="form.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="مبلغ البيع (0 للإتلاف)" :error="form.errors.proceeds"><input v-model="form.proceeds" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ" :error="form.errors.date"><DatePicker v-model="form.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="مبلغ البيع (0 للإتلاف)" :error="form.errors.proceeds"><input v-model.number="form.proceeds" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <label class="flex items-center gap-2"><input v-model="form.taxable" type="checkbox" class="rounded" /> بيع خاضع للضريبة {{ $taxRate() }}% ({{ ((parseFloat(form.proceeds) || 0) * $taxRate() / 100).toFixed(2) }})</label>
                 <p v-if="form.errors.vat_amount" class="text-rose-600">{{ form.errors.vat_amount }}</p>
                 <Field label="طريقة القبض"><select v-model="form.method" class="w-full rounded-xl border-slate-200 text-xs"><option value="bank_transfer">بنك</option><option value="cash">نقداً</option></select></Field>

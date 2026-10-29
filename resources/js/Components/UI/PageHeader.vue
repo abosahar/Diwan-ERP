@@ -1,5 +1,6 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
 import { HomeIcon, ChevronRightIcon } from '@heroicons/vue/24/outline';
 
 defineProps({
@@ -7,6 +8,14 @@ defineProps({
     subtitle: { type: String, default: '' },
     // [{ label, href? }]
     crumbs: { type: Array, default: () => [] },
+    // The list below shows only the fiscal year chosen in the top bar: say so.
+    yearScoped: { type: Boolean, default: false },
+});
+
+const page = usePage();
+const activeYear = computed(() => {
+    const s = page.props.fiscalSwitcher;
+    return s?.items?.find((y) => y.id === s.active) || null;
 });
 </script>
 
@@ -23,6 +32,9 @@ defineProps({
             </div>
             <h1 class="text-lg font-black text-slate-800">{{ title }}</h1>
             <p v-if="subtitle" class="text-xs text-slate-500 mt-0.5">{{ subtitle }}</p>
+            <p v-if="yearScoped && activeYear" class="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-bold" data-year-chip>
+                السنة المالية {{ activeYear.name }} فقط · غيّرها من الشريط العلوي أو بفلتر التاريخ
+            </p>
         </div>
         <div class="flex flex-wrap items-center gap-2 print:hidden">
             <slot name="actions" />

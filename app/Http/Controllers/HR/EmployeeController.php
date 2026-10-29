@@ -14,6 +14,7 @@ use App\Models\EmployeeLoan;
 use App\Models\EmployeePayItem;
 use App\Models\EmployeeSalaryChange;
 use App\Models\JobPosition;
+use App\Models\Nationality;
 use App\Models\Payroll;
 use App\Models\PayrollItem;
 use App\Models\User;
@@ -237,7 +238,13 @@ class EmployeeController extends Controller
         $rules = [
             'employee_number' => ['nullable', 'string', 'max:30', Rule::unique('employees')->where('company_id', $companyId)->ignore($employee?->id)],
             'name' => 'required|string|max:255',
-            'nationality' => 'required|string|size:2',
+            // Must be one of the company's active nationalities (when it keeps such a list).
+            'nationality' => ['required', 'string', 'size:2', function ($attribute, $value, $fail) {
+                $has = Nationality::where('is_active', true);
+                if ($has->exists() && ! (clone $has)->where('code', strtoupper((string) $value))->exists()) {
+                    $fail('الجنسية غير موجودة في قائمة الجنسيات النشطة.');
+                }
+            }],
             'gender' => 'nullable|in:M,F',
             'birth_date' => 'nullable|date',
             'marital_status' => 'nullable|string|max:20',
@@ -320,6 +327,7 @@ class EmployeeController extends Controller
             'shifts' => WorkShift::orderBy('name')->get(['id', 'name']),
             'costCenters' => CostCenter::where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar']),
             'managers' => Employee::where('status', '!=', 'terminated')->orderBy('name')->limit(500)->get(['id', 'name']),
+            'nationalities' => Nationality::where('is_active', true)->orderBy('sort')->get(['id', 'code', 'name_ar']),
             'users' => User::where('company_id', app(TenantManager::class)->getTenantId())->orderBy('name')->get(['id', 'name', 'email']),
         ];
     }

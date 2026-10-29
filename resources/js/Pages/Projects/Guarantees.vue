@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import HijriDate from '@/Components/UI/HijriDate.vue';
 import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
@@ -62,10 +63,10 @@ const daysLeft = (d) => Math.ceil((new Date(d) - new Date()) / 86400000);
                 <Field label="رقم الخطاب" :error="form.errors.number"><input v-model="form.number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="البنك" :error="form.errors.bank_name"><input v-model="form.bank_name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المستفيد" :error="form.errors.beneficiary" class="col-span-2"><input v-model="form.beneficiary" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="المبلغ" :error="form.errors.amount"><input v-model="form.amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field label="الغطاء النقدي"><input v-model="form.cash_margin" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field label="تاريخ الإصدار" :error="form.errors.issue_date"><input v-model="form.issue_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ الانتهاء" :error="form.errors.expiry_date"><input v-model="form.expiry_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="المبلغ" :error="form.errors.amount"><input v-model.number="form.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field label="الغطاء النقدي"><input v-model.number="form.cash_margin" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field label="تاريخ الإصدار" :error="form.errors.issue_date"><DatePicker v-model="form.issue_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الانتهاء" :error="form.errors.expiry_date"><DatePicker v-model="form.expiry_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field v-if="editing" label="الحالة"><select v-model="form.status" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in statuses" :key="k" :value="k">{{ l }}</option></select></Field>
             </div>
             <template #footer><button @click="save" :disabled="form.processing" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">{{ $t('ui.save') }}</button></template>

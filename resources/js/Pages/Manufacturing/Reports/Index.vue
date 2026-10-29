@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -19,7 +20,7 @@ const num = (v) => Number(v || 0).toLocaleString('en-US', { maximumFractionDigit
         <PageHeader title="تقارير التصنيع" :crumbs="[{ label: 'التصنيع' }, { label: 'التقارير' }]" />
         <div class="flex flex-wrap items-center gap-2 mb-4">
             <button v-for="[k, l] in tabs" :key="k" type="button" @click="go(k)" :class="report === k ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 border border-slate-200'" class="px-3 py-1.5 rounded-full text-xs font-bold">{{ l }}</button>
-            <span class="ms-auto flex items-center gap-2 text-xs"><input v-model="from" type="date" class="text-xs rounded-xl border-slate-200" @change="go()" /> → <input v-model="to" type="date" class="text-xs rounded-xl border-slate-200" @change="go()" /></span>
+            <span class="ms-auto flex items-center gap-2 text-xs"><DatePicker v-model="from" class="text-xs rounded-xl border-slate-200" @change="go()" /> → <DatePicker v-model="to" class="text-xs rounded-xl border-slate-200" @change="go()" /></span>
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl overflow-x-auto">
             <template v-if="report === 'summary'">

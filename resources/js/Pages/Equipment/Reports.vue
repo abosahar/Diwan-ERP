@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { computed, reactive } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -74,9 +75,9 @@ const insights = computed(() => {
         </div>
 
         <form @submit.prevent="go()" class="flex flex-wrap items-end gap-3 mb-4 text-xs">
-            <label class="font-bold text-slate-600">من <input v-model="f.from" type="date" class="block rounded-xl border-slate-200 text-xs" /></label>
-            <label class="font-bold text-slate-600">إلى <input v-model="f.to" type="date" class="block rounded-xl border-slate-200 text-xs" /></label>
-            <label v-if="type === 'utilization'" class="font-bold text-slate-600">ساعات اليوم القياسية <input v-model="f.standard_hours" type="number" min="1" max="24" class="block rounded-xl border-slate-200 text-xs w-24" /></label>
+            <label class="font-bold text-slate-600">من <DatePicker v-model="f.from" class="block rounded-xl border-slate-200 text-xs" /></label>
+            <label class="font-bold text-slate-600">إلى <DatePicker v-model="f.to" class="block rounded-xl border-slate-200 text-xs" /></label>
+            <label v-if="type === 'utilization'" class="font-bold text-slate-600">ساعات اليوم القياسية <input v-model.number="f.standard_hours" type="text" inputmode="decimal" data-num min="1" max="24" class="block rounded-xl border-slate-200 text-xs w-24" /></label>
             <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">عرض</button>
         </form>
 

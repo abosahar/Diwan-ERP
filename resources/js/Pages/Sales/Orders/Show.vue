@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { computed, ref } from 'vue';
@@ -27,6 +28,7 @@ const deliverForm = useForm({
 const deliver = () => deliverForm.transform((d) => ({ ...d, lines: d.lines.map(({ sales_order_item_id, quantity }) => ({ sales_order_item_id, quantity })) }))
     .post(route('sales.orders.deliver', props.order.id), { onSuccess: () => (showDeliver.value = false) });
 
+const remove = () => { if (confirm('نقل أمر البيع إلى سلة المحذوفات؟')) router.delete(route('sales.orders.destroy', props.order.id)); };
 const act = (name, message) => { if (!message || confirm(message)) router.post(route(name, props.order.id)); };
 </script>
 
@@ -44,6 +46,7 @@ const act = (name, message) => { if (!message || confirm(message)) router.post(r
                 <button v-if="canDeliver && $can('sales.deliveries.create')" @click="showDeliver = true" class="px-3 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">إذن تسليم</button>
                 <button v-if="canInvoice && $can('sales.orders.convert')" @click="act('sales.orders.invoice', 'إصدار فاتورة بالكميات غير المسلمة وصرفها من المخزون؟')" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">فوترة مباشرة</button>
                 <button v-if="['draft', 'pending_approval', 'confirmed', 'rejected'].includes(order.status) && $can('sales.orders.cancel')" @click="act('sales.orders.cancel', 'إلغاء أمر البيع؟')" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">إلغاء</button>
+                <button v-if="['draft', 'pending_approval', 'confirmed', 'rejected', 'cancelled'].includes(order.status) && $can('sales.orders.cancel')" @click="remove" class="px-3 py-2 rounded-xl border border-rose-200 text-rose-600 text-xs font-bold">حذف</button>
             </template>
         </PageHeader>
 
@@ -91,7 +94,7 @@ const act = (name, message) => { if (!message || confirm(message)) router.post(r
 
         <Dialog :show="showDeliver" title="إذن تسليم بضاعة" size="lg" @close="showDeliver = false">
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <Field label="تاريخ التسليم"><input v-model="deliverForm.delivery_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ التسليم"><DatePicker v-model="deliverForm.delivery_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المستودع"><SelectCreate v-model="deliverForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="المستلم"><input v-model="deliverForm.receiver_name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
@@ -100,7 +103,7 @@ const act = (name, message) => { if (!message || confirm(message)) router.post(r
                 <tr v-for="l in deliverForm.lines" :key="l.sales_order_item_id" class="border-t border-slate-100">
                     <td class="py-1.5">{{ l.name }}</td>
                     <td class="text-center font-mono">{{ qty(l.open) }}</td>
-                    <td><input v-model="l.quantity" type="number" min="0" :max="l.open" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td><input v-model.number="l.quantity" type="text" inputmode="decimal" data-num min="0" :max="l.open" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                 </tr>
             </table></div>
             <p v-for="(msg, key) in deliverForm.errors" :key="key" class="text-xs text-rose-600 mt-1">{{ msg }}</p>

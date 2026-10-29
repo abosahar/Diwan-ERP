@@ -24,7 +24,7 @@ class PurchaseRequestController extends Controller
         $requests = PurchaseRequest::with('requester:id,name')->withCount('items')
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where('request_number', 'like', "%{$s}%"))
-            ->orderByDesc('request_date')->orderByDesc('id')
+            ->inActiveYear('request_date')->orderByDesc('request_date')->orderByDesc('id')
             ->paginate($this->perPage($request))->withQueryString();
 
         return Inertia::render('Purchases/Requests/Index', ['requests' => $requests, 'filters' => $filters]);

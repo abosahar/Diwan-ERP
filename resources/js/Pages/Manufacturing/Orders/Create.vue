@@ -1,4 +1,6 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -12,6 +14,7 @@ const form = useForm({
     product_id: props.preset?.product_id || '', quantity: props.preset?.quantity || 1, bom_id: '', routing_id: '', warehouse_id: props.warehouses?.[0]?.id || '', output_warehouse_id: '',
     planned_start: today(), planned_end: '', sales_order_id: props.preset?.sales_order_id || '', priority: 3, notes: '',
 });
+useUnsavedGuard(form);
 const productBoms = computed(() => props.boms.filter((b) => b.product_id === form.product_id));
 watch(() => form.product_id, () => { form.bom_id = productBoms.value.find((b) => b.is_default)?.id || productBoms.value[0]?.id || ''; });
 watch(() => form.bom_id, (id) => { const b = props.boms.find((x) => x.id === id); if (b?.routing_id && !form.routing_id) form.routing_id = b.routing_id; });
@@ -26,13 +29,13 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
         <form @submit.prevent="submit" class="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-5">
             <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                 <Field label="المنتج *" :error="form.errors.product_id"><SelectCreate v-model="form.product_id" :options="products" entity="product" :label="(p) => `${p.name_ar} (${p.sku})`" placeholder="— اختر —" required /></Field>
-                <Field label="الكمية *" :error="form.errors.quantity"><input v-model="form.quantity" type="number" step="0.0001" :class="input" required /></Field>
+                <Field label="الكمية *" :error="form.errors.quantity"><input v-model.number="form.quantity" type="text" inputmode="decimal" data-num step="0.0001" :class="input" required /></Field>
                 <Field label="قائمة المواد" :error="form.errors.bom_id"><select v-model="form.bom_id" :class="input"><option value="">— الافتراضية —</option><option v-for="b in productBoms" :key="b.id" :value="b.id">{{ b.name }} (إصدار {{ b.version }})</option></select></Field>
                 <Field label="مسار التشغيل"><select v-model="form.routing_id" :class="input"><option value="">— من القائمة —</option><option v-for="r in routings" :key="r.id" :value="r.id">{{ r.code }} — {{ r.name }}</option></select></Field>
                 <Field label="مستودع صرف المواد *" :error="form.errors.warehouse_id"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required /></Field>
                 <Field label="مستودع المنتج التام" hint="الافتراضي: نفس مستودع المواد"><SelectCreate v-model="form.output_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="—" /></Field>
-                <Field label="بداية مخططة"><input v-model="form.planned_start" type="date" :class="input" /></Field>
-                <Field label="نهاية مخططة" :error="form.errors.planned_end"><input v-model="form.planned_end" type="date" :class="input" /></Field>
+                <Field label="بداية مخططة"><DatePicker v-model="form.planned_start" :class="input" /></Field>
+                <Field label="نهاية مخططة" :error="form.errors.planned_end"><DatePicker v-model="form.planned_end" :class="input" /></Field>
                 <Field label="الأولوية"><select v-model="form.priority" :class="input"><option :value="1">عاجلة جداً</option><option :value="2">عالية</option><option :value="3">عادية</option><option :value="4">منخفضة</option><option :value="5">مؤجلة</option></select></Field>
                 <Field label="أمر بيع مرتبط"><select v-model="form.sales_order_id" :class="input"><option value="">—</option><option v-for="s in salesOrders" :key="s.id" :value="s.id">{{ s.order_number }}</option></select></Field>
             </div>

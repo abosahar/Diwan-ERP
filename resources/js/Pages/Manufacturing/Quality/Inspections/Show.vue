@@ -43,15 +43,15 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
                 <h2 class="font-black text-slate-800 text-sm mb-3">بنود الفحص ({{ i.plan.name }})</h2>
                 <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-3">
                     <Field v-for="(c, k) in checks" :key="k" :label="c.type === 'numeric' ? `${c.name} (${c.min ?? '—'} → ${c.max ?? '—'})` : c.name">
-                        <input v-if="c.type === 'numeric'" v-model="values[k]" type="number" step="any" :class="input" />
+                        <input v-if="c.type === 'numeric'" v-model.number="values[k]" type="text" inputmode="decimal" data-num step="any" :class="input" />
                         <select v-else v-model="values[k]" :class="input"><option value="">—</option><option value="pass">سليم</option><option value="fail">معيب</option></select>
                     </Field>
                 </div>
             </div>
             <div class="grid md:grid-cols-4 gap-3">
-                <Field label="مقبول" :error="form.errors.accepted"><input v-model="form.accepted" type="number" step="0.0001" :class="input" /></Field>
-                <Field label="مرفوض"><input v-model="form.rejected" type="number" step="0.0001" :class="input" /></Field>
-                <Field label="إعادة تشغيل"><input v-model="form.rework" type="number" step="0.0001" :class="input" /></Field>
+                <Field label="مقبول" :error="form.errors.accepted"><input v-model.number="form.accepted" type="text" inputmode="decimal" data-num step="0.0001" :class="input" /></Field>
+                <Field label="مرفوض"><input v-model.number="form.rejected" type="text" inputmode="decimal" data-num step="0.0001" :class="input" /></Field>
+                <Field label="إعادة تشغيل"><input v-model.number="form.rework" type="text" inputmode="decimal" data-num step="0.0001" :class="input" /></Field>
                 <Field label="تصرف المرفوض"><select v-model="form.disposition" :class="input"><option value="accept">لا يوجد مرفوض</option><option value="scrap">إتلاف (يُحمَّل خسارة)</option><option value="rework">إعادة تشغيل</option><option value="return">إرجاع للمورد</option></select></Field>
             </div>
             <p class="text-xs" :class="Math.abs(sum - Number(i.inspected_quantity)) < 0.0001 ? 'text-slate-500' : 'text-rose-600'">المجموع {{ num(sum) }} من {{ num(i.inspected_quantity) }} مفحوصة.</p>

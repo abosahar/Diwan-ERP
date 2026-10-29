@@ -36,7 +36,7 @@ class SupplierPaymentController extends Controller
             });
         }
 
-        $payments = $query->orderBy('payment_date', 'desc')
+        $payments = $query->inActiveYear('payment_date')->orderBy('payment_date', 'desc')
             ->orderBy('id', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();

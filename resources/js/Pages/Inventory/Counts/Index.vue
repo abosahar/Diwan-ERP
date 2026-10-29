@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -20,7 +21,7 @@ const statusLabel = { draft: ['قيد الجرد', 'text-amber-600'], approved: 
 
         <form v-if="$can('inventory.counts.create')" @submit.prevent="start" class="bg-white border border-slate-200 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-5 gap-3 text-xs mb-4">
             <Field label="المستودع" :error="form.errors.warehouse_id"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required /></Field>
-            <Field label="تاريخ الجرد"><input v-model="form.count_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+            <Field label="تاريخ الجرد"><DatePicker v-model="form.count_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             <Field label="نوع الجرد"><select v-model="form.count_type" class="w-full rounded-xl border-slate-200 text-xs"><option value="full">جرد كامل للمستودع</option><option value="partial">جرد مفاجئ (أصناف محددة)</option></select></Field>
             <Field label="ملاحظات"><input v-model="form.notes" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             <div class="flex items-end"><button class="w-full rounded-xl bg-indigo-600 text-white font-bold py-2" :disabled="form.processing">بدء الجرد</button></div>

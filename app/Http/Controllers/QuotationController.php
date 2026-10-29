@@ -7,7 +7,9 @@ use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Quotation;
 use App\Rules\AllowedBranch;
+use App\Services\RecycleBin;
 use App\Services\Sales\InvoiceService;
+use App\Services\Sales\PromotionEngine;
 use App\Services\Sales\QuotationService;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
@@ -42,7 +44,7 @@ class QuotationController extends Controller
             $query->where('status', $status);
         }
 
-        $quotations = $query->orderBy('quotation_date', 'desc')
+        $quotations = $query->inActiveYear('quotation_date')->orderBy('quotation_date', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();
 
@@ -116,10 +118,11 @@ class QuotationController extends Controller
             'items.*.tax_rate' => 'nullable|numeric|min:0',
         ]);
 
+        [$validated['items'], $promotions] = app(PromotionEngine::class)->apply($validated['items'], (int) $validated['customer_id'], 'quotation', $validated['quotation_date'] ?? null);
         $quotation = app(QuotationService::class)->create($validated);
 
         return redirect()->route('sales.quotations.show', $quotation->id)
-            ->with('success', 'تم إنشاء عرض السعر بنجاح');
+            ->with('success', 'تم إنشاء عرض السعر بنجاح'.($promotions ? ' (طُبِّق عرض: '.implode('، ', $promotions).')' : ''));
     }
 
     /**
@@ -139,6 +142,13 @@ class QuotationController extends Controller
     /**
      * Convert quotation into a tax invoice.
      */
+    public function destroy(Quotation $quotation, RecycleBin $bin)
+    {
+        $bin->trash($quotation);
+
+        return redirect()->route('sales.quotations.index')->with('success', 'نُقل عرض السعر إلى سلة المحذوفات (يُحفظ '.RecycleBin::RETENTION_DAYS.' يومًا)');
+    }
+
     public function convertToInvoice(Quotation $quotation)
     {
         $tenantManager = app(TenantManager::class);

@@ -39,13 +39,13 @@ class CreditNoteController extends Controller
             });
         }
 
-        $returns = $query->orderBy('credit_note_date', 'desc')
+        $returns = $query->inActiveYear('credit_note_date')->orderBy('credit_note_date', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();
 
         $stats = [
-            'total_returns' => CreditNote::count(),
-            'total_amount' => CreditNote::query()->sumBase('total'),
+            'total_returns' => CreditNote::inActiveYear('credit_note_date')->count(),
+            'total_amount' => CreditNote::inActiveYear('credit_note_date')->sumBase('total'),
         ];
 
         return Inertia::render('Sales/Returns/Index', [

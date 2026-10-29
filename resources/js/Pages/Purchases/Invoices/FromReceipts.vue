@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
@@ -46,11 +47,11 @@ const save = () => form.transform((d) => ({ ...d, lines: selected.value.map(({ g
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="المورد" class="md:col-span-2"><PartyPicker :model-value="form.supplier_id" route-name="lookup.suppliers" :initial="supplier" @update:model-value="pickSupplier" /></Field>
                 <Field label="رقم فاتورة المورد" :error="form.errors.supplier_invoice_number"><input v-model="form.supplier_invoice_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ الفاتورة"><input v-model="form.invoice_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ الاستحقاق"><input v-model="form.due_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الفاتورة"><DatePicker v-model="form.invoice_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الاستحقاق"><DatePicker v-model="form.due_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="طريقة الدفع"><select v-model="form.payment_method" class="w-full rounded-xl border-slate-200 text-xs"><option value="credit">آجل</option><option value="cash">نقدي</option><option value="bank_transfer">تحويل بنكي</option><option value="card">بطاقة</option></select></Field>
                 <Field label="حالة السداد"><select v-model="form.payment_status" class="w-full rounded-xl border-slate-200 text-xs"><option value="unpaid">غير مدفوعة</option><option value="partially_paid">مدفوعة جزئياً</option><option value="paid">مدفوعة</option></select></Field>
-                <Field v-if="form.payment_status === 'partially_paid'" label="المبلغ المدفوع"><input v-model="form.paid_amount" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field v-if="form.payment_status === 'partially_paid'" label="المبلغ المدفوع"><input v-model.number="form.paid_amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field v-if="form.payment_status !== 'unpaid'" label="الحساب البنكي / الصندوق"><SelectCreate v-model="form.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <div v-if="!supplier" class="text-xs text-slate-400 py-8 text-center">اختر المورد لعرض الاستلامات غير المفوترة.</div>
@@ -63,10 +64,10 @@ const save = () => form.transform((d) => ({ ...d, lines: selected.value.map(({ g
                             <td class="px-2 py-1.5 font-mono">{{ l.receipt }}</td>
                             <td class="px-2 py-1.5">{{ l.name }}</td>
                             <td class="px-2 py-1.5 text-center font-mono">{{ qty(l.open) }}</td>
-                            <td class="px-2 py-1.5"><input v-model="l.quantity" type="number" step="0.0001" min="0" :max="l.open" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                            <td class="px-2 py-1.5"><input v-model.number="l.quantity" type="text" inputmode="decimal" data-num step="0.0001" min="0" :max="l.open" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                             <td class="px-2 py-1.5 text-center font-mono">{{ l.po_price != null ? money(l.po_price) : '—' }}</td>
-                            <td class="px-2 py-1.5"><input v-model="l.unit_price" type="number" step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" :class="l.po_price != null && Number(l.unit_price) > l.po_price ? 'border-amber-400 bg-amber-50' : ''" /></td>
-                            <td class="px-2 py-1.5"><input v-model="l.discount" type="number" step="0.01" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                            <td class="px-2 py-1.5"><input v-model.number="l.unit_price" type="text" inputmode="decimal" data-num step="0.0001" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" :class="l.po_price != null && Number(l.unit_price) > l.po_price ? 'border-amber-400 bg-amber-50' : ''" /></td>
+                            <td class="px-2 py-1.5"><input v-model.number="l.discount" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                             <td class="px-2 py-1.5 text-end font-mono">{{ money(net(l)) }}</td>
                         </tr>
                         <tr v-if="!form.lines.length"><td colspan="9" class="py-6 text-center text-slate-400">لا توجد استلامات غير مفوترة لهذا المورد.</td></tr>

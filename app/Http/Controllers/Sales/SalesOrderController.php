@@ -7,6 +7,8 @@ use App\Models\Invoice;
 use App\Models\SalesOrder;
 use App\Models\Warehouse;
 use App\Rules\AllowedBranch;
+use App\Services\RecycleBin;
+use App\Services\Sales\PromotionEngine;
 use App\Services\Sales\SalesCycleService;
 use App\Services\Workflow\ApprovalService;
 use App\Support\BranchOptions;
@@ -25,7 +27,7 @@ class SalesOrderController extends Controller
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('order_number', 'like', "%{$s}%")
                 ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$s}%"))))
-            ->orderByDesc('order_date')->orderByDesc('id')
+            ->inActiveYear('order_date')->orderByDesc('order_date')->orderByDesc('id')
             ->paginate($this->perPage($request))->withQueryString();
 
         return Inertia::render('Sales/Orders/Index', ['orders' => $orders, 'filters' => $filters]);
@@ -61,11 +63,13 @@ class SalesOrderController extends Controller
             'items.*.tax_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
+        [$validated['items'], $promotions] = app(PromotionEngine::class)->apply($validated['items'], (int) $validated['customer_id'], 'order', $validated['order_date'] ?? null);
         $order = $this->cycle->createOrder($validated, $validated['items']);
+        $note = $promotions ? ' (طُبِّق عرض: '.implode('، ', $promotions).')' : '';
 
         return redirect()->route('sales.orders.show', $order->id)->with('success', $order->status === 'pending_approval'
-            ? "تم إنشاء أمر البيع {$order->order_number} وإرساله للاعتماد"
-            : "تم إنشاء أمر البيع {$order->order_number} واعتماده");
+            ? "تم إنشاء أمر البيع {$order->order_number} وإرساله للاعتماد{$note}"
+            : "تم إنشاء أمر البيع {$order->order_number} واعتماده{$note}");
     }
 
     public function show(SalesOrder $order)
@@ -102,6 +106,13 @@ class SalesOrderController extends Controller
         $order->update(['status' => 'cancelled']);
 
         return back()->with('success', 'تم إلغاء أمر البيع');
+    }
+
+    public function destroy(SalesOrder $order, RecycleBin $bin)
+    {
+        $bin->trash($order);
+
+        return redirect()->route('sales.orders.index')->with('success', 'نُقل أمر البيع إلى سلة المحذوفات (يُحفظ '.RecycleBin::RETENTION_DAYS.' يومًا)');
     }
 
     public function deliver(Request $request, SalesOrder $order)

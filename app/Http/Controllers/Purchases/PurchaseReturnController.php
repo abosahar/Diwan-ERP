@@ -21,7 +21,7 @@ class PurchaseReturnController extends Controller
         $returns = PurchaseReturn::with(['supplier:id,name', 'purchaseInvoice:id,invoice_number'])
             ->when($search, fn ($q, $s) => $q->where(fn ($q) => $q->where('return_number', 'like', "%{$s}%")
                 ->orWhereHas('supplier', fn ($c) => $c->where('name', 'like', "%{$s}%"))))
-            ->orderByDesc('return_date')->orderByDesc('id')
+            ->inActiveYear('return_date')->orderByDesc('return_date')->orderByDesc('id')
             ->paginate($this->perPage($request))->withQueryString();
 
         return Inertia::render('Purchases/Returns/Index', ['returns' => $returns, 'filters' => ['search' => $search]]);

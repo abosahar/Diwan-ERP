@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ref } from 'vue';
 import axios from 'axios';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -97,8 +98,8 @@ const close = () => closeForm.post(route('equipment.rentals.close', r.id), { pre
         <Dialog :show="billOpen" :title="isCustomer ? 'إصدار فاتورة تأجير' : 'تحميل على المشروع'" size="md" @close="billOpen = false">
             <div class="space-y-3 text-xs">
                 <div class="grid grid-cols-2 gap-3">
-                    <Field label="من" :error="billForm.errors.period_from"><input v-model="billForm.period_from" @change="loadPreview" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="إلى" :error="billForm.errors.period_to"><input v-model="billForm.period_to" @change="loadPreview" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="من" :error="billForm.errors.period_from"><DatePicker v-model="billForm.period_from" @change="loadPreview" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="إلى" :error="billForm.errors.period_to"><DatePicker v-model="billForm.period_to" @change="loadPreview" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
                 <div v-if="preview" class="rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-1">
                     <p v-if="preview.error" class="text-rose-600">{{ preview.error }}</p>
@@ -110,8 +111,8 @@ const close = () => closeForm.post(route('equipment.rentals.close', r.id), { pre
                     </template>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <Field :label="`تعديل الكمية (${unit})`" :error="billForm.errors.quantity" hint="اتركه فارغاً لاعتماد المحسوب"><input v-model="billForm.quantity" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="تاريخ المستند" hint="فارغ = نهاية الفترة"><input v-model="billForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field :label="`تعديل الكمية (${unit})`" :error="billForm.errors.quantity" hint="اتركه فارغاً لاعتماد المحسوب"><input v-model.number="billForm.quantity" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="تاريخ المستند" hint="فارغ = نهاية الفترة"><DatePicker v-model="billForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
             </div>
             <template #footer>
@@ -122,9 +123,9 @@ const close = () => closeForm.post(route('equipment.rentals.close', r.id), { pre
 
         <Dialog :show="editOpen" title="تعديل العقد" size="md" @close="editOpen = false">
             <div class="grid grid-cols-2 gap-3 text-xs">
-                <Field :label="`السعر لكل ${unit}`" :error="editForm.errors.rate" hint="ينطبق على الفترات التي لم تُفوتر"><input v-model="editForm.rate" type="number" min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field v-if="r.billing_basis === 'hourly'" label="حد أدنى ساعات/يوم" :error="editForm.errors.min_hours_per_day"><input v-model="editForm.min_hours_per_day" type="number" min="0" max="24" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ النهاية" :error="editForm.errors.end_date"><input v-model="editForm.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field :label="`السعر لكل ${unit}`" :error="editForm.errors.rate" hint="ينطبق على الفترات التي لم تُفوتر"><input v-model.number="editForm.rate" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field v-if="r.billing_basis === 'hourly'" label="حد أدنى ساعات/يوم" :error="editForm.errors.min_hours_per_day"><input v-model.number="editForm.min_hours_per_day" type="text" inputmode="decimal" data-num min="0" max="24" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ النهاية" :error="editForm.errors.end_date"><DatePicker v-model="editForm.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الموقع"><input v-model="editForm.site" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <label class="col-span-2 flex items-center gap-2 font-bold"><input v-model="editForm.with_operator" type="checkbox" class="rounded border-slate-300" /> مع مشغّل</label>
                 <Field label="ملاحظات" class="col-span-2"><textarea v-model="editForm.notes" rows="2" class="w-full rounded-xl border-slate-200 text-xs"></textarea></Field>
@@ -138,7 +139,7 @@ const close = () => closeForm.post(route('equipment.rentals.close', r.id), { pre
         <Dialog :show="closeOpen" title="إنهاء العقد" size="sm" @close="closeOpen = false">
             <div class="text-xs space-y-3">
                 <p class="text-slate-600">تعود المعدة «متاحة» بعد الإنهاء. تأكد من فوترة الفترة الأخيرة.</p>
-                <Field label="آخر يوم في العقد" :error="closeForm.errors.end_date"><input v-model="closeForm.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="آخر يوم في العقد" :error="closeForm.errors.end_date"><DatePicker v-model="closeForm.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <template #footer>
                 <button type="button" @click="closeOpen = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold">إلغاء</button>

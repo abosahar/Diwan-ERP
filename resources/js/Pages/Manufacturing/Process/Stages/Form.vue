@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -12,6 +13,7 @@ const form = useForm({
     code: s.code || '', name: s.name || '', sequence: s.sequence ?? 1, product_id: s.product_id || '', previous_stage_id: s.previous_stage_id || '',
     warehouse_id: s.warehouse_id || props.warehouses?.[0]?.id || '', work_center_id: s.work_center_id || '', is_active: s.is_active ?? true,
 });
+useUnsavedGuard(form);
 const submit = () => (editing ? form.put(route('manufacturing.stages.update', s.id)) : form.post(route('manufacturing.stages.store')));
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
 </script>
@@ -24,7 +26,7 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
             <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
                 <Field label="الرمز *" :error="form.errors.code"><input v-model="form.code" :class="input" class="font-mono" required /></Field>
                 <Field label="الاسم *" :error="form.errors.name"><input v-model="form.name" :class="input" required /></Field>
-                <Field label="التسلسل *"><input v-model="form.sequence" type="number" :class="input" /></Field>
+                <Field label="التسلسل *"><input v-model.number="form.sequence" type="text" inputmode="decimal" data-num :class="input" /></Field>
                 <Field label="ناتج المرحلة *" hint="للمرحلة الأخيرة: المنتج التام الذي يدخل المخزون" :error="form.errors.product_id"><SelectCreate v-model="form.product_id" :options="products" entity="product" label="name_ar" placeholder="— اختر —" required /></Field>
                 <Field label="تستلم من مرحلة" hint="تنتقل تكلفة المرحلة السابقة إليها"><select v-model="form.previous_stage_id" :class="input"><option value="">— أول مرحلة —</option><option v-for="x in stages" :key="x.id" :value="x.id">{{ x.code }} — {{ x.name }}</option></select></Field>
                 <Field label="المستودع *" :error="form.errors.warehouse_id"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required /></Field>

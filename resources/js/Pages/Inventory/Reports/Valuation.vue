@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { reactive } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -19,7 +20,7 @@ const apply = () => router.get(route('inventory.reports.valuation'), Object.from
         <form @submit.prevent="apply" class="bg-white border border-slate-200 rounded-2xl p-4 grid grid-cols-2 md:grid-cols-5 gap-3 text-xs mb-4">
             <select v-model="form.warehouse_id" class="rounded-xl border-slate-200 text-xs"><option value="">كل المستودعات</option><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select>
             <select v-model="form.category_id" class="rounded-xl border-slate-200 text-xs"><option value="">كل التصنيفات</option><option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name_ar }}</option></select>
-            <input v-model="form.as_of" type="date" class="rounded-xl border-slate-200 text-xs" title="كما في تاريخ" />
+            <DatePicker v-model="form.as_of" class="rounded-xl border-slate-200 text-xs" title="كما في تاريخ" />
             <input v-model="form.search" placeholder="بحث" class="rounded-xl border-slate-200 text-xs" />
             <button class="rounded-xl bg-indigo-600 text-white font-bold py-2">{{ $t('ui.apply') }}</button>
         </form>

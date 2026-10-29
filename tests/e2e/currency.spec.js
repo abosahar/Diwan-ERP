@@ -7,6 +7,7 @@ test('USD invoice, then a receipt voucher at another rate', async ({ page }) => 
     // A dated rate for USD (the demo company already defines the currency).
     await page.goto('/settings/currencies');
     await page.getByLabel('التاريخ').fill('2026-01-01');
+    await page.keyboard.press('Escape'); // close the date picker panel
     await page.getByLabel(/^السعر \(1/).fill('3.75');
     await page.getByRole('button', { name: 'حفظ السعر' }).click();
     await expect(page.locator('body')).toContainText('3.750000');

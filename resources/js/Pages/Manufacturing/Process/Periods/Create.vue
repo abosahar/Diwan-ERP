@@ -1,4 +1,6 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -12,6 +14,7 @@ const form = useForm({
     date_from: `${month}-01`,
     date_to: monthEnd(month),
 });
+useUnsavedGuard(form);
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
 </script>
 
@@ -22,8 +25,8 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
         <form @submit.prevent="form.post(route('manufacturing.periods.store'))" class="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-5">
             <div class="grid md:grid-cols-3 gap-4">
                 <Field label="المرحلة *" :error="form.errors.process_stage_id || form.errors.stage"><select v-model="form.process_stage_id" :class="input" required><option v-for="s in stages" :key="s.id" :value="s.id">{{ s.code }} — {{ s.name }}</option></select></Field>
-                <Field label="من *"><input v-model="form.date_from" type="date" :class="input" /></Field>
-                <Field label="إلى *" :error="form.errors.date_to"><input v-model="form.date_to" type="date" :class="input" /></Field>
+                <Field label="من *"><DatePicker v-model="form.date_from" :class="input" /></Field>
+                <Field label="إلى *" :error="form.errors.date_to"><DatePicker v-model="form.date_to" :class="input" /></Field>
             </div>
             <p class="text-xs text-slate-500">تبدأ الفترة بما بقي تحت التشغيل في إغلاق الفترة السابقة للمرحلة نفسها.</p>
             <div class="flex gap-2 pt-2 border-t border-slate-100">

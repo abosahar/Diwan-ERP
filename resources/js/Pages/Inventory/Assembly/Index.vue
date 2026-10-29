@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -56,8 +57,8 @@ const run = () => orderForm.post(route('inventory.assembly.orders.store'), { pre
                 <h3 class="font-black text-slate-800">أمر تجميع</h3>
                 <Field label="قائمة المواد" :error="orderForm.errors.bom_id"><select v-model="orderForm.bom_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="b in boms" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
                 <Field label="المستودع"><SelectCreate v-model="orderForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" /></Field>
-                <Field label="الكمية المنتجة" :error="orderForm.errors.quantity"><input v-model="orderForm.quantity" type="number" step="0.0001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="التاريخ"><input v-model="orderForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="الكمية المنتجة" :error="orderForm.errors.quantity"><input v-model.number="orderForm.quantity" type="text" inputmode="decimal" data-num step="0.0001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="orderForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <p v-if="orderForm.errors.items" class="text-rose-600">{{ orderForm.errors.items }}</p>
                 <button :disabled="orderForm.processing" class="w-full rounded-xl bg-emerald-600 text-white font-bold py-2">تنفيذ</button>
             </form>
@@ -83,7 +84,7 @@ const run = () => orderForm.post(route('inventory.assembly.orders.store'), { pre
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <Field label="اسم القائمة"><input v-model="bomForm.name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="كمية الإنتاج للقائمة"><input v-model="bomForm.output_quantity" type="number" step="0.0001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="كمية الإنتاج للقائمة"><input v-model.number="bomForm.output_quantity" type="text" inputmode="decimal" data-num step="0.0001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
                 <Field label="إضافة مكوّن"><input v-model="lookup" @input="search('component')" placeholder="ابحث عن مكوّن..." class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <div v-if="results.length" class="bg-white border rounded-xl shadow max-h-40 overflow-y-auto">
@@ -92,7 +93,7 @@ const run = () => orderForm.post(route('inventory.assembly.orders.store'), { pre
                 <table class="w-full">
                     <tr v-for="(item, i) in bomForm.items" :key="i" class="border-t border-slate-100">
                         <td class="py-1.5">{{ item.name }}</td>
-                        <td class="py-1.5 w-32"><input v-model="item.quantity" type="number" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                        <td class="py-1.5 w-32"><input v-model.number="item.quantity" type="text" inputmode="decimal" data-num step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                         <td class="py-1.5 w-8"><button @click="bomForm.items.splice(i, 1)" class="text-slate-400 hover:text-rose-600"><TrashIcon class="w-4 h-4" /></button></td>
                     </tr>
                 </table>

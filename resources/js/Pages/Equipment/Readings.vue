@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { computed } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -42,7 +43,7 @@ const filled = computed(() => form.rows.filter((r) => r.hours_reading !== '' || 
         <Head title="قراءات العدادات اليومية" />
         <PageHeader title="قراءات العدادات اليومية" subtitle="قراءة العداد تُحدّث مواعيد الصيانة، وساعات العمل تُحسب عليها فواتير التأجير بالساعة" :crumbs="[{ label: 'المعدات', href: route('equipment.index') }, { label: 'القراءات' }]">
             <template #actions>
-                <label class="text-xs font-bold text-slate-600 flex items-center gap-2">التاريخ <input :value="date" :max="today()" @change="changeDate($event.target.value)" type="date" class="rounded-xl border-slate-200 text-xs" /></label>
+                <label class="text-xs font-bold text-slate-600 flex items-center gap-2">التاريخ <DatePicker :model-value="date" :max="today()" @change="changeDate($event.target.value)" class="rounded-xl border-slate-200 text-xs" /></label>
             </template>
         </PageHeader>
 
@@ -65,20 +66,20 @@ const filled = computed(() => form.rows.filter((r) => r.hours_reading !== '' || 
                         </td>
                         <td class="px-3 py-2">
                             <template v-if="usesHours(r.equipment)">
-                                <input v-model="form.rows[i].hours_reading" type="number" min="0" step="0.1" :aria-label="`عداد ساعات ${r.equipment.code}`" :class="['w-full rounded-lg text-xs font-mono', err(i, 'hours_reading') ? 'border-rose-400 bg-rose-50' : 'border-slate-200']" />
+                                <input v-model.number="form.rows[i].hours_reading" type="text" inputmode="decimal" data-num min="0" step="0.1" :aria-label="`عداد ساعات ${r.equipment.code}`" :class="['w-full rounded-lg text-xs font-mono', err(i, 'hours_reading') ? 'border-rose-400 bg-rose-50' : 'border-slate-200']" />
                                 <div v-if="delta(i, 'hours_reading', 'hours_reading') !== null" class="text-[10px] text-slate-400">+{{ delta(i, 'hours_reading', 'hours_reading').toFixed(1) }} س</div>
                                 <div v-if="err(i, 'hours_reading')" class="text-[10px] text-rose-600">{{ err(i, 'hours_reading') }}</div>
                             </template>
                         </td>
                         <td class="px-3 py-2">
                             <template v-if="usesKm(r.equipment)">
-                                <input v-model="form.rows[i].km_reading" type="number" min="0" step="0.1" :aria-label="`كيلومترات ${r.equipment.code}`" :class="['w-full rounded-lg text-xs font-mono', err(i, 'km_reading') ? 'border-rose-400 bg-rose-50' : 'border-slate-200']" />
+                                <input v-model.number="form.rows[i].km_reading" type="text" inputmode="decimal" data-num min="0" step="0.1" :aria-label="`كيلومترات ${r.equipment.code}`" :class="['w-full rounded-lg text-xs font-mono', err(i, 'km_reading') ? 'border-rose-400 bg-rose-50' : 'border-slate-200']" />
                                 <div v-if="delta(i, 'km_reading', 'km_reading') !== null" class="text-[10px] text-slate-400">+{{ delta(i, 'km_reading', 'km_reading').toLocaleString('en-US') }} كم</div>
                                 <div v-if="err(i, 'km_reading')" class="text-[10px] text-rose-600">{{ err(i, 'km_reading') }}</div>
                             </template>
                         </td>
                         <td class="px-3 py-2">
-                            <input v-model="form.rows[i].worked_hours" type="number" min="0" max="24" step="0.5" :placeholder="usesHours(r.equipment) ? 'من العداد' : ''" :aria-label="`ساعات عمل ${r.equipment.code}`" :class="['w-full rounded-lg text-xs font-mono', err(i, 'worked_hours') ? 'border-rose-400 bg-rose-50' : 'border-slate-200']" />
+                            <input v-model.number="form.rows[i].worked_hours" type="text" inputmode="decimal" data-num min="0" max="24" step="0.5" :placeholder="usesHours(r.equipment) ? 'من العداد' : ''" :aria-label="`ساعات عمل ${r.equipment.code}`" :class="['w-full rounded-lg text-xs font-mono', err(i, 'worked_hours') ? 'border-rose-400 bg-rose-50' : 'border-slate-200']" />
                             <div v-if="err(i, 'worked_hours')" class="text-[10px] text-rose-600">{{ err(i, 'worked_hours') }}</div>
                         </td>
                         <td class="px-3 py-2"><input v-model="form.rows[i].operator" :aria-label="`مشغّل ${r.equipment.code}`" class="w-full rounded-lg border-slate-200 text-xs" /></td>

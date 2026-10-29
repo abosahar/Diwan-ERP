@@ -76,7 +76,7 @@ class DocumentMapper
             'subtype' => $invoice->invoice_type === 'simplified' ? self::SIMPLIFIED : self::STANDARD,
             'supply_date' => $invoice->supply_date ? Carbon::parse($invoice->supply_date)->toDateString() : null,
             'payment_means' => $this->paymentMeans($invoice->payment_method),
-            'customer' => $invoice->customer,
+            'customer' => $invoice->buyer,
             'lines' => $invoice->items->map(fn ($item) => $this->vat([
                 'name' => $item->item_name,
                 'quantity' => (float) $item->quantity,
@@ -114,7 +114,7 @@ class DocumentMapper
             'billing_reference' => $note->invoice?->invoice_number ?? $note->credit_note_number,
             'instruction_note' => $note->reason,
             'payment_means' => $this->paymentMeans($note->refund_method),
-            'customer' => $note->customer,
+            'customer' => $note->buyer,
             'lines' => $lines,
         ]);
     }
@@ -132,7 +132,7 @@ class DocumentMapper
             'billing_reference' => $note->invoice?->invoice_number ?? $note->debit_note_number,
             'instruction_note' => $note->reason,
             'payment_means' => '30',
-            'customer' => $note->customer,
+            'customer' => $note->buyer,
             'lines' => [$this->vat(['name' => mb_substr($note->reason, 0, 200), 'quantity' => 1, 'unit_price' => (float) $note->subtotal, 'discount' => 0, 'tax_rate' => (float) $note->tax_rate])],
         ]);
     }

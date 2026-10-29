@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ImportButton from '@/Components/UI/ImportButton.vue';
 import { computed, ref, reactive } from 'vue';
@@ -96,21 +97,21 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
                 <Field label="الرقم التسلسلي"><input v-model="assetForm.serial_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الموقع"><input v-model="assetForm.location" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="مركز التكلفة"><SelectCreate v-model="assetForm.cost_center_id" :options="costCenters" entity="cost_center" label="name_ar" placeholder="—" /></Field>
-                <Field label="تاريخ الشراء" :error="assetForm.errors.acquisition_date"><input v-model="assetForm.acquisition_date" type="date" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="التكلفة" :error="assetForm.errors.cost"><input v-model="assetForm.cost" type="number" step="0.01" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="القيمة التخريدية" :error="assetForm.errors.salvage_value"><input v-model="assetForm.salvage_value" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="العمر الإنتاجي (شهر)" hint="فارغ = حسب الفئة"><input v-model="assetForm.useful_life_months" type="number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الشراء" :error="assetForm.errors.acquisition_date"><DatePicker v-model="assetForm.acquisition_date" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التكلفة" :error="assetForm.errors.cost"><input v-model.number="assetForm.cost" type="text" inputmode="decimal" data-num step="0.01" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="القيمة التخريدية" :error="assetForm.errors.salvage_value"><input v-model.number="assetForm.salvage_value" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="العمر الإنتاجي (شهر)" hint="فارغ = حسب الفئة"><input v-model.number="assetForm.useful_life_months" type="text" inputmode="decimal" data-num class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <template v-if="unitsCategory">
-                    <Field label="إجمالي الوحدات المتوقعة طوال العمر" :error="assetForm.errors.total_units"><input v-model="assetForm.total_units" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="إجمالي الوحدات المتوقعة طوال العمر" :error="assetForm.errors.total_units"><input v-model.number="assetForm.total_units" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="وحدة القياس"><input v-model="assetForm.unit_label" placeholder="ساعة، كم، قطعة" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </template>
                 <Field label="طريقة السداد"><select v-model="assetForm.paid_from" class="w-full rounded-xl border-slate-200 text-xs"><option value="bank_transfer">بنك</option><option value="cash">نقداً</option><option value="payables">آجل لمورد</option><option value="opening">رصيد افتتاحي</option></select></Field>
                 <Field v-if="['cash','bank_transfer'].includes(assetForm.paid_from)" label="الصندوق / البنك"><SelectCreate v-model="assetForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
-                <Field v-if="assetForm.paid_from === 'payables'" label="رقم المورد" :error="assetForm.errors.supplier_id"><input v-model="assetForm.supplier_id" type="number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field v-if="assetForm.paid_from === 'payables'" label="رقم المورد" :error="assetForm.errors.supplier_id"><input v-model.number="assetForm.supplier_id" type="text" inputmode="decimal" data-num class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field v-if="assetForm.paid_from !== 'opening'" label="ضريبة المدخلات" :error="assetForm.errors.acquisition_vat">
                     <label class="flex items-center gap-2 py-2"><input v-model="assetForm.taxable" type="checkbox" class="rounded" /> فاتورة ضريبية {{ $taxRate() }}% ({{ ((parseFloat(assetForm.cost) || 0) * $taxRate() / 100).toFixed(2) }})</label>
                 </Field>
-                <Field v-else label="مجمع الإهلاك حتى تاريخ البدء" :error="assetForm.errors.opening_accumulated"><input v-model="assetForm.opening_accumulated" type="number" step="0.01" min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field v-else label="مجمع الإهلاك حتى تاريخ البدء" :error="assetForm.errors.opening_accumulated"><input v-model.number="assetForm.opening_accumulated" type="text" inputmode="decimal" data-num step="0.01" min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </form>
             <template #footer>
                 <button @click="assetOpen = false" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold">{{ $t('ui.cancel') }}</button>
@@ -122,7 +123,7 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
             <form @submit.prevent="saveCategory" class="space-y-3 text-xs">
                 <Field label="اسم الفئة" :error="categoryForm.errors.name_ar"><input v-model="categoryForm.name_ar" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <div class="grid grid-cols-2 gap-3">
-                    <Field label="العمر الإنتاجي (شهر)"><input v-model="categoryForm.useful_life_months" type="number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="العمر الإنتاجي (شهر)"><input v-model.number="categoryForm.useful_life_months" type="text" inputmode="decimal" data-num class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="طريقة الإهلاك"><select v-model="categoryForm.depreciation_method" class="w-full rounded-xl border-slate-200 text-xs"><option value="straight_line">القسط الثابت</option><option value="declining_balance">القسط المتناقص</option><option value="units_of_production">وحدات الإنتاج (ساعات/كم/وحدات)</option></select></Field>
                 </div>
                 <Field label="حساب الأصل" hint="فارغ = الحساب الافتراضي"><SelectCreate v-model="categoryForm.asset_account_id" :options="accounts.filter(x => x.type === 'asset')" entity="account" :label="(a) => `${a.code} - ${a.name_ar}`" placeholder="الافتراضي" /></Field>
@@ -135,7 +136,7 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
         </Dialog>
 
         <Dialog :show="depreciateOpen" title="ترحيل الإهلاك الشهري" size="sm" @close="depreciateOpen = false">
-            <Field label="الشهر" hint="يتم ترحيل إهلاك كل الأصول النشطة لهذا الشهر (لا يتكرر لنفس الشهر)"><input v-model="depreciateForm.month" type="month" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+            <Field label="الشهر" hint="يتم ترحيل إهلاك كل الأصول النشطة لهذا الشهر (لا يتكرر لنفس الشهر)"><DatePicker v-model="depreciateForm.month" type="month" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             <template #footer>
                 <button @click="runDepreciation" :disabled="depreciateForm.processing" class="px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold">ترحيل</button>
             </template>

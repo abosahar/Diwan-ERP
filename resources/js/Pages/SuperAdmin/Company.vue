@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ask } from '@/composables/useDialog';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
@@ -27,8 +28,8 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                     <h3 class="font-black">الاشتراك</h3>
                     <label class="block">الباقة<select v-model="form.subscription_plan_id" :class="inp"><option value="">—</option><option v-for="p in plans" :key="p.id" :value="p.id">{{ p.name_ar }}</option></select></label>
                     <label class="block">الحالة<select v-model="form.status" :class="inp"><option value="trial">تجريبي</option><option value="active">فعال</option><option value="suspended">موقوف</option></select></label>
-                    <label class="block">نهاية التجربة<input v-model="form.trial_ends_at" type="date" :class="inp" /></label>
-                    <label class="block">نهاية الاشتراك<input v-model="form.subscription_ends_at" type="date" :class="inp" /></label>
+                    <label class="block">نهاية التجربة<DatePicker v-model="form.trial_ends_at" :class="inp" /></label>
+                    <label class="block">نهاية الاشتراك<DatePicker v-model="form.subscription_ends_at" :class="inp" /></label>
                     <label v-if="form.status === 'suspended'" class="block">سبب الإيقاف<input v-model="form.suspended_reason" :class="inp" /></label>
                     <p v-for="(m, k) in form.errors" :key="k" class="text-rose-600">{{ m }}</p>
                     <button @click="form.put(route('super-admin.companies.update', c.id), { preserveScroll: true })" class="w-full px-3 py-2 rounded-xl bg-slate-900 text-white font-bold">حفظ</button>

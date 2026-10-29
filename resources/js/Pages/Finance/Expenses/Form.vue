@@ -1,4 +1,7 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DimensionFields from '@/Components/Documents/DimensionFields.vue';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { taxRate } from '@/utils/tax';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -6,12 +9,14 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { today } from '@/utils/format';
 
-const props = defineProps({ expenseAccounts: Array, bankAccounts: Array });
+const props = defineProps({ expenseAccounts: Array, bankAccounts: Array, costCenters: Array, projects: Array, dimensionPolicy: Object });
 
 const form = useForm({
     title: '',
     category: 'مصروفات عامة',
     account_id: props.expenseAccounts?.[0]?.id || '',
+    cost_center_id: '',
+    project_id: '',
     bank_account_id: props.bankAccounts?.[0]?.id || '',
     amount: '',
     tax_amount: '',
@@ -23,6 +28,7 @@ const form = useForm({
     vendor_name: '',
     notes: '',
 });
+useUnsavedGuard(form);
 
 const onAmountChange = () => {
     if (form.amount && form.taxable) {
@@ -68,12 +74,10 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                 </div>
                                 <div>
                                     <label class="block font-medium text-slate-700 mb-1">تاريخ الصرف <span class="text-rose-500">*</span></label>
-                                    <input 
+                                    <DatePicker 
                                         v-model="form.expense_date" 
-                                        type="date" 
                                         required 
-                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500" 
-                                    />
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500" />
                                 </div>
                             </div>
             
@@ -81,9 +85,9 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                 <div>
                                     <label class="block font-medium text-slate-700 mb-1">المبلغ (غير شامل الضريبة) <span class="text-rose-500">*</span></label>
                                     <input 
-                                        v-model="form.amount" 
+                                        v-model.number="form.amount" 
                                         @input="onAmountChange"
-                                        type="number" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01" 
                                         required 
                                         placeholder="0.00"
@@ -93,9 +97,9 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                 <div>
                                     <label class="flex items-center gap-2 font-medium text-slate-700 mb-1"><input v-model="form.taxable" type="checkbox" @change="onAmountChange" class="rounded border-slate-300" /> خاضع لـ{{ $taxLabel() }}</label>
                                     <input 
-                                        v-model="form.tax_amount" 
+                                        v-model.number="form.tax_amount" 
                                         :disabled="!form.taxable"
-                                        type="number" 
+                                        type="text" inputmode="decimal" data-num 
                                         step="0.01" 
                                         placeholder="0.00"
                                         class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-rose-500 focus:border-rose-500 text-end" 
@@ -120,6 +124,8 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                     <SelectCreate v-model="form.account_id" :options="expenseAccounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar}`" :allow-empty="false" />
                                 </div>
                             </div>
+                            <DimensionFields v-model:cost-center="form.cost_center_id" v-model:project="form.project_id" :account="{ type: 'expense', requires_cost_center: expenseAccounts.find((a) => a.id === form.account_id)?.requires_cost_center }" :policy="dimensionPolicy" :cost-centers="costCenters" :projects="projects" :errors="form.errors" />
+
             
                             <div class="grid grid-cols-2 gap-3">
                                 <div>

@@ -10,6 +10,7 @@ use App\Http\Middleware\EnsureTwoFactorEnrolled;
 use App\Http\Middleware\ForceHttps;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ResolveTenant;
+use App\Http\Middleware\SaveAndNew;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
 use App\Services\Accounting\AccountingException;
@@ -46,6 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ], append: [
             SetLocale::class,
             ResolveTenant::class,
+            SaveAndNew::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             // A password change logs the account out of its other sessions.

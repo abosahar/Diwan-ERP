@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
@@ -23,7 +24,7 @@ const approve = (s) => { if (confirm('اعتماد المخالصة وإنهاء
         <Head title="نهاية الخدمة" />
         <PageHeader title="مكافأة نهاية الخدمة والمخالصات" subtitle="المادة 84: نصف شهر عن كل سنة من الخمس الأولى ثم شهر كامل؛ المادة 85: الاستقالة ثلث/ثلثان/كامل" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'نهاية الخدمة' }]">
             <template #actions>
-                <div v-if="$can('hr.settlements.approve')" class="flex gap-2 items-center"><input v-model="provision.date" type="date" class="rounded-xl border-slate-200 text-xs" /><button @click="provision.post(route('hr.settlements.provision'))" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">تحديث مخصص نهاية الخدمة</button></div>
+                <div v-if="$can('hr.settlements.approve')" class="flex gap-2 items-center"><DatePicker v-model="provision.date" class="rounded-xl border-slate-200 text-xs" /><button @click="provision.post(route('hr.settlements.provision'))" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">تحديث مخصص نهاية الخدمة</button></div>
             </template>
         </PageHeader>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
@@ -52,9 +53,9 @@ const approve = (s) => { if (confirm('اعتماد المخالصة وإنهاء
                 <h3 class="font-black text-slate-700">احتساب مخالصة</h3>
                 <SelectCreate v-model="form.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
                 <select v-model="form.reason" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in reasons" :key="k" :value="k">{{ l }}</option></select>
-                <label class="block">تاريخ آخر يوم عمل<input v-model="form.termination_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
-                <label class="block">أيام راتب مستحقة لم تُصرف<input v-model="form.salary_days" type="number" step="1" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
-                <div class="grid grid-cols-2 gap-2"><label>مستحقات أخرى<input v-model="form.other_dues" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label><label>استقطاعات أخرى<input v-model="form.other_deductions" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label></div>
+                <label class="block">تاريخ آخر يوم عمل<DatePicker v-model="form.termination_date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+                <label class="block">أيام راتب مستحقة لم تُصرف<input v-model.number="form.salary_days" type="text" inputmode="decimal" data-num step="1" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
+                <div class="grid grid-cols-2 gap-2"><label>مستحقات أخرى<input v-model.number="form.other_dues" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label><label>استقطاعات أخرى<input v-model.number="form.other_deductions" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label></div>
                 <p class="text-slate-500">يُحتسب رصيد الإجازات وأرصدة السلف آلياً.</p>
                 <p v-for="(m, k) in form.errors" :key="k" class="text-rose-600">{{ m }}</p>
                 <button @click="form.post(route('hr.settlements.store'), { preserveScroll: true })" class="w-full px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">احتساب</button>
@@ -62,7 +63,7 @@ const approve = (s) => { if (confirm('اعتماد المخالصة وإنهاء
         </div>
         <Dialog :show="!!paying" title="صرف المخالصة" @close="paying = null">
             <div class="grid grid-cols-2 gap-3">
-                <Field label="التاريخ"><input v-model="payForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="payForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الحساب"><SelectCreate v-model="payForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <template #footer><button @click="payForm.post(route('hr.settlements.pay', paying.id), { onSuccess: () => (paying = null) })" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">صرف {{ money(paying?.net_amount) }}</button></template>

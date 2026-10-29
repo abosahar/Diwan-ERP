@@ -1,4 +1,6 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -9,6 +11,7 @@ import BoqEditor from '@/Components/Projects/BoqEditor.vue';
 
 const props = defineProps({ managers: Array, warehouses: Array, suggestedCode: String, branches: Array, defaultBranchId: Number });
 const form = useForm({ customer_id: null, branch_id: props.defaultBranchId || props.branches?.[0]?.id || '', name: '', contract_number: '', manager_id: '', warehouse_id: '', start_date: '', end_date: '', contract_value: 0, advance_percent: 0, retention_percent: 5, location: '', description: '', boq: [] });
+useUnsavedGuard(form);
 const save = () => {
     form.clearErrors();
     if (!form.name) form.setError('name', 'أدخل اسم المشروع.');
@@ -30,11 +33,11 @@ const save = () => {
                 <Field label="مدير المشروع"><select v-model="form.manager_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">—</option><option v-for="m in managers" :key="m.id" :value="m.id">{{ m.name }}</option></select></Field>
                 <Field label="مستودع الموقع"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="الموقع"><input v-model="form.location" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ البدء"><input v-model="form.start_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ الانتهاء" :error="form.errors.end_date"><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="نسبة استرداد الدفعة المقدمة %" hint="تُخصم من كل مستخلص"><input v-model="form.advance_percent" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field label="نسبة المحتجزات %"><input v-model="form.retention_percent" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field v-if="!form.boq.length" label="قيمة العقد (بدون جدول كميات)"><input v-model="form.contract_value" type="number" step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field label="تاريخ البدء"><DatePicker v-model="form.start_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الانتهاء" :error="form.errors.end_date"><DatePicker v-model="form.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="نسبة استرداد الدفعة المقدمة %" hint="تُخصم من كل مستخلص"><input v-model.number="form.advance_percent" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field label="نسبة المحتجزات %"><input v-model.number="form.retention_percent" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
+                <Field v-if="!form.boq.length" label="قيمة العقد (بدون جدول كميات)"><input v-model.number="form.contract_value" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
             </div>
             <div>
                 <h3 class="text-xs font-black text-slate-700 mb-2">جدول الكميات (BOQ)</h3>

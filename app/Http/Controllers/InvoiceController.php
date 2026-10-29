@@ -15,6 +15,7 @@ use App\Rules\AllowedBranch;
 use App\Services\Accounting\ExchangeRates;
 use App\Services\Documents\FreeformTemplates;
 use App\Services\Sales\InvoiceService;
+use App\Services\Sales\PromotionEngine;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
 use App\Services\ZatcaService;
@@ -59,17 +60,18 @@ class InvoiceController extends Controller
             $query->whereDate('invoice_date', '<=', $dateTo);
         }
 
-        $invoices = $query->orderBy('invoice_date', 'desc')
+        $yearScoped = ! $dateFrom && ! $dateTo;
+        $invoices = $query->inActiveYear('invoice_date', $yearScoped)->orderBy('invoice_date', 'desc')
             ->orderBy('id', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();
 
         // Calculate summary KPI stats using aggregate queries (no full load)
         $stats = [
-            'total_count' => Invoice::count(),
-            'total_amount' => Invoice::query()->sumBase('total'),
-            'paid_amount' => Invoice::where('payment_status', 'paid')->sumBase('total'),
-            'unpaid_amount' => Invoice::whereIn('payment_status', ['unpaid', 'partially_paid'])->sumBase('remaining_amount'),
+            'total_count' => Invoice::inActiveYear('invoice_date')->count(),
+            'total_amount' => Invoice::inActiveYear('invoice_date')->sumBase('total'),
+            'paid_amount' => Invoice::inActiveYear('invoice_date')->where('payment_status', 'paid')->sumBase('total'),
+            'unpaid_amount' => Invoice::inActiveYear('invoice_date')->whereIn('payment_status', ['unpaid', 'partially_paid'])->sumBase('remaining_amount'),
         ];
 
         return Inertia::render('Sales/Invoices/Index', [
@@ -207,12 +209,14 @@ class InvoiceController extends Controller
             'items.*.tax_rate' => 'nullable|numeric|min:0',
         ] + ExchangeRates::rules());
 
+        [$validated['items'], $promotions] = app(PromotionEngine::class)->apply($validated['items'], (int) $validated['customer_id'], 'invoice', $validated['invoice_date'] ?? null);
+
         $invoice = app(InvoiceService::class)->create(
             collect($validated)->except('items')->all(),
             $validated['items'],
         );
 
-        return redirect()->route('sales.invoices.show', $invoice->id)->with('success', 'تم إنشاء الفاتورة الضريبية بنجاح وفق متطلبات هيئة الزكاة');
+        return redirect()->route('sales.invoices.show', $invoice->id)->with('success', 'تم إنشاء الفاتورة الضريبية بنجاح وفق متطلبات هيئة الزكاة'.($promotions ? ' (طُبِّق عرض: '.implode('، ', $promotions).')' : ''));
     }
 
     /**

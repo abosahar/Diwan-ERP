@@ -57,7 +57,7 @@ const importCounts = (lines) => {
         </PageHeader>
 
         <div class="grid grid-cols-3 gap-3 mb-4">
-            <StatCard label="عدد الأصناف" :value="summary.lines" />
+            <StatCard label="عدد الأصناف" :value="summary.line_count" />
             <StatCard label="لم تُجرد بعد" :value="summary.uncounted" tone="amber" />
             <StatCard label="قيمة الفروقات" :value="amount(summary.value_difference)" :tone="summary.value_difference < 0 ? 'rose' : 'emerald'" />
         </div>
@@ -84,7 +84,7 @@ const importCounts = (lines) => {
                         <td class="px-3 py-2 font-semibold">{{ item.product?.name_ar }} <span class="text-slate-400 font-mono">{{ item.product?.sku }}</span></td>
                         <td class="px-3 py-2 text-end font-mono">{{ qty(item.system_quantity) }}</td>
                         <td class="px-3 py-1 text-center">
-                            <input v-if="editable" v-model="entered[item.product_id]" type="number" step="0.0001" min="0" class="w-32 rounded-lg border-slate-200 text-xs font-mono text-center" />
+                            <input v-if="editable" v-model.number="entered[item.product_id]" type="text" inputmode="decimal" data-num step="0.0001" min="0" class="w-32 rounded-lg border-slate-200 text-xs font-mono text-center" />
                             <span v-else class="font-mono">{{ item.counted_quantity === null ? '—' : qty(item.counted_quantity) }}</span>
                         </td>
                         <td class="px-3 py-2 text-end font-mono" :class="entered[item.product_id] !== '' && Number(entered[item.product_id]) !== Number(item.system_quantity) ? 'text-rose-600 font-bold' : ''">

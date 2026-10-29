@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { confirmAction } from '@/composables/useDialog';
 import HijriDate from '@/Components/UI/HijriDate.vue';
 import { ref } from 'vue';
@@ -45,7 +46,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
                 <div class="flex justify-between"><span>العقد</span><b>{{ employee.contract_type === 'limited' ? 'محدد حتى ' + date(employee.contract_end) : 'غير محدد المدة' }}</b></div>
                 <div class="flex justify-between"><span>المدير</span><b>{{ employee.manager?.name || '—' }}</b></div>
                 <div class="flex justify-between"><span>الوردية</span><b>{{ employee.shift?.name || 'الافتراضية' }}</b></div>
-                <div class="flex justify-between"><span>الحالة</span><b>{{ employee.status }}</b></div>
+                <div class="flex justify-between"><span>الحالة</span><StatusBadge :status="employee.status" /></div>
             </div>
             <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-1.5">
                 <div class="flex justify-between"><span>رصيد الإجازة السنوية</span><b class="font-mono">{{ leaveBalance.balance }} يوم</b></div>
@@ -73,7 +74,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
             <div v-if="$can('hr.employees.edit')" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
                 <Field label="النوع"><select v-model="docForm.type" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in docLabel" :key="k" :value="k">{{ l }}</option></select></Field>
                 <Field label="الرقم"><input v-model="docForm.number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <div class="grid grid-cols-2 gap-2"><Field label="الإصدار"><input v-model="docForm.issue_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field><Field label="الانتهاء"><input v-model="docForm.expiry_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field></div>
+                <div class="grid grid-cols-2 gap-2"><Field label="الإصدار"><DatePicker v-model="docForm.issue_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field><Field label="الانتهاء"><DatePicker v-model="docForm.expiry_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field></div>
                 <Field label="الملف (PDF/صورة)" :error="docForm.errors.file"><input type="file" @input="docForm.file = $event.target.files[0]" class="text-xs" /></Field>
                 <button @click="docForm.post(route('hr.employees.documents.store', employee.id), { preserveScroll: true, forceFormData: true, onSuccess: () => docForm.reset() })" class="w-full px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">إضافة</button>
             </div>
@@ -97,7 +98,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
                 <div v-if="$can('hr.employees.edit')" class="grid grid-cols-6 gap-2 mt-3 items-end">
                     <select v-model="payForm.kind" class="rounded-xl border-slate-200 text-xs"><option value="allowance">بدل</option><option value="deduction">استقطاع</option></select>
                     <input v-model="payForm.name" placeholder="الاسم" class="col-span-2 rounded-xl border-slate-200 text-xs" />
-                    <input v-model="payForm.amount" type="number" step="0.01" class="rounded-xl border-slate-200 text-xs font-mono" />
+                    <input v-model.number="payForm.amount" type="text" inputmode="decimal" data-num step="0.01" class="rounded-xl border-slate-200 text-xs font-mono" />
                     <label class="flex items-center gap-1"><input v-model="payForm.gosi_applicable" type="checkbox" class="rounded" /> تأمينات</label>
                     <button @click="payForm.post(route('hr.employees.pay-items.store', employee.id), { preserveScroll: true, onSuccess: () => payForm.reset() })" class="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">إضافة</button>
                 </div>
@@ -132,10 +133,10 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
         </div>
 
         <div v-if="tab === 'attendance'" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-            <div class="p-3 border-b border-slate-100"><input type="month" :value="month" @change="changeMonth" class="rounded-xl border-slate-200 text-xs" /></div>
+            <div class="p-3 border-b border-slate-100"><DatePicker type="month" :model-value="month" @change="changeMonth" class="rounded-xl border-slate-200 text-xs" /></div>
             <table class="w-full text-xs">
                 <thead class="bg-slate-50 text-slate-500"><tr><th class="px-3 py-2">التاريخ</th><th class="px-3 py-2">الحالة</th><th class="px-3 py-2">دخول</th><th class="px-3 py-2">خروج</th><th class="px-3 py-2">العمل</th><th class="px-3 py-2">تأخير</th><th class="px-3 py-2">إضافي</th></tr></thead>
-                <tbody><tr v-for="a in attendance" :key="a.id" class="border-t border-slate-100 text-center"><td class="px-3 py-1.5 font-mono">{{ date(a.date) }}</td><td>{{ a.status }}</td><td class="font-mono">{{ a.check_in?.substring(0, 5) }}</td><td class="font-mono">{{ a.check_out?.substring(0, 5) }}</td><td class="font-mono">{{ minutes(a.worked_minutes) }}</td><td class="font-mono text-rose-600">{{ a.late_minutes || '' }}</td><td class="font-mono text-emerald-600">{{ minutes(a.overtime_minutes) }}</td></tr></tbody>
+                <tbody><tr v-for="a in attendance" :key="a.id" class="border-t border-slate-100 text-center"><td class="px-3 py-1.5 font-mono">{{ date(a.date) }}</td><td>{{ { present: 'حاضر', absent: 'غائب', leave: 'إجازة', holiday: 'عطلة رسمية', weekend: 'راحة أسبوعية' }[a.status] || a.status }}</td><td class="font-mono">{{ a.check_in?.substring(0, 5) }}</td><td class="font-mono">{{ a.check_out?.substring(0, 5) }}</td><td class="font-mono">{{ minutes(a.worked_minutes) }}</td><td class="font-mono text-rose-600">{{ a.late_minutes || '' }}</td><td class="font-mono text-emerald-600">{{ minutes(a.overtime_minutes) }}</td></tr></tbody>
             </table>
         </div>
 

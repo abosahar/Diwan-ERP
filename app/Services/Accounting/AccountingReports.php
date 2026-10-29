@@ -555,7 +555,7 @@ class AccountingReports
         [$role, $partyType, $docTable, $partyColumn, $partyModel] = $payables
             ? ['payables', 'supplier', 'purchase_invoices', 'supplier_id', Supplier::class]
             : ['receivables', 'customer', 'invoices', 'customer_id', Customer::class];
-        $accountId = $this->map->id($role);
+        $accountIds = $payables ? [$this->map->id($role)] : (app(PartyAccounts::class)->receivableAccountIds() ?: [$this->map->id($role)]);
         $sign = $payables ? -1 : 1;
 
         $balances = DB::table('journal_entry_lines as l')
@@ -564,7 +564,7 @@ class AccountingReports
             ->whereIn('e.status', [JournalEntry::STATUS_POSTED, JournalEntry::STATUS_REVERSED])
             ->when($this->branchIds(), fn ($q, $ids) => $q->whereIn('e.branch_id', $ids))
             ->where('e.date', '<=', $asOf->toDateString().' 23:59:59')
-            ->where('l.account_id', $accountId)
+            ->whereIn('l.account_id', $accountIds)
             ->groupBy('l.party_type', 'l.party_id')
             ->selectRaw('l.party_type, l.party_id, SUM(l.debit - l.credit) as balance')
             ->get();

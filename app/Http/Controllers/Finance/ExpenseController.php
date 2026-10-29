@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\BankAccount;
+use App\Models\CostCenter;
 use App\Models\Expense;
+use App\Models\Project;
+use App\Services\Accounting\DimensionPolicy;
 use App\Services\Accounting\DocumentPoster;
 use App\Services\Tax\TaxProfile;
 use Illuminate\Http\Request;
@@ -34,7 +37,7 @@ class ExpenseController extends Controller
             $query->where('category', $request->input('category'));
         }
 
-        $expenses = $query->paginate(15)->withQueryString();
+        $expenses = $query->inActiveYear('expense_date')->paginate(15)->withQueryString();
 
         $stats = [
             'total_expenses' => Expense::sum('total_amount'),
@@ -43,7 +46,7 @@ class ExpenseController extends Controller
             'categories' => Expense::distinct()->pluck('category'),
         ];
 
-        $expenseAccounts = Account::where('type', 'expense')->where('is_parent', false)->get(['id', 'code', 'name_ar']);
+        $expenseAccounts = Account::where('type', 'expense')->where('is_parent', false)->get(['id', 'code', 'name_ar', 'requires_cost_center']);
         $bankAccounts = BankAccount::withLedgerBalances(BankAccount::where('is_active', true)->get(['id', 'name', 'type', 'account_id', 'current_balance']));
 
         return Inertia::render('Finance/Expenses/Index', [
@@ -58,7 +61,10 @@ class ExpenseController extends Controller
     public function create(): Response
     {
         return Inertia::render('Finance/Expenses/Form', [
-            'expenseAccounts' => Account::where('type', 'expense')->where('is_parent', false)->get(['id', 'code', 'name_ar']),
+            'costCenters' => CostCenter::where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar']),
+            'projects' => Project::orderBy('name')->get(['id', 'name']),
+            'dimensionPolicy' => app(DimensionPolicy::class)->modes(),
+            'expenseAccounts' => Account::where('type', 'expense')->where('is_parent', false)->get(['id', 'code', 'name_ar', 'requires_cost_center']),
             'bankAccounts' => BankAccount::withLedgerBalances(BankAccount::where('is_active', true)->get(['id', 'name', 'type', 'account_id', 'current_balance'])),
         ]);
     }
@@ -70,6 +76,7 @@ class ExpenseController extends Controller
             'account_id' => 'nullable|tenant_exists:accounts,id',
             'bank_account_id' => 'nullable|tenant_exists:bank_accounts,id',
             'cost_center_id' => 'nullable|tenant_exists:cost_centers,id',
+            'project_id' => 'nullable|tenant_exists:projects,id',
             'category' => 'required|string|max:100',
             'amount' => 'required|numeric|min:0.01',
             'tax_amount' => 'nullable|numeric|min:0',
@@ -98,6 +105,7 @@ class ExpenseController extends Controller
                 'account_id' => $validated['account_id'] ?? null,
                 'bank_account_id' => $validated['bank_account_id'] ?? null,
                 'cost_center_id' => $validated['cost_center_id'] ?? null,
+                'project_id' => $validated['project_id'] ?? null,
                 'title' => $validated['title'],
                 'category' => $validated['category'],
                 'amount' => $validated['amount'],

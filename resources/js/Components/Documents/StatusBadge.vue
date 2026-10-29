@@ -16,12 +16,22 @@ const map = {
     partially_received: ['مستلم جزئياً', 'bg-sky-50 text-sky-700'],
     received: ['مستلم', 'bg-sky-50 text-sky-700'],
     invoiced: ['مفوتر', 'bg-indigo-50 text-indigo-700'],
+    partially_invoiced: ['مفوتر جزئياً', 'bg-indigo-50 text-indigo-700'],
     converted_to_invoice: ['مفوتر', 'bg-indigo-50 text-indigo-700'],
     ordered: ['تم الطلب', 'bg-indigo-50 text-indigo-700'],
     refunded: ['مسترد', 'bg-indigo-50 text-indigo-700'],
     paid: ['مدفوع', 'bg-emerald-50 text-emerald-700'],
     partially_paid: ['مدفوع جزئياً', 'bg-amber-50 text-amber-700'],
     unpaid: ['غير مدفوع', 'bg-rose-50 text-rose-700'],
+    active: ['نشط', 'bg-emerald-50 text-emerald-700'],
+    inactive: ['غير نشط', 'bg-slate-100 text-slate-500'],
+    on_leave: ['في إجازة', 'bg-sky-50 text-sky-700'],
+    suspended: ['موقوف', 'bg-amber-50 text-amber-700'],
+    terminated: ['منتهية خدمته', 'bg-slate-100 text-slate-500'],
+    open: ['مفتوح', 'bg-emerald-50 text-emerald-700'],
+    closed: ['مغلق', 'bg-slate-100 text-slate-500'],
+    completed: ['مكتمل', 'bg-emerald-50 text-emerald-700'],
+    posted: ['مرحّل', 'bg-emerald-50 text-emerald-700'],
 };
 const entry = computed(() => map[props.status] || [props.status, 'bg-slate-100 text-slate-600']);
 </script>

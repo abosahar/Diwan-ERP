@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -11,7 +12,8 @@ import ApprovalTimeline from '@/Components/Documents/ApprovalTimeline.vue';
 import { money, date, qty, today } from '@/utils/format';
 
 const props = defineProps({ order: Object, receipts: Array, invoices: Array, approvals: Array, warehouses: Array });
-const canReceive = computed(() => ['approved', 'pending', 'partially_received'].includes(props.order.status));
+const canReceive = computed(() => ['approved', 'pending', 'partially_received', 'partially_invoiced'].includes(props.order.status));
+const remove = () => { if (confirm('نقل أمر الشراء إلى سلة المحذوفات؟')) router.delete(route('purchases.orders.destroy', props.order.id)); };
 const act = (name, message) => { if (!message || confirm(message)) router.post(route(name, props.order.id)); };
 const printPage = () => window.print();
 
@@ -44,8 +46,10 @@ const receive = () => form.transform((d) => ({ ...d, lines: d.lines.map(({ name,
                     <button @click="act('purchases.orders.reject', 'رفض أمر الشراء؟')" class="px-3 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold">رفض</button>
                 </template>
                 <button v-if="canReceive && $can('purchases.receipts.create')" @click="open = true" class="px-3 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">استلام بضاعة</button>
+                <Link v-if="['pending', 'approved', 'partially_invoiced'].includes(order.status) && $can('purchases.orders.convert')" :href="route('purchases.orders.invoice-form', order.id)" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold" data-stage-invoice>فوترة الأمر</Link>
                 <Link v-if="['partially_received', 'received'].includes(order.status) && $can('purchases.invoices.create')" :href="route('purchases.invoices.from-receipts', { supplier_id: order.supplier_id })" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">فاتورة المورد</Link>
                 <button v-if="['draft', 'pending_approval', 'approved', 'rejected'].includes(order.status) && $can('purchases.orders.cancel')" @click="act('purchases.orders.cancel', 'إلغاء أمر الشراء؟')" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">إلغاء</button>
+                <button v-if="['draft', 'pending_approval', 'approved', 'rejected', 'cancelled'].includes(order.status) && $can('purchases.orders.cancel')" @click="remove" class="px-3 py-2 rounded-xl border border-rose-200 text-rose-600 text-xs font-bold">حذف</button>
                 <button @click="printPage" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">طباعة</button>
             </template>
         </PageHeader>
@@ -89,7 +93,7 @@ const receive = () => form.transform((d) => ({ ...d, lines: d.lines.map(({ name,
         </div>
         <Dialog :show="open" title="استلام بضاعة (GRN)" size="xl" @close="open = false">
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <Field label="تاريخ الاستلام"><input v-model="form.receipt_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الاستلام"><DatePicker v-model="form.receipt_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المستودع"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="رقم إشعار تسليم المورد"><input v-model="form.supplier_delivery_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
@@ -98,9 +102,9 @@ const receive = () => form.transform((d) => ({ ...d, lines: d.lines.map(({ name,
                 <tr v-for="l in form.lines" :key="l.purchase_order_item_id" class="border-t border-slate-100">
                     <td class="py-1.5">{{ l.name }}</td>
                     <td class="text-center font-mono">{{ qty(l.open) }}</td>
-                    <td><input v-model="l.quantity" type="number" min="0" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
+                    <td><input v-model.number="l.quantity" type="text" inputmode="decimal" data-num min="0" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td><input v-model="l.batch_number" class="w-full rounded-lg border-slate-200 text-xs" /></td>
-                    <td><input v-model="l.expiry_date" type="date" class="w-full rounded-lg border-slate-200 text-xs" /></td>
+                    <td><DatePicker v-model="l.expiry_date" class="w-full rounded-lg border-slate-200 text-xs" /></td>
                 </tr>
             </table></div>
             <p v-for="(msg, key) in form.errors" :key="key" class="text-xs text-rose-600 mt-1">{{ msg }}</p>

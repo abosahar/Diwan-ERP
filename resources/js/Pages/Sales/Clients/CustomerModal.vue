@@ -1,7 +1,8 @@
 <script setup>
 import { notify } from '@/composables/useDialog';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import axios from 'axios';
+import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import {
     XMarkIcon,
     PencilSquareIcon,
@@ -39,6 +40,7 @@ const emit = defineEmits(['close', 'saved']);
 // Form State
 const form = ref({
     customer_type: 'commercial', // 'commercial' or 'individual'
+    customer_group_id: '',
     code: '',
     name: '',
     company_name: '',
@@ -70,6 +72,13 @@ const showPhoneSection = ref(true);
 const showEmailSection = ref(true);
 const showAddressSection = ref(true);
 
+const customerGroups = ref([]);
+onMounted(async () => {
+    try {
+        customerGroups.value = (await axios.get(route('lookup.list', 'customer_groups'))).data.data;
+    } catch (e) { /* groups are optional */ }
+});
+
 const isCodeEditable = ref(false);
 const isSubmitting = ref(false);
 const formErrors = ref({});
@@ -97,6 +106,7 @@ watch(
             // Editing existing customer
             form.value = {
                 customer_type: cust.customer_type || (cust.tax_number || cust.commercial_registration ? 'commercial' : 'individual'),
+                customer_group_id: cust.customer_group_id || '',
                 code: cust.code || ('1-' + String(cust.id).padStart(6, '0')),
                 name: cust.name || '',
                 company_name: cust.company_name || '',
@@ -130,6 +140,7 @@ watch(
             // Creating new customer
             form.value = {
                 customer_type: 'individual', // Screenshot 2 defaults or shows individual/commercial
+                customer_group_id: '',
                 code: props.nextCode || '1-000001',
                 name: props.initialName || '',
                 company_name: '',
@@ -331,6 +342,12 @@ const saveCustomer = async () => {
                             </div>
                         </div>
 
+                        <!-- Customer group (may post to its own receivable account) -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">مجموعة العميل</label>
+                            <SelectCreate v-model="form.customer_group_id" :options="customerGroups" entity="customer_group" label="label" placeholder="بدون مجموعة" @created="(g) => customerGroups.push(g)" />
+                        </div>
+
                         <!-- Code Field with Edit Pencil Icon -->
                         <div>
                             <div class="flex items-center justify-between mb-1">
@@ -405,8 +422,8 @@ const saveCustomer = async () => {
                             <label class="block text-xs font-bold text-slate-700 mb-1">الرصيد الافتتاحي</label>
                             <div class="relative">
                                 <input
-                                    v-model="form.opening_balance"
-                                    type="number"
+                                    v-model.number="form.opening_balance"
+                                    type="text" inputmode="decimal" data-num
                                     step="0.01"
                                     placeholder="0.00"
                                     class="w-full text-sm rounded-lg border border-slate-200 pe-3 ps-10 py-2 font-mono transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"

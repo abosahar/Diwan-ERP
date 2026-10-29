@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { reactive } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -50,7 +51,7 @@ const zakatRows = [
                         <h2 class="font-black text-slate-800">إعادة تقييم أرصدة العملات الأجنبية</h2>
                         <p class="text-3xs text-slate-500 mt-1">الفواتير المفتوحة بعملة أجنبية تُقاس بسعر نهاية الشهر؛ يُعكس القيد أول الشهر التالي حتى لا يتكرر الفرق عند السداد.</p>
                     </div>
-                    <Field label="الشهر"><input v-model="filters.month" type="month" @change="reload" class="rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="الشهر"><DatePicker v-model="filters.month" type="month" @change="reload" class="rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
 
                 <div class="overflow-x-auto"><table class="w-full text-xs">
@@ -92,9 +93,9 @@ const zakatRows = [
                     <Field label="أساس السنة">
                         <select v-model="filters.calendar" @change="reload" class="w-full rounded-xl border-slate-200 text-xs"><option value="gregorian">ميلادية (2.5776%)</option><option value="hijri">هجرية (2.5%)</option></select>
                     </Field>
-                    <Field label="حصة الملكية السعودية/الخليجية %"><input v-model.number="filters.saudi_share" type="number" min="0" max="100" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="إضافات أخرى"><input v-model.number="filters.additions" type="number" min="0" step="0.01" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="حسميات أخرى"><input v-model.number="filters.deductions" type="number" min="0" step="0.01" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="حصة الملكية السعودية/الخليجية %"><input v-model.number="filters.saudi_share" type="text" inputmode="decimal" data-num min="0" max="100" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="إضافات أخرى"><input v-model.number="filters.additions" type="text" inputmode="decimal" data-num min="0" step="0.01" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="حسميات أخرى"><input v-model.number="filters.deductions" type="text" inputmode="decimal" data-num min="0" step="0.01" @change="reload" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
 
                 <div class="overflow-x-auto" v-if="zakat"><table class="w-full text-xs">

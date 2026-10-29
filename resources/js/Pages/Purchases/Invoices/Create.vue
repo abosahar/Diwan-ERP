@@ -1,4 +1,6 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
@@ -37,6 +39,7 @@ const props = defineProps({
     products: Array,
     categories: Array,
     units: Array,
+    bankAccounts: { type: Array, default: () => [] },
     suggestedNumber: String,
     defaultTaxRate: Number,
     defaultBranchId: Number,
@@ -68,6 +71,7 @@ const form = useForm({
     exchange_rate: '',
     payment_status: 'unpaid',
     paid_amount: 0,
+    payments: [],
     notes: '',
     items: [
         {
@@ -81,6 +85,7 @@ const form = useForm({
         }
     ],
 });
+useUnsavedGuard(form);
 
 // Warehouses of the chosen branch (and shared ones without a branch); all of them if none match.
 const branchWarehouses = computed(() => {
@@ -401,8 +406,12 @@ const total = computed(() => {
     return subtotal.value + taxAmount.value;
 });
 
+const addPayment = () => form.payments.push({ method: 'cash', bank_account_id: '', amount: Math.max(0, remainingNow.value) || '' });
+const paidNow = computed(() => form.payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0));
+const remainingNow = computed(() => Math.round((total.value - paidNow.value) * 100) / 100);
 const submit = () => {
-    form.post(route('purchases.invoices.store'));
+    form.transform((d) => ({ ...d, payments: d.payments.map((p) => ({ ...p, amount: Number(p.amount) || 0, bank_account_id: p.bank_account_id || null })), payment_method: d.payments.length ? d.payments[0].method : 'credit', payment_status: 'unpaid' }))
+        .post(route('purchases.invoices.store'));
 };
 
 const formatCurrency = (val) => {
@@ -621,28 +630,22 @@ const importLines = (lines, replace) => {
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
                             <div>
                                 <label class="block font-bold text-slate-600 mb-1">تاريخ الفاتورة</label>
-                                <input 
+                                <DatePicker 
                                     v-model="form.invoice_date" 
-                                    type="date" 
                                     required 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
+                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500" />
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-600 mb-1">تاريخ الاستحقاق</label>
-                                <input 
+                                <DatePicker 
                                     v-model="form.due_date" 
-                                    type="date" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
+                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500" />
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-600 mb-1">تاريخ استلام البضاعة</label>
-                                <input 
+                                <DatePicker 
                                     v-model="form.supply_date" 
-                                    type="date" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
+                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500" />
                             </div>
                         </div>
                         <CurrencyPicker v-model:code="form.currency_code" v-model:rate="form.exchange_rate" :errors="form.errors" class="pt-2" />
@@ -754,7 +757,7 @@ const importLines = (lines, replace) => {
                                         <td class="py-2.5 px-2">
                                             <input 
                                                 v-model.number="item.quantity" 
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 step="0.01" 
                                                 min="0.01" 
                                                 required 
@@ -766,7 +769,7 @@ const importLines = (lines, replace) => {
                                         <td class="py-2.5 px-2">
                                             <input 
                                                 v-model.number="item.unit_price" 
-                                                type="number" 
+                                                type="text" inputmode="decimal" data-num 
                                                 step="0.01" 
                                                 min="0" 
                                                 required 
@@ -840,41 +843,26 @@ const importLines = (lines, replace) => {
 
                         <!-- Payment Status & Method -->
                         <div class="pt-4 border-t border-slate-100 space-y-3 text-xs">
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">حالة السداد للمورد</label>
-                                <select 
-                                    v-model="form.payment_status" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-medium"
-                                >
-                                    <option value="unpaid">غير مدفوعة (مستحقة لاحقاً / آجل)</option>
-                                    <option value="partially_paid">مدفوعة جزئياً (دفعة مقدمة)</option>
-                                    <option value="paid">مدفوعة بالكامل الآن</option>
-                                </select>
+                            <div class="flex items-center justify-between">
+                                <label class="block font-bold text-slate-700">الدفعات عند الإصدار</label>
+                                <button type="button" @click="addPayment" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold" data-add-payment>+ دفعة</button>
                             </div>
-
-                            <div v-if="form.payment_status === 'partially_paid'">
-                                <label class="block font-bold text-slate-700 mb-1">المبلغ المدفوع مقدماً</label>
-                                <input 
-                                    v-model="form.paid_amount" 
-                                    type="number" 
-                                    step="0.01" 
-                                    :max="total"
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-mono font-bold text-emerald-600"
-                                />
-                            </div>
-
-                            <div>
-                                <label class="block font-bold text-slate-700 mb-1">طريقة السداد</label>
-                                <select 
-                                    v-model="form.payment_method" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-medium"
-                                >
-                                    <option value="bank_transfer">تحويل بنكي</option>
+                            <p v-if="!form.payments.length" class="text-slate-500">الفاتورة آجلة بالكامل. أضف دفعة (أو أكثر: نقد وتحويل مثلًا) لتسجيل ما دُفع الآن.</p>
+                            <div v-for="(p, i) in form.payments" :key="i" class="grid grid-cols-12 gap-2 items-end p-2 rounded-xl bg-slate-50 border border-slate-100" data-payment-row>
+                                <select v-model="p.method" class="col-span-4 rounded-lg border border-slate-200 px-2 py-1.5 font-medium">
                                     <option value="cash">نقداً</option>
+                                    <option value="bank_transfer">تحويل بنكي</option>
                                     <option value="card">بطاقة / مدى</option>
-                                    <option value="credit">آجل</option>
                                 </select>
+                                <div class="col-span-4"><SelectCreate v-model="p.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الصندوق / البنك" /></div>
+                                <input v-model="p.amount" type="text" inputmode="decimal" data-num class="col-span-3 rounded-lg border border-slate-200 px-2 py-1.5 font-mono font-bold text-emerald-600" />
+                                <button type="button" @click="form.payments.splice(i, 1)" class="col-span-1 text-rose-500 font-bold">×</button>
                             </div>
+                            <div v-if="form.payments.length" class="flex justify-between text-slate-600">
+                                <span>المدفوع: <b class="font-mono text-emerald-600">{{ formatCurrency(paidNow) }}</b></span>
+                                <span>المتبقي للمورد: <b class="font-mono" :class="remainingNow < 0 ? 'text-rose-600' : 'text-slate-800'">{{ formatCurrency(remainingNow) }}</b></span>
+                            </div>
+                            <p v-if="form.errors.payments" class="text-rose-600 font-bold">{{ form.errors.payments }}</p>
                         </div>
 
                         <div class="pt-2">
@@ -1006,7 +994,7 @@ const importLines = (lines, replace) => {
                             <label class="block font-bold text-slate-700 mb-1">الرصيد الافتتاحي (﷼)</label>
                             <input 
                                 v-model.number="newSupplierForm.opening_balance"
-                                type="number" 
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01"
                                 placeholder="0.00"
                                 class="w-full rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 font-mono"
@@ -1147,7 +1135,7 @@ const importLines = (lines, replace) => {
                             <label class="block font-bold text-slate-700 mb-1">سعر الشراء / التكلفة (﷼) <span class="text-rose-500">*</span></label>
                             <input 
                                 v-model.number="newProductForm.purchase_price"
-                                type="number" 
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01" 
                                 min="0" 
                                 required
@@ -1161,7 +1149,7 @@ const importLines = (lines, replace) => {
                             <label class="block font-bold text-slate-700 mb-1">سعر البيع المقترح (﷼)</label>
                             <input 
                                 v-model.number="newProductForm.selling_price"
-                                type="number" 
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01" 
                                 min="0" 
                                 placeholder="0.00 (اختياري، يطابق الشراء إن ترك فارغاً)"
@@ -1174,7 +1162,7 @@ const importLines = (lines, replace) => {
                             <label class="block font-bold text-slate-700 mb-1">نسبة الضريبة (%)</label>
                             <input 
                                 v-model.number="newProductForm.tax_rate"
-                                type="number" 
+                                type="text" inputmode="decimal" data-num 
                                 step="0.01" 
                                 min="0" 
                                 placeholder="15"
