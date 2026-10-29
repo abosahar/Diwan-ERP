@@ -102,6 +102,8 @@ class StockCountController extends Controller
             ->selectRaw('COUNT(*) as line_count, SUM(CASE WHEN counted_quantity IS NULL THEN 1 ELSE 0 END) as uncounted,
                 COALESCE(SUM(CASE WHEN counted_quantity IS NOT NULL THEN (counted_quantity - system_quantity) * unit_cost ELSE 0 END),0) as value_difference')
             ->first();
+        // MySQL returns SUM() as a string.
+        $summary = ['line_count' => (int) $summary->line_count, 'uncounted' => (int) $summary->uncounted, 'value_difference' => (float) $summary->value_difference];
 
         return Inertia::render('Inventory/Counts/Show', [
             'count' => $count->load('warehouse:id,name_ar'),
