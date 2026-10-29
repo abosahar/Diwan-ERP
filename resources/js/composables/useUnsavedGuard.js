@@ -1,6 +1,7 @@
 import { onBeforeUnmount } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { confirmUnsaved } from '@/composables/useDialog';
+import { useSaveAndNew } from '@/composables/useSaveAndNew';
 
 /**
  * Leaving a create / edit page with unsaved changes asks first: save, leave without
@@ -11,6 +12,7 @@ import { confirmUnsaved } from '@/composables/useDialog';
 let leaving = false;
 
 export function useUnsavedGuard(form) {
+    useSaveAndNew(form);
     const dirty = () => !!form.isDirty && !form.processing;
 
     const stop = router.on('before', (event) => {
