@@ -1,69 +1,51 @@
 <script setup>
-import { reactive, watch } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { reactive } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
-import Pagination from '@/Components/UI/Pagination.vue';
-import { date } from '@/utils/format';
-import { statusTone } from './status';
+import Field from '@/Components/UI/Field.vue';
 
-const props = defineProps({ requests: Object, filters: Object, statuses: Object, kinds: Object });
-const f = reactive({ ...props.filters });
-let timer;
-watch(f, () => {
-    clearTimeout(timer);
-    timer = setTimeout(() => router.get(route('feature-requests.index'), { ...f, mine: f.mine ? 1 : undefined }, { preserveState: true, replace: true }), 250);
-});
-const vote = (r) => router.post(route('feature-requests.vote', r.id), {}, { preserveScroll: true });
-const input = 'rounded-xl border-slate-200 text-xs';
+const props = defineProps({ repo: String });
+const page = usePage();
+const kinds = { feature: 'ميزة جديدة', improvement: 'تحسين على ميزة قائمة' };
+const form = reactive({ kind: 'feature', area: '', title: '', description: '' });
+const input = 'w-full rounded-xl border-slate-200 text-xs';
+const issues = `https://github.com/${props.repo}/issues`;
+
+// Opens GitHub's "new issue" page pre-filled; the user reviews and submits it there.
+const send = () => {
+    const body = [
+        `**النوع:** ${kinds[form.kind]}`,
+        form.area ? `**الشاشة أو القسم:** ${form.area}` : '',
+        `**إصدار الديوان:** ${page.props.brand?.version}`,
+        '',
+        form.description,
+    ].filter((l, i) => l !== '' || i > 0).join('\n');
+    const query = new URLSearchParams({ title: form.title, body, labels: form.kind === 'feature' ? 'enhancement' : 'improvement' });
+    window.open(`${issues}/new?${query}`, '_blank', 'noopener');
+};
 </script>
 
 <template>
     <AppLayout>
         <Head title="طلبات المميزات" />
-        <PageHeader title="طلبات المميزات والتحسينات" subtitle="اقترح ميزة جديدة أو تحسينًا على ميزة قائمة، وصوّت على ما يهمك" :crumbs="[{ label: 'التحديثات' }, { label: 'طلبات المميزات' }]">
+        <PageHeader title="طلب ميزة أو تحسين" subtitle="يصل طلبك إلى مطوّر النظام مباشرة على GitHub" :crumbs="[{ label: 'التحديثات' }, { label: 'طلبات المميزات' }]">
             <template #actions>
                 <Link :href="route('whats-new.index')" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">أبرز التحديثات</Link>
-                <Link :href="route('feature-requests.create')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">طلب جديد</Link>
+                <a :href="issues" target="_blank" rel="noopener" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">الطلبات المفتوحة والتصويت</a>
             </template>
         </PageHeader>
-
-        <div class="bg-white border border-slate-200 rounded-2xl p-3 flex flex-wrap items-center gap-2 mb-4">
-            <input v-model="f.search" type="search" placeholder="بحث في الطلبات" :class="input" class="w-56" />
-            <select v-model="f.status" :class="input">
-                <option value="open">المفتوحة</option>
-                <option value="all">الكل</option>
-                <option v-for="(label, key) in statuses" :key="key" :value="key">{{ label }}</option>
-            </select>
-            <select v-model="f.kind" :class="input">
-                <option value="">كل الأنواع</option>
-                <option v-for="(label, key) in kinds" :key="key" :value="key">{{ label }}</option>
-            </select>
-            <select v-model="f.sort" :class="input">
-                <option value="votes">الأكثر تصويتًا</option>
-                <option value="latest">الأحدث</option>
-            </select>
-            <label class="flex items-center gap-1.5 text-xs font-bold text-slate-600"><input type="checkbox" v-model="f.mine" class="rounded" /> طلباتي فقط</label>
-        </div>
-
-        <div class="space-y-2">
-            <article v-for="r in requests.data" :key="r.id" class="bg-white border border-slate-200 rounded-2xl p-4 flex items-start gap-4">
-                <button type="button" @click="vote(r)" :class="r.voted ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'" class="flex flex-col items-center justify-center w-14 py-2 rounded-xl border font-bold text-xs flex-shrink-0" :title="r.voted ? 'إلغاء التصويت' : 'تصويت'">
-                    <span>▲</span><span class="font-mono text-sm">{{ r.votes_count }}</span>
-                </button>
-                <div class="min-w-0 flex-1">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <Link :href="route('feature-requests.show', r.id)" class="font-black text-sm text-slate-900 hover:text-indigo-600">{{ r.title }}</Link>
-                        <span :class="statusTone[r.status]" class="px-2 py-0.5 rounded-md text-3xs font-bold">{{ statuses[r.status] }}</span>
-                        <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-3xs font-bold">{{ kinds[r.kind] }}</span>
-                        <span v-if="r.released_in" class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-3xs font-bold font-mono">v{{ r.released_in }}</span>
-                    </div>
-                    <p class="text-xs text-slate-600 mt-1 line-clamp-2">{{ r.description }}</p>
-                    <p class="text-3xs text-slate-400 mt-1.5">{{ r.author?.name || '—' }} · {{ date(r.created_at) }}<span v-if="r.area"> · {{ r.area }}</span></p>
-                </div>
-            </article>
-            <p v-if="!requests.data.length" class="text-center text-slate-400 text-xs py-10">لا توجد طلبات مطابقة</p>
-        </div>
-        <Pagination :paginator="requests" />
+        <form @submit.prevent="send" class="bg-white border border-slate-200 rounded-2xl p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <Field label="نوع الطلب *">
+                <select v-model="form.kind" :class="input"><option v-for="(label, key) in kinds" :key="key" :value="key">{{ label }}</option></select>
+            </Field>
+            <Field label="الشاشة أو القسم" hint="مثل: فواتير المبيعات، الرواتب"><input v-model="form.area" :class="input" /></Field>
+            <Field label="عنوان الطلب *" class="md:col-span-2"><input v-model="form.title" required maxlength="200" :class="input" /></Field>
+            <Field label="الوصف *" hint="ما الذي تريده، ولماذا، وكيف تتخيل عمله؟" class="md:col-span-2"><textarea v-model="form.description" required rows="6" :class="input"></textarea></Field>
+            <p class="md:col-span-2 text-slate-500">عند الإرسال تُفتح صفحة GitHub بالطلب جاهزًا لتراجعه وتؤكد إرساله بحسابك (يلزم حساب GitHub مجاني). يمكن للآخرين التصويت عليه بـ 👍.</p>
+            <div class="md:col-span-2 pt-2 border-t border-slate-100">
+                <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold">إرسال إلى المطوّر عبر GitHub</button>
+            </div>
+        </form>
     </AppLayout>
 </template>
