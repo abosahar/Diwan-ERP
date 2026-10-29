@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\SalesOrder;
 use App\Models\Warehouse;
 use App\Rules\AllowedBranch;
+use App\Services\RecycleBin;
 use App\Services\Sales\SalesCycleService;
 use App\Services\Workflow\ApprovalService;
 use App\Support\BranchOptions;
@@ -102,6 +103,13 @@ class SalesOrderController extends Controller
         $order->update(['status' => 'cancelled']);
 
         return back()->with('success', 'تم إلغاء أمر البيع');
+    }
+
+    public function destroy(SalesOrder $order, RecycleBin $bin)
+    {
+        $bin->trash($order);
+
+        return redirect()->route('sales.orders.index')->with('success', 'نُقل أمر البيع إلى سلة المحذوفات (يُحفظ '.RecycleBin::RETENTION_DAYS.' يومًا)');
     }
 
     public function deliver(Request $request, SalesOrder $order)

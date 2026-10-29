@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Quotation;
 use App\Rules\AllowedBranch;
+use App\Services\RecycleBin;
 use App\Services\Sales\InvoiceService;
 use App\Services\Sales\QuotationService;
 use App\Services\Tax\TaxProfile;
@@ -139,6 +140,13 @@ class QuotationController extends Controller
     /**
      * Convert quotation into a tax invoice.
      */
+    public function destroy(Quotation $quotation, RecycleBin $bin)
+    {
+        $bin->trash($quotation);
+
+        return redirect()->route('sales.quotations.index')->with('success', 'نُقل عرض السعر إلى سلة المحذوفات (يُحفظ '.RecycleBin::RETENTION_DAYS.' يومًا)');
+    }
+
     public function convertToInvoice(Quotation $quotation)
     {
         $tenantManager = app(TenantManager::class);

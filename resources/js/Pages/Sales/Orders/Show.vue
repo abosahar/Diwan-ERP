@@ -28,6 +28,7 @@ const deliverForm = useForm({
 const deliver = () => deliverForm.transform((d) => ({ ...d, lines: d.lines.map(({ sales_order_item_id, quantity }) => ({ sales_order_item_id, quantity })) }))
     .post(route('sales.orders.deliver', props.order.id), { onSuccess: () => (showDeliver.value = false) });
 
+const remove = () => { if (confirm('نقل أمر البيع إلى سلة المحذوفات؟')) router.delete(route('sales.orders.destroy', props.order.id)); };
 const act = (name, message) => { if (!message || confirm(message)) router.post(route(name, props.order.id)); };
 </script>
 
@@ -45,6 +46,7 @@ const act = (name, message) => { if (!message || confirm(message)) router.post(r
                 <button v-if="canDeliver && $can('sales.deliveries.create')" @click="showDeliver = true" class="px-3 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold">إذن تسليم</button>
                 <button v-if="canInvoice && $can('sales.orders.convert')" @click="act('sales.orders.invoice', 'إصدار فاتورة بالكميات غير المسلمة وصرفها من المخزون؟')" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">فوترة مباشرة</button>
                 <button v-if="['draft', 'pending_approval', 'confirmed', 'rejected'].includes(order.status) && $can('sales.orders.cancel')" @click="act('sales.orders.cancel', 'إلغاء أمر البيع؟')" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">إلغاء</button>
+                <button v-if="['draft', 'pending_approval', 'confirmed', 'rejected', 'cancelled'].includes(order.status) && $can('sales.orders.cancel')" @click="remove" class="px-3 py-2 rounded-xl border border-rose-200 text-rose-600 text-xs font-bold">حذف</button>
             </template>
         </PageHeader>
 

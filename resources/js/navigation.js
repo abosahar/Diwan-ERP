@@ -194,6 +194,7 @@ export default [
             { label: 'nav.users', route: 'users.index', path: '/users' },
             { label: 'nav.roles', route: 'roles.index', path: '/roles' },
             { label: 'nav.audit_log', route: 'audit.index', path: '/audit-log' },
+            { label: 'nav.recycle_bin', route: 'recycle-bin.index', path: '/recycle-bin' },
             { label: 'nav.approval_rules', route: 'approval-rules.index', path: '/approval-rules' },
             { label: 'nav.e_invoicing', route: 'zatca.index', path: '/zatca', feature: 'zatca' },
             { label: 'nav.billing', route: 'billing.index', path: '/billing' },

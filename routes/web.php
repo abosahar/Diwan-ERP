@@ -59,6 +59,7 @@ use App\Http\Controllers\PurchaseInvoiceController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\Purchases as P;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\RecycleBinController;
 use App\Http\Controllers\ReleaseNotesController;
 use App\Http\Controllers\Reports\InsightsController;
 use App\Http\Controllers\Reports\ReportController;
@@ -236,6 +237,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::get('/quotations/create', [QuotationController::class, 'create'])->name('quotations.create');
         Route::post('/quotations', [QuotationController::class, 'store'])->name('quotations.store');
         Route::get('/quotations/{quotation}', [QuotationController::class, 'show'])->name('quotations.show');
+        Route::delete('/quotations/{quotation}', [QuotationController::class, 'destroy'])->name('quotations.destroy');
         Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convertToInvoice'])->name('quotations.convert');
 
         // Clients (Customers)
@@ -280,6 +282,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/orders/{order}/approve', [S\SalesOrderController::class, 'approve'])->name('orders.approve');
         Route::post('/orders/{order}/reject', [S\SalesOrderController::class, 'reject'])->name('orders.reject');
         Route::post('/orders/{order}/cancel', [S\SalesOrderController::class, 'cancel'])->name('orders.cancel');
+        Route::delete('/orders/{order}', [S\SalesOrderController::class, 'destroy'])->name('orders.destroy');
         Route::post('/orders/{order}/deliver', [S\SalesOrderController::class, 'deliver'])->name('orders.deliver');
         Route::post('/orders/{order}/invoice', [S\SalesOrderController::class, 'invoice'])->name('orders.invoice');
         Route::get('/deliveries', [S\DeliveryNoteController::class, 'index'])->name('deliveries.index');
@@ -398,6 +401,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/orders/{order}/approve', [PurchaseOrderController::class, 'approve'])->name('orders.approve');
         Route::post('/orders/{order}/reject', [PurchaseOrderController::class, 'reject'])->name('orders.reject');
         Route::post('/orders/{order}/cancel', [PurchaseOrderController::class, 'cancel'])->name('orders.cancel');
+        Route::delete('/orders/{order}', [PurchaseOrderController::class, 'destroy'])->name('orders.destroy');
         Route::post('/orders/{order}/convert', [PurchaseOrderController::class, 'convertToInvoice'])->name('orders.convert');
         Route::post('/orders/{order}/receive', [P\GoodsReceiptController::class, 'store'])->name('orders.receive');
 
@@ -759,6 +763,9 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::delete('/integrations/webhooks/{webhook}', [IntegrationController::class, 'destroyWebhook'])->name('webhooks.destroy');
     Route::post('/integrations/webhooks/{webhook}/test', [IntegrationController::class, 'testWebhook'])->name('webhooks.test');
 
+    Route::get('/recycle-bin', [RecycleBinController::class, 'index'])->name('recycle-bin.index');
+    Route::post('/recycle-bin/{type}/{id}/restore', [RecycleBinController::class, 'restore'])->name('recycle-bin.restore');
+    Route::delete('/recycle-bin/{type}/{id}', [RecycleBinController::class, 'purge'])->name('recycle-bin.purge');
     Route::get('/whats-new', [ReleaseNotesController::class, 'index'])->name('whats-new.index');
     Route::get('/feature-requests', [FeatureRequestController::class, 'index'])->name('feature-requests.index');
 

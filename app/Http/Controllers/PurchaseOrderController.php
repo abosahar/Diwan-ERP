@@ -11,6 +11,7 @@ use App\Rules\AllowedBranch;
 use App\Services\Accounting\DocumentPoster;
 use App\Services\Inventory\DocumentStock;
 use App\Services\Purchases\PurchaseCycleService;
+use App\Services\RecycleBin;
 use App\Services\TenantManager;
 use App\Services\Workflow\ApprovalService;
 use App\Support\BranchOptions;
@@ -242,6 +243,13 @@ class PurchaseOrderController extends Controller
         app(PurchaseCycleService::class)->cancelOrder($order);
 
         return back()->with('success', 'تم إلغاء أمر الشراء');
+    }
+
+    public function destroy(PurchaseOrder $order, RecycleBin $bin)
+    {
+        $bin->trash($order);
+
+        return redirect()->route('purchases.orders.index')->with('success', 'نُقل أمر الشراء إلى سلة المحذوفات (يُحفظ '.RecycleBin::RETENTION_DAYS.' يومًا)');
     }
 
     protected function validateOrder(Request $request): array
