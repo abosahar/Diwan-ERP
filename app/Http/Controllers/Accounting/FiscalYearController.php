@@ -111,12 +111,28 @@ class FiscalYearController extends Controller
         return back()->with('success', 'تم تحديث حالة الفترة');
     }
 
-    public function close(FiscalYear $year, YearEndClosing $closing)
+    /** Page: per-branch readiness, warnings and the choice «all must pass» / «close the ready ones». */
+    public function closeForm(FiscalYear $year, YearEndClosing $closing): Response
     {
-        $entry = $closing->close($year);
+        return Inertia::render('Accounting/FiscalYears/Close', [
+            'year' => $year,
+            'branches' => $closing->branchStatus($year),
+            'warnings' => $closing->warnings($year),
+            'ended' => ! Carbon::parse($year->end_date)->endOfDay()->isFuture(),
+        ]);
+    }
 
-        return back()->with('success', $entry
-            ? "تم إقفال السنة المالية وترحيل صافي النتيجة للأرباح المحتجزة بالقيد {$entry->entry_number}"
+    public function close(Request $request, FiscalYear $year, YearEndClosing $closing)
+    {
+        $mode = $request->validate(['mode' => 'nullable|in:all,passed'])['mode'] ?? 'all';
+        $entry = $closing->close($year, $mode);
+
+        if ($closing->report['skipped']) {
+            return redirect()->route('accounting.fiscal-years.close-form', $year->id)->with('warning', 'أُقفلت الفروع الجاهزة وبقيت: '.implode('، ', $closing->report['skipped']).'. السنة ستُغلق عند إقفال الباقي.');
+        }
+
+        return redirect()->route('accounting.fiscal-years.index')->with('success', $entry
+            ? 'تم إقفال السنة المالية وترحيل صافي النتيجة للأرباح المحتجزة بالقيد '.$entry->entry_number
             : 'تم إقفال السنة المالية');
     }
 

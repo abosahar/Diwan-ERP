@@ -490,6 +490,7 @@ return [
         'accounting.fiscal-years.preview' => 'accounting.fiscal_years.create',
         'accounting.fiscal-periods.update' => 'accounting.fiscal_years.manage',
         'accounting.fiscal-years.close' => 'accounting.fiscal_years.approve',
+        'accounting.fiscal-years.close-form' => 'accounting.fiscal_years.approve',
         'accounting.fiscal-years.reopen' => 'accounting.fiscal_years.approve',
         'accounting.mappings.index' => 'accounting.mappings.view',
         'accounting.mappings.update' => 'accounting.mappings.edit',

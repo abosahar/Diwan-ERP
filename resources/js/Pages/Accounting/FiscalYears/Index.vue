@@ -9,7 +9,6 @@ import { ChevronDownIcon } from '@heroicons/vue/24/outline';
 defineProps({ years: Array, periodTypes: Object });
 
 const setStatus = (period, status) => router.put(route('accounting.fiscal-periods.update', period.id), { status }, { preserveScroll: true });
-const closeYear = (year) => confirm(`إقفال السنة المالية ${year.name}؟ سيتم ترحيل صافي الربح/الخسارة إلى الأرباح المحتجزة وإغلاق جميع الفترات.`) && router.post(route('accounting.fiscal-years.close', year.id), {}, { preserveScroll: true });
 const reopenYear = (year) => confirm(`إعادة فتح السنة ${year.name}؟ سيتم عكس قيد الإقفال.`) && router.post(route('accounting.fiscal-years.reopen', year.id), {}, { preserveScroll: true });
 
 const statusClass = { open: 'bg-emerald-50 text-emerald-700 border-emerald-200', closed: 'bg-amber-50 text-amber-700 border-amber-200', locked: 'bg-slate-100 text-slate-600 border-slate-300' };
@@ -41,7 +40,7 @@ const expanded = ref(null);
                         </button>
                         <span :class="[statusClass[year.status], 'px-2.5 py-0.5 rounded-full border text-[11px] font-bold']">{{ statusLabel[year.status] }}</span>
                         <template v-if="$can('accounting.fiscal_years.approve')">
-                            <button v-if="year.status === 'open'" @click="closeYear(year)" class="px-3 py-1.5 rounded-xl border border-amber-300 text-amber-700 text-xs font-bold">إقفال السنة</button>
+                            <Link v-if="year.status === 'open'" :href="route('accounting.fiscal-years.close-form', year.id)" class="px-3 py-1.5 rounded-xl border border-amber-300 text-amber-700 text-xs font-bold" data-close-year>إقفال السنة</Link>
                             <button v-else @click="reopenYear(year)" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold">إعادة فتح</button>
                         </template>
                     </div>
