@@ -5,6 +5,7 @@ import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import StatusPill from '@/Components/Mfg/StatusPill.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ order: Object });
 const o = computed(() => props.order);
@@ -12,7 +13,7 @@ const left = computed(() => Number(o.value.quantity) - Number(o.value.received_q
 const money = (v) => Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const num = (v) => Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 4 });
 const act = (n) => router.post(route(`manufacturing.subcontracts.${n}`, o.value.id), {}, { preserveScroll: true });
-const rec = useForm({ quantity: '', date: new Date().toISOString().slice(0, 10), notes: '' });
+const rec = useForm({ quantity: '', date: today(), notes: '' });
 const receive = () => rec.post(route('manufacturing.subcontracts.receive', o.value.id), { preserveScroll: true, onSuccess: () => rec.reset('quantity') });
 const input = 'w-full text-xs rounded-xl border-slate-200';
 const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';

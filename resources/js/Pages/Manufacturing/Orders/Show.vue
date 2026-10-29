@@ -6,6 +6,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import StatusPill from '@/Components/Mfg/StatusPill.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ order: Object, sheet: Object, workCenters: Array, employees: Array, inspections: Array, wip: Number });
 
@@ -17,11 +18,11 @@ const post = (name, data = {}) => router.post(route(`manufacturing.orders.${name
 const qty = reactive({});
 const material = (m, action) => { if (qty[m.id] > 0) { post(action, { material_id: m.id, quantity: qty[m.id] }); qty[m.id] = ''; } };
 
-const time = useForm({ work_center_id: props.order.operations?.[0]?.work_center_id || props.workCenters?.[0]?.id || '', operation_id: '', employee_id: '', minutes: '', quantity: '', date: new Date().toISOString().slice(0, 10) });
+const time = useForm({ work_center_id: props.order.operations?.[0]?.work_center_id || props.workCenters?.[0]?.id || '', operation_id: '', employee_id: '', minutes: '', quantity: '', date: today() });
 const logTime = () => time.post(route('manufacturing.orders.time', o.value.id), { preserveScroll: true, onSuccess: () => time.reset('minutes', 'quantity') });
 const pickOp = () => { const op = o.value.operations.find((x) => x.id === time.operation_id); if (op) time.work_center_id = op.work_center_id; };
 
-const rec = useForm({ quantity: '', scrap_quantity: '', scrap_abnormal: false, batch_number: '', date: new Date().toISOString().slice(0, 10) });
+const rec = useForm({ quantity: '', scrap_quantity: '', scrap_abnormal: false, batch_number: '', date: today() });
 const receive = () => rec.post(route('manufacturing.orders.receive', o.value.id), { preserveScroll: true, onSuccess: () => rec.reset('quantity', 'scrap_quantity') });
 const remove = () => confirm('حذف أمر المسودة؟') && router.delete(route('manufacturing.orders.destroy', o.value.id));
 const inspectionOf = (receiptId) => props.inspections.find((i) => i.source_id === receiptId);

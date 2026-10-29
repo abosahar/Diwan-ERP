@@ -5,10 +5,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
 import Field from '@/Components/UI/Field.vue';
-import { money, date } from '@/utils/format';
+import { money, date, today } from '@/utils/format';
 
 defineProps({ reconciliations: Object, bankAccounts: Array });
-const form = useForm({ bank_account_id: '', statement_date: new Date().toISOString().substring(0, 10), statement_balance: '' });
+const form = useForm({ bank_account_id: '', statement_date: today(), statement_balance: '' });
 const start = () => form.post(route('accounting.reconciliations.store'));
 </script>
 

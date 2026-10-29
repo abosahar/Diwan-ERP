@@ -9,6 +9,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { dimensionRequired } from '@/utils/dimensions';
 import { PlusIcon, TrashIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
+import { today } from '@/utils/format';
 
 const props = defineProps({
     accounts: Array,
@@ -49,7 +50,7 @@ const needs = (line, dimension) => dimensionRequired(props.dimensionPolicy, dime
 const blankLine = (i = 0) => ({ account_id: props.accounts?.[i]?.id || '', cost_center_id: '', project_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 });
 
 const form = useForm({
-    date: new Date().toISOString().split('T')[0],
+    date: today(),
     reference: '',
     description: '',
     entry_type: 'manual',

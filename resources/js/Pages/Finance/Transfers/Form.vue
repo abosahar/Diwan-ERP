@@ -6,6 +6,7 @@ import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ accounts: Array });
 
@@ -13,7 +14,7 @@ const form = useForm({
     from_account_id: props.accounts?.[0]?.id || '',
     to_account_id: props.accounts?.[1]?.id || '',
     amount: '',
-    transfer_date: new Date().toISOString().substring(0, 10),
+    transfer_date: today(),
     reference: '',
     notes: '',
 });

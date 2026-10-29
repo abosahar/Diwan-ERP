@@ -8,10 +8,10 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
 import PartyPicker from '@/Components/Documents/PartyPicker.vue';
 import LineItemsEditor from '@/Components/Documents/LineItemsEditor.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ warehouses: Array, suggestedNumber: String, branches: Array, defaultBranchId: Number });
-const today = new Date().toISOString().substring(0, 10);
-const form = useForm({ customer_id: null, branch_id: props.defaultBranchId || props.branches?.[0]?.id || '', warehouse_id: '', order_date: today, delivery_date: '', notes: '', items: [] });
+const form = useForm({ customer_id: null, branch_id: props.defaultBranchId || props.branches?.[0]?.id || '', warehouse_id: '', order_date: today(), delivery_date: '', notes: '', items: [] });
 useUnsavedGuard(form);
 const save = () => form.post(route('sales.orders.store'));
 </script>

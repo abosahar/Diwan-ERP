@@ -9,7 +9,7 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
-import { qty, money, date } from '@/utils/format';
+import { qty, money, date, today } from '@/utils/format';
 import { TrashIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({ boms: Array, orders: Object, warehouses: Array });
@@ -31,7 +31,7 @@ const pick = (p) => {
 };
 const saveBom = () => bomForm.post(route('inventory.assembly.boms.store'), { preserveScroll: true, onSuccess: () => { bomOpen.value = false; bomForm.reset(); } });
 
-const orderForm = useForm({ bom_id: '', warehouse_id: props.warehouses[0]?.id ?? '', quantity: 1, date: new Date().toISOString().substring(0, 10) });
+const orderForm = useForm({ bom_id: '', warehouse_id: props.warehouses[0]?.id ?? '', quantity: 1, date: today() });
 const run = () => orderForm.post(route('inventory.assembly.orders.store'), { preserveScroll: true });
 </script>
 

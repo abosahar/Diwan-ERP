@@ -10,7 +10,7 @@ import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
 import ApprovalTimeline from '@/Components/Documents/ApprovalTimeline.vue';
-import { money, date, qty } from '@/utils/format';
+import { money, date, qty, today } from '@/utils/format';
 
 const props = defineProps({ order: Object, invoices: Array, approvals: Array, warehouses: Array });
 
@@ -20,7 +20,7 @@ const canInvoice = computed(() => ['confirmed', 'partially_delivered', 'delivere
 
 const showDeliver = ref(false);
 const deliverForm = useForm({
-    delivery_date: new Date().toISOString().substring(0, 10),
+    delivery_date: today(),
     warehouse_id: props.order.warehouse_id || '',
     receiver_name: '',
     lines: props.order.items.map((i) => ({ sales_order_item_id: i.id, name: i.item_name, open: open(i), quantity: open(i) })),

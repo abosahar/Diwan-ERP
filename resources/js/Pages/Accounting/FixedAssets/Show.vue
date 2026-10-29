@@ -8,20 +8,20 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import StatCard from '@/Components/UI/StatCard.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
-import { money, date, monthLabel } from '@/utils/format';
+import { money, date, monthLabel, today, thisMonth } from '@/utils/format';
 
 const props = defineProps({ asset: Object, monthlyAmount: Number, schedule: Array, bankAccounts: Array });
 const methods = { straight_line: 'القسط الثابت', declining_balance: 'القسط المتناقص', units_of_production: 'وحدات الإنتاج' };
 const units = props.asset.depreciation_method === 'units_of_production';
 const impairOpen = ref(false);
 const showAll = ref(false);
-const impairForm = useForm({ date: new Date().toISOString().substring(0, 10), amount: '', reason: '' });
+const impairForm = useForm({ date: today(), amount: '', reason: '' });
 const impair = () => impairForm.post(route('accounting.fixed-assets.impair', props.asset.id), { preserveScroll: true, onSuccess: () => { impairOpen.value = false; impairForm.reset(); } });
-const usageForm = useForm({ month: new Date().toISOString().substring(0, 7), units: '' });
+const usageForm = useForm({ month: thisMonth(), units: '' });
 const saveUsage = () => usageForm.post(route('accounting.fixed-assets.usage', props.asset.id), { preserveScroll: true, onSuccess: () => usageForm.reset('units') });
 const usageOf = (period) => props.asset.usages?.find((u) => Number(u.period) === Number(period))?.units;
 const disposeOpen = ref(false);
-const form = useForm({ date: new Date().toISOString().substring(0, 10), proceeds: 0, method: 'bank_transfer', bank_account_id: '', taxable: false });
+const form = useForm({ date: today(), proceeds: 0, method: 'bank_transfer', bank_account_id: '', taxable: false });
 const dispose = () => form.transform((d) => ({ ...d, vat_amount: d.taxable ? Math.round((parseFloat(d.proceeds) || 0) * 15) / 100 : 0 })).post(route('accounting.fixed-assets.dispose', props.asset.id), { onSuccess: () => (disposeOpen.value = false) });
 </script>
 

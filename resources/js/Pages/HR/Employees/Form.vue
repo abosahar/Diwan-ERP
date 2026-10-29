@@ -6,7 +6,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
-import { money } from '@/utils/format';
+import { money, today } from '@/utils/format';
 
 const props = defineProps({ employee: Object, branches: Array, departments: Array, positions: Array, shifts: Array, costCenters: Array, managers: Array, users: Array, nationalities: { type: Array, default: () => [] } });
 const e = props.employee || {};
@@ -20,7 +20,7 @@ const form = useForm({
     basic_salary: e.basic_salary ?? 0, housing_allowance: e.housing_allowance ?? 0, transport_allowance: e.transport_allowance ?? 0, other_allowances: e.other_allowances ?? 0,
     gosi_registered: e.gosi_registered ?? true, gosi_number: e.gosi_number || '', gosi_join_date: d(e.gosi_join_date), annual_leave_days: e.annual_leave_days || 21, leave_opening_balance: e.leave_opening_balance ?? 0,
     bank_name: e.bank_name || '', bank_code: e.bank_code || '', iban: e.iban || '', status: e.status || 'active', notes: e.notes || '',
-    salary_effective_date: new Date().toISOString().slice(0, 10), salary_change_reason: '',
+    salary_effective_date: today(), salary_change_reason: '',
 });
 useUnsavedGuard(form);
 // A pay change on an existing employee is recorded with its effective date.

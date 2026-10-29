@@ -4,6 +4,7 @@ import { computed, ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ types: Array });
 const forms = Object.fromEntries(props.types.map((t) => [t.key, useForm({ file: null, opening_date: null })]));
@@ -12,7 +13,7 @@ const formFor = (key) => forms[key];
 const lines = (...messages) => messages.filter(Boolean).flatMap((m) => String(m).split('\n'));
 
 // Go-live date shared by every opening balance posted from this page.
-const openingDate = ref(new Date().toISOString().slice(0, 10));
+const openingDate = ref(today());
 const upload = (key) => {
     const form = formFor(key);
     form.opening_date = openingDate.value;

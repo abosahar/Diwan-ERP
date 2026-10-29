@@ -4,6 +4,7 @@ import axios from 'axios';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
 import { ArrowDownTrayIcon, PaperAirplaneIcon } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 /**
  * "PDF" and "send to customer" (email with the PDF attached, or WhatsApp with
@@ -65,7 +66,7 @@ const send = async () => {
 
 const channels = { email: 'بريد', whatsapp: 'واتساب', link: 'رابط' };
 const statuses = { sent: ['تم', 'text-emerald-700 bg-emerald-50'], queued: ['قيد الإرسال', 'text-amber-700 bg-amber-50'], failed: ['فشل', 'text-rose-700 bg-rose-50'] };
-const when = (d) => (d ? new Date(d).toLocaleString('ar-SA-u-nu-latn', { dateStyle: 'short', timeStyle: 'short' }) : '');
+const when = (d) => (d ? new Date(d).toLocaleString('ar-SA-u-nu-latn', { dateStyle: 'short', timeStyle: 'short', timeZone: timeZone() }) : '');
 </script>
 
 <template>

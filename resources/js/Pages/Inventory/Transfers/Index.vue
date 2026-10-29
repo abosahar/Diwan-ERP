@@ -10,13 +10,13 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
-import { date } from '@/utils/format';
+import { date, today } from '@/utils/format';
 import { PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
 defineProps({ transfers: Object, warehouses: Array, filters: Object });
 
 const open = ref(false);
-const form = useForm({ from_warehouse_id: '', to_warehouse_id: '', transfer_date: new Date().toISOString().substring(0, 10), notes: '', items: [] });
+const form = useForm({ from_warehouse_id: '', to_warehouse_id: '', transfer_date: today(), notes: '', items: [] });
 const lookup = ref('');
 const results = ref([]);
 const search = async () => {

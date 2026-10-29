@@ -11,14 +11,13 @@ import Pagination from '@/Components/UI/Pagination.vue';
 import StatCard from '@/Components/UI/StatCard.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
-import { money, date } from '@/utils/format';
+import { money, date, today } from '@/utils/format';
 import { PlusIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({ cheques: Object, summary: Object, bankAccounts: Array, transitions: Object, filters: Object });
 
-const today = new Date().toISOString().substring(0, 10);
 const open = ref(false);
-const form = useForm({ direction: 'incoming', cheque_number: '', bank_name: '', bank_account_id: '', party_type: 'customer', party_id: '', invoice_id: '', amount: '', issue_date: today, due_date: today, notes: '' });
+const form = useForm({ direction: 'incoming', cheque_number: '', bank_name: '', bank_account_id: '', party_type: 'customer', party_id: '', invoice_id: '', amount: '', issue_date: today(), due_date: today(), notes: '' });
 // Open invoices of the chosen customer: a cheque against one of them pays it.
 const openInvoices = ref([]);
 const loadInvoices = async () => {
@@ -52,7 +51,7 @@ const apply = () => router.get(route('accounting.cheques.index'), filters, { pre
 const statusLabel = { pending: 'في الحافظة / صادر', deposited: 'مودع للتحصيل', cleared: 'محصّل / مصروف', bounced: 'مرتجع', cancelled: 'ملغى' };
 const actionLabel = { deposited: 'إيداع', cleared: 'تحصيل/صرف', bounced: 'ارتجاع', cancelled: 'إلغاء' };
 const move = async (cheque, status) => {
-    const d = await ask(`تاريخ عملية «${actionLabel[status]}» للشيك ${cheque.cheque_number ?? ''}:`, { title: actionLabel[status], type: 'date', default: today, required: true, danger: status === 'bounced' });
+    const d = await ask(`تاريخ عملية «${actionLabel[status]}» للشيك ${cheque.cheque_number ?? ''}:`, { title: actionLabel[status], type: 'date', default: today(), required: true, danger: status === 'bounced' });
     if (!d) return;
     router.post(route('accounting.cheques.transition', cheque.id), { status, date: d, bank_account_id: cheque.bank_account_id }, { preserveScroll: true });
 };
@@ -92,7 +91,7 @@ const move = async (cheque, status) => {
                             <td class="px-3 py-2 font-mono">{{ c.cheque_number }}</td>
                             <td class="px-3 py-2 font-semibold">{{ c.party_name }}</td>
                             <td class="px-3 py-2 text-slate-500">{{ c.bank_name || c.bank_account?.name || '—' }}</td>
-                            <td class="px-3 py-2 text-center font-mono" :class="c.status === 'pending' && c.due_date <= new Date().toISOString().substring(0,10) ? 'text-rose-600 font-bold' : ''">{{ date(c.due_date) }}</td>
+                            <td class="px-3 py-2 text-center font-mono" :class="c.status === 'pending' && date(c.due_date) <= today() ? 'text-rose-600 font-bold' : ''">{{ date(c.due_date) }}</td>
                             <td class="px-3 py-2 text-end font-mono font-bold">{{ money(c.amount) }}</td>
                             <td class="px-3 py-2 text-center">{{ statusLabel[c.status] }}</td>
                             <td class="px-3 py-2 text-center whitespace-nowrap">

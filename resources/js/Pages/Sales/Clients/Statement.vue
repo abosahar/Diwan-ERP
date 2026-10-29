@@ -13,6 +13,7 @@ import {
     DocumentTextIcon,
     UserIcon,
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 const props = defineProps({
     client: Object,
@@ -44,6 +45,7 @@ const formatDate = (dateStr) => {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
+            timeZone: timeZone(),
         });
     } catch {
         return dateStr;

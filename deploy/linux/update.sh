@@ -95,11 +95,19 @@ restart() {
 ln -sfn "$NEW" "$DIR/current.next" && mv -Tf "$DIR/current.next" "$DIR/current"
 restart
 
-PORT=$(grep -E '^APP_URL=' "$DIR/shared/.env" | sed -E 's#.*:([0-9]+)$#\1#')
+# The port the web service really listens on (its systemd unit), else the one in APP_URL.
+PORT=8000
+port_re='--port=([0-9]+)'
+url_re=':([0-9]+)/?"?$'
+if [[ $(cat /etc/systemd/system/diwan-web.service 2> /dev/null) =~ $port_re ]]; then
+    PORT=${BASH_REMATCH[1]}
+elif [[ $(grep -E '^APP_URL=' "$DIR/shared/.env") =~ $url_re ]]; then
+    PORT=${BASH_REMATCH[1]}
+fi
 healthy=0
 for _ in 1 2 3 4 5 6 7 8 9 10; do
     sleep 2
-    curl -fs -o /dev/null --max-time 10 "http://127.0.0.1:${PORT:-8000}/up" && { healthy=1; break; }
+    curl -fs -o /dev/null --max-time 10 "http://127.0.0.1:$PORT/up" && { healthy=1; break; }
 done
 if [[ $healthy != 1 && -d /run/systemd/system ]]; then
     ln -sfn "$CURRENT" "$DIR/current.next" && mv -Tf "$DIR/current.next" "$DIR/current"

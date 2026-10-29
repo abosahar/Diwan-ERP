@@ -9,7 +9,7 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
 import ProductPicker from '@/Components/Documents/ProductPicker.vue';
 import MaintenanceStatus from '@/Components/Equipment/MaintenanceStatus.vue';
-import { money, qty, date } from '@/utils/format';
+import { money, qty, date, today } from '@/utils/format';
 
 const props = defineProps({ order: Object, selected: Array, schedules: Array, warehouses: Array, stock: Object });
 const o = computed(() => props.order);
@@ -20,7 +20,7 @@ const usesKm = computed(() => ['km', 'both'].includes(e.value.meter_type));
 
 // --- storekeeper issue
 const stockOf = ref({ ...props.stock });
-const issueForm = useForm({ warehouse_id: props.order.warehouse_id || props.warehouses[0]?.id || '', date: new Date().toLocaleDateString('en-CA'), lines: [] });
+const issueForm = useForm({ warehouse_id: props.order.warehouse_id || props.warehouses[0]?.id || '', date: today(), lines: [] });
 const products = ref({});
 const addLine = (line = {}) => issueForm.lines.push({ product_id: null, quantity: 1, schedule_id: null, ...line });
 const fromSchedules = () => {
@@ -40,7 +40,7 @@ const issue = () => issueForm.post(route('equipment.maintenance.issue', o.value.
 
 // --- complete
 const checked = ref([...props.selected]);
-const completeForm = useForm({ schedule_ids: [], hours_reading: props.order.hours_reading ?? '', km_reading: props.order.km_reading ?? '', date: new Date().toLocaleDateString('en-CA'), notes: props.order.notes || '' });
+const completeForm = useForm({ schedule_ids: [], hours_reading: props.order.hours_reading ?? '', km_reading: props.order.km_reading ?? '', date: today(), notes: props.order.notes || '' });
 const complete = () => {
     completeForm.schedule_ids = checked.value;
     completeForm.post(route('equipment.maintenance.complete', o.value.id), { preserveScroll: true });

@@ -7,13 +7,13 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
-import { money, date } from '@/utils/format';
+import { money, date, today } from '@/utils/format';
 import { PlusIcon, TrashIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({ templates: Array, accounts: Array, costCenters: Array });
 const open = ref(false);
 const blank = () => ({ account_id: '', cost_center_id: '', debit: 0, credit: 0, description: '' });
-const form = useForm({ name: '', description: '', frequency: 'monthly', next_run_date: new Date().toISOString().substring(0, 10), end_date: '', auto_reverse: false, lines: [blank(), blank()] });
+const form = useForm({ name: '', description: '', frequency: 'monthly', next_run_date: today(), end_date: '', auto_reverse: false, lines: [blank(), blank()] });
 const totals = computed(() => form.lines.reduce((t, l) => ({ d: t.d + Number(l.debit || 0), c: t.c + Number(l.credit || 0) }), { d: 0, c: 0 }));
 const balanced = computed(() => Math.abs(totals.value.d - totals.value.c) < 0.01 && totals.value.d > 0);
 const save = () => form.post(route('accounting.recurring.store'), { preserveScroll: true, onSuccess: () => { open.value = false; form.reset(); } });

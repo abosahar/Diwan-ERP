@@ -7,6 +7,7 @@ import { taxRate } from '@/utils/tax';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ expenseAccounts: Array, bankAccounts: Array, costCenters: Array, projects: Array, dimensionPolicy: Object });
 
@@ -21,7 +22,7 @@ const form = useForm({
     tax_amount: '',
     taxable: false,
     vendor_tax_number: '',
-    expense_date: new Date().toISOString().split('T')[0],
+    expense_date: today(),
     payment_method: 'bank_transfer',
     reference_number: '',
     vendor_name: '',

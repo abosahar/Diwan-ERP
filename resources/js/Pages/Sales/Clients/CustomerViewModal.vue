@@ -11,6 +11,7 @@ import {
     ArrowTopRightOnSquareIcon,
     PrinterIcon,
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 const props = defineProps({
     show: {
@@ -48,6 +49,7 @@ const formatDate = (dateStr) => {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
+            timeZone: timeZone(),
         });
     } catch {
         return dateStr;

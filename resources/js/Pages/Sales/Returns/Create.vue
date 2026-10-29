@@ -16,6 +16,7 @@ import {
     UserIcon,
     InformationCircleIcon,
 } from '@heroicons/vue/24/outline';
+import { today } from '@/utils/format';
 
 const props = defineProps({
     customers: Array,
@@ -26,13 +27,12 @@ const props = defineProps({
     defaultTaxRate: Number,
 });
 
-const today = new Date().toISOString().split('T')[0];
 
 const form = useForm({
     invoice_id: props.selectedInvoice?.id || '',
     customer_id: props.selectedInvoice?.customer_id || props.customers?.[0]?.id || '',
     credit_note_number: props.suggestedNumber || 'CN-26-000001',
-    credit_note_date: today,
+    credit_note_date: today(),
     subtotal: props.selectedInvoice ? Number(props.selectedInvoice.subtotal) : 0,
     tax_amount: props.selectedInvoice ? Number(props.selectedInvoice.tax_amount) : 0,
     total: props.selectedInvoice ? Number(props.selectedInvoice.total) : 0,

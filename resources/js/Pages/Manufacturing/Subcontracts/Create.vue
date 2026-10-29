@@ -7,11 +7,12 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ suppliers: Array, products: Array, boms: Array, warehouses: Array });
 const form = useForm({
     supplier_id: '', product_id: '', bom_id: '', quantity: 1, service_price: 0, source_warehouse_id: props.warehouses?.[0]?.id || '', vendor_warehouse_id: '', output_warehouse_id: props.warehouses?.[0]?.id || '',
-    order_date: new Date().toISOString().slice(0, 10), expected_date: '', notes: '',
+    order_date: today(), expected_date: '', notes: '',
 });
 useUnsavedGuard(form);
 const productBoms = computed(() => props.boms.filter((b) => b.product_id === form.product_id));

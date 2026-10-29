@@ -9,6 +9,7 @@ import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
 import { confirmAction } from '@/composables/useDialog';
 import { PlusIcon, PencilSquareIcon, TrashIcon, GlobeAltIcon } from '@heroicons/vue/24/outline';
+import { today } from '@/utils/format';
 
 /**
  * Branches and the country each one operates in: the country sets the tax
@@ -44,7 +45,7 @@ const rates = (p) => (p.has_tax ? p.rates.map((r) => `${Number(r)}%`).join(' / '
 
 // Countries the company works in (with tax), and a rate change from a date.
 const taxCountries = computed(() => [...new Map(props.branches.filter((b) => b.profile.has_tax).map((b) => [b.profile.country, b.profile])).values()]);
-const rateForm = useForm({ country: '', standard: '', rates: '', from: new Date().toISOString().slice(0, 10) });
+const rateForm = useForm({ country: '', standard: '', rates: '', from: today() });
 const rateOpen = ref(false);
 const editRates = (p) => { rateForm.country = p.country; rateForm.standard = p.rate; rateForm.rates = p.rates.filter((r) => r !== p.rate).join(', '); rateForm.clearErrors(); rateOpen.value = true; };
 const saveRates = () => rateForm.post(route('branches.tax-rates'), { preserveScroll: true, onSuccess: () => { rateOpen.value = false; } });

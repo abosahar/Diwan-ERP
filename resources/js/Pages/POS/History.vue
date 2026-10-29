@@ -13,6 +13,7 @@ import {
     EyeIcon,
     ArrowPathIcon,
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 const props = defineProps({
     orders: Object,
@@ -115,7 +116,7 @@ const formatCurrency = (val) => {
                                     {{ formatCurrency(order.total) }} <span class="text-3xs text-slate-500 font-normal">﷼</span>
                                 </td>
                                 <td class="py-3.5 px-4 text-slate-500 font-mono text-3xs">
-                                    {{ new Date(order.created_at).toLocaleString('ar-SA-u-nu-latn') }}
+                                    {{ new Date(order.created_at).toLocaleString('ar-SA-u-nu-latn', { timeZone: timeZone() }) }}
                                 </td>
                                 <td class="py-3.5 px-4 text-center">
                                     <button
@@ -160,7 +161,7 @@ const formatCurrency = (val) => {
 
                         <div class="border-t border-slate-200 pt-2 text-3xs text-start space-y-0.5">
                             <p>رقم الفاتورة: <strong>{{ activeOrder.order_number }}</strong></p>
-                            <p>التاريخ: {{ new Date(activeOrder.created_at).toLocaleString('ar-SA-u-nu-latn') }}</p>
+                            <p>التاريخ: {{ new Date(activeOrder.created_at).toLocaleString('ar-SA-u-nu-latn', { timeZone: timeZone() }) }}</p>
                             <p>طريقة الدفع: {{ ({ cash: 'نقداً', card: 'بطاقة مدى', multiple: 'مجزأ (نقد + بطاقة)' })[activeOrder.payment_method] || activeOrder.payment_method }}</p>
                         </div>
 

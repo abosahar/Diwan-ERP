@@ -9,6 +9,7 @@ import Field from '@/Components/UI/Field.vue';
 import DocumentTable from '@/Components/Documents/DocumentTable.vue';
 import LineItemsEditor from '@/Components/Documents/LineItemsEditor.vue';
 import { PlusIcon } from '@heroicons/vue/24/outline';
+import { today } from '@/utils/format';
 
 defineProps({ requests: Object, filters: Object });
 const columns = [
@@ -21,7 +22,7 @@ const columns = [
 ];
 const statuses = [{ value: 'pending_approval', label: 'بانتظار الاعتماد' }, { value: 'approved', label: 'معتمد' }, { value: 'ordered', label: 'تم الطلب' }, { value: 'rejected', label: 'مرفوض' }];
 const open = ref(false);
-const form = useForm({ request_date: new Date().toISOString().substring(0, 10), required_date: '', notes: '', items: [] });
+const form = useForm({ request_date: today(), required_date: '', notes: '', items: [] });
 const save = () => form.transform((d) => ({ ...d, items: d.items.map((i) => ({ product_id: i.product_id, item_name: i.item_name, quantity: i.quantity, estimated_price: i.estimated_price })) }))
     .post(route('purchases.requests.store'));
 </script>

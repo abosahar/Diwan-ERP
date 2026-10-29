@@ -3,7 +3,7 @@ import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ask } from '@/composables/useDialog';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
-import { money, date } from '@/utils/format';
+import { money, date, dateTime } from '@/utils/format';
 
 const props = defineProps({ company: Object, state: String, usage: Object, users: Array, invoices: Array, audit: Array, plans: Array });
 const c = props.company;
@@ -54,7 +54,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 </div>
                 <div class="bg-white rounded-2xl border p-4">
                     <h3 class="font-black mb-2">سجل التدقيق</h3>
-                    <div v-for="a in audit" :key="a.id" class="py-1 border-b border-slate-50"><b>{{ a.action }}</b> — {{ a.user?.name }} <span class="text-slate-400 font-mono">{{ String(a.created_at).substring(0, 16).replace('T', ' ') }}</span><div class="text-slate-400 break-all">{{ JSON.stringify(a.details) }}</div></div>
+                    <div v-for="a in audit" :key="a.id" class="py-1 border-b border-slate-50"><b>{{ a.action }}</b> — {{ a.user?.name }} <span class="text-slate-400 font-mono">{{ dateTime(a.created_at) }}</span><div class="text-slate-400 break-all">{{ JSON.stringify(a.details) }}</div></div>
                 </div>
             </div>
         </div>

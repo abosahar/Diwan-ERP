@@ -17,6 +17,7 @@ import {
     CheckIcon,
     UserPlusIcon,
 } from '@heroicons/vue/24/outline';
+import { today, addDays } from '@/utils/format';
 
 const props = defineProps({
     customers: Array,
@@ -28,8 +29,7 @@ const props = defineProps({
     defaultBranchId: Number,
 });
 
-const today = new Date().toISOString().split('T')[0];
-const defaultValidUntil = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+const defaultValidUntil = addDays(today(), 15);
 
 
 // Tax rules of the chosen branch (its country): default rate of new lines.
@@ -41,7 +41,7 @@ const form = useForm({
     customer_id: props.customers?.[0]?.id || '',
     branch_id: selectedBranchId.value,
     quotation_number: props.suggestedNumber || 'QUO-26-1-000001',
-    quotation_date: today,
+    quotation_date: today(),
     valid_until: defaultValidUntil,
     notes: taxRate() ? `عرض السعر ساري حتى التاريخ المحدد أعلاه. الأسعار تخضع لـ${taxLabel()}.` : 'عرض السعر ساري حتى التاريخ المحدد أعلاه.',
     terms: '1. الدفع عند قبول العرض وتأكيد الطلب.\n2. مدة التوريد والتنفيذ متفق عليها وفق طبيعة الأعمال.\n3. هذا العرض وثيقة تقديرية ولا يعتبر فاتورة ضريبية.',

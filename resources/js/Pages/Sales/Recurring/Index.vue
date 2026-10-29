@@ -12,7 +12,7 @@ import PartyPicker from '@/Components/Documents/PartyPicker.vue';
 import LineItemsEditor from '@/Components/Documents/LineItemsEditor.vue';
 import CurrencyPicker from '@/Components/Documents/CurrencyPicker.vue';
 import HijriDate from '@/Components/UI/HijriDate.vue';
-import { money } from '@/utils/format';
+import { money, today } from '@/utils/format';
 
 /**
  * Recurring invoices: service contracts billed automatically every month,
@@ -27,8 +27,7 @@ const statuses = { active: ['نشطة', 'bg-emerald-50 text-emerald-700'], pause
 const open = ref(false);
 const editing = ref(null);
 const customer = ref(null);
-const today = new Date().toISOString().substring(0, 10);
-const blank = () => ({ name: '', customer_id: null, frequency: 'monthly', interval: 1, start_date: today, end_date: '', max_count: '', due_days: '', invoice_type: 'standard', auto_send: false, send_to: '', notes: '', currency_code: '', exchange_rate: '', lines: [] });
+const blank = () => ({ name: '', customer_id: null, frequency: 'monthly', interval: 1, start_date: today(), end_date: '', max_count: '', due_days: '', invoice_type: 'standard', auto_send: false, send_to: '', notes: '', currency_code: '', exchange_rate: '', lines: [] });
 const form = useForm(blank());
 
 const create = (data = null) => {

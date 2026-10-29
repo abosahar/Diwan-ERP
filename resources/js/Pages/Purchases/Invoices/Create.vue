@@ -30,6 +30,7 @@ import {
     ChevronUpDownIcon,
     InformationCircleIcon,
 } from '@heroicons/vue/24/outline';
+import { today, addDays } from '@/utils/format';
 
 const props = defineProps({
     suppliers: Array,
@@ -62,9 +63,9 @@ const form = useForm({
     branch_id: selectedBranchId.value,
     invoice_number: props.suggestedNumber || '',
     supplier_invoice_number: '',
-    invoice_date: new Date().toISOString().split('T')[0],
-    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    supply_date: new Date().toISOString().split('T')[0],
+    invoice_date: today(),
+    due_date: addDays(today(), 30),
+    supply_date: today(),
     payment_method: 'bank_transfer',
     currency_code: '',
     exchange_rate: '',

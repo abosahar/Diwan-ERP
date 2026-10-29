@@ -6,10 +6,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
 import Field from '@/Components/UI/Field.vue';
-import { date } from '@/utils/format';
+import { date, today } from '@/utils/format';
 
 defineProps({ counts: Object, warehouses: Array });
-const form = useForm({ warehouse_id: '', count_date: new Date().toISOString().substring(0, 10), count_type: 'full', notes: '' });
+const form = useForm({ warehouse_id: '', count_date: today(), count_type: 'full', notes: '' });
 const start = () => form.post(route('inventory.counts.store'));
 const statusLabel = { draft: ['قيد الجرد', 'text-amber-600'], approved: ['معتمد', 'text-emerald-600'], cancelled: ['ملغى', 'text-slate-400'] };
 </script>

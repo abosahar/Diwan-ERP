@@ -115,6 +115,8 @@ class HandleInertiaRequests extends Middleware
                 'local_install' => (bool) config('app.local_install'),
             ],
             'locale' => app()->getLocale(),
+            // Business time zone: the frontend shows timestamps sent in UTC in it.
+            'timezone' => config('app.timezone'),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
