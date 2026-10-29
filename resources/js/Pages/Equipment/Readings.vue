@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
-import { date as fmtDate } from '@/utils/format';
+import { date as fmtDate, today } from '@/utils/format';
 
 /**
  * Daily sheet: the supervisor fills one row per working equipment. Worked
@@ -35,7 +35,6 @@ const delta = (i, field, prevKey) => {
     return v !== '' && v !== null && prev !== undefined && prev !== null ? Number(v) - Number(prev) : null;
 };
 const filled = computed(() => form.rows.filter((r) => r.hours_reading !== '' || r.km_reading !== '' || r.worked_hours !== '').length);
-const today = new Date().toLocaleDateString('en-CA');
 </script>
 
 <template>
@@ -43,7 +42,7 @@ const today = new Date().toLocaleDateString('en-CA');
         <Head title="قراءات العدادات اليومية" />
         <PageHeader title="قراءات العدادات اليومية" subtitle="قراءة العداد تُحدّث مواعيد الصيانة، وساعات العمل تُحسب عليها فواتير التأجير بالساعة" :crumbs="[{ label: 'المعدات', href: route('equipment.index') }, { label: 'القراءات' }]">
             <template #actions>
-                <label class="text-xs font-bold text-slate-600 flex items-center gap-2">التاريخ <input :value="date" :max="today" @change="changeDate($event.target.value)" type="date" class="rounded-xl border-slate-200 text-xs" /></label>
+                <label class="text-xs font-bold text-slate-600 flex items-center gap-2">التاريخ <input :value="date" :max="today()" @change="changeDate($event.target.value)" type="date" class="rounded-xl border-slate-200 text-xs" /></label>
             </template>
         </PageHeader>
 

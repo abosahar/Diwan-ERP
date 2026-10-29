@@ -13,6 +13,7 @@ import {
     CubeIcon,
     XMarkIcon,
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 const props = defineProps({
     stocks: Object,
@@ -127,7 +128,7 @@ const props = defineProps({
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-center text-slate-400 font-mono text-[11px]" dir="ltr">
-                                    {{ new Date(stock.updated_at).toLocaleDateString('ar-SA') }}
+                                    {{ new Date(stock.updated_at).toLocaleDateString('ar-SA', { timeZone: timeZone() }) }}
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <Link v-if="$can('inventory.operations.create')" :href="route('inventory.operations.adjust.create', { product_id: stock.product_id, warehouse_id: stock.warehouse_id })" class="px-2.5 py-1 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg text-xs font-bold transition inline-flex items-center gap-1">

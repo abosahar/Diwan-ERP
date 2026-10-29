@@ -6,7 +6,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
-import { money, date } from '@/utils/format';
+import { money, date, today } from '@/utils/format';
 
 const props = defineProps({ rental: Object, readings: Array, summary: Object, suggest: Object, bases: Object });
 const r = props.rental;
@@ -33,7 +33,7 @@ const editOpen = ref(false);
 const editForm = useForm({ rate: r.rate, min_hours_per_day: r.min_hours_per_day ?? '', end_date: r.end_date?.substring(0, 10) || '', site: r.site || '', with_operator: r.with_operator, notes: r.notes || '' });
 const saveEdit = () => editForm.put(route('equipment.rentals.update', r.id), { preserveScroll: true, onSuccess: () => { editOpen.value = false; } });
 const closeOpen = ref(false);
-const closeForm = useForm({ end_date: r.end_date?.substring(0, 10) || new Date().toLocaleDateString('en-CA') });
+const closeForm = useForm({ end_date: r.end_date?.substring(0, 10) || today() });
 const close = () => closeForm.post(route('equipment.rentals.close', r.id), { preserveScroll: true, onSuccess: () => { closeOpen.value = false; } });
 </script>
 

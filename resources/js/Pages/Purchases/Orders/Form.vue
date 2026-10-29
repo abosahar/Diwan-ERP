@@ -6,6 +6,7 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
 import PartyPicker from '@/Components/Documents/PartyPicker.vue';
 import LineItemsEditor from '@/Components/Documents/LineItemsEditor.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ order: Object, warehouses: Array, suggestedNumber: String, branches: Array, defaultBranchId: Number });
 const o = props.order;
@@ -13,7 +14,7 @@ const form = useForm({
     supplier_id: o?.supplier_id ?? null,
     branch_id: o?.branch_id ?? (props.defaultBranchId || props.branches?.[0]?.id || ''),
     warehouse_id: o?.warehouse_id ?? '',
-    order_date: o?.order_date?.substring(0, 10) ?? new Date().toISOString().substring(0, 10),
+    order_date: o?.order_date?.substring(0, 10) ?? today(),
     expected_delivery_date: o?.expected_delivery_date?.substring(0, 10) ?? '',
     notes: o?.notes ?? '',
     terms: o?.terms ?? '',

@@ -12,10 +12,9 @@ import StatCard from '@/Components/UI/StatCard.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
 import PartyPicker from '@/Components/Documents/PartyPicker.vue';
 import BoqEditor from '@/Components/Projects/BoqEditor.vue';
-import { money, date, qty } from '@/utils/format';
+import { money, date, qty, today } from '@/utils/format';
 
 const props = defineProps({ project: Object, summary: Object, boq: Array, billings: Array, variations: Array, subcontracts: Array, costs: Array, guarantees: Array, dailyReports: Array, bankAccounts: Array, warehouses: Array });
-const today = new Date().toISOString().substring(0, 10);
 const tab = ref('overview');
 const tabs = [['overview', 'نظرة عامة'], ['boq', 'جدول الكميات'], ['billings', 'المستخلصات'], ['variations', 'أوامر التغيير'], ['subcontracts', 'مقاولو الباطن'], ['costs', 'التكاليف'], ['guarantees', 'خطابات الضمان'], ['daily', 'التقارير اليومية']];
 const categoryLabel = { material: 'مواد', labour: 'عمالة', equipment: 'معدات', subcontract: 'مقاولو باطن', other: 'أخرى' };
@@ -30,36 +29,36 @@ const saveBoq = () => boqForm.put(route('projects.boq.update', props.project.id)
 const billable = computed(() => props.boq.filter((b) => !b.is_group && Number(b.quantity) > 0));
 
 // Billing
-const billingForm = useForm({ billing_date: today, period_from: '', period_to: today, notes: '', lines: [] });
+const billingForm = useForm({ billing_date: today(), period_from: '', period_to: today(), notes: '', lines: [] });
 const openBilling = () => { billingForm.lines = billable.value.map((b) => ({ boq_item_id: b.id, code: b.code, description: b.description, contract: Number(b.quantity), billed: Number(b.billed_quantity), price: Number(b.unit_price), current_quantity: 0 })); dialog.value = 'billing'; };
 const billingValue = computed(() => billingForm.lines.reduce((s, l) => s + Number(l.current_quantity || 0) * l.price, 0));
 const saveBilling = () => billingForm.transform((d) => ({ ...d, lines: d.lines.filter((l) => Number(l.current_quantity) > 0).map(({ boq_item_id, current_quantity }) => ({ boq_item_id, current_quantity })) })).post(route('projects.billings.store', props.project.id));
 
 // Advance / retention
-const advanceForm = useForm({ date: today, amount: 0, payment_method: 'bank_transfer', bank_account_id: '' });
-const retentionForm = useForm({ date: today, amount: props.summary.retention_open });
+const advanceForm = useForm({ date: today(), amount: 0, payment_method: 'bank_transfer', bank_account_id: '' });
+const retentionForm = useForm({ date: today(), amount: props.summary.retention_open });
 
 // Variations
-const variationForm = useForm({ date: today, description: '', amount: 0, cost_impact: 0, time_impact_days: 0 });
+const variationForm = useForm({ date: today(), description: '', amount: 0, cost_impact: 0, time_impact_days: 0 });
 const variationAct = (v, action) => router.post(route(`projects.variations.${action}`, [props.project.id, v.id]), {}, { preserveScroll: true });
 
 // Subcontracts
 const subForm = useForm({ supplier_id: null, scope: '', contract_value: 0, retention_percent: 10, start_date: '', end_date: '' });
 const selectedSub = ref(null);
-const subAdvanceForm = useForm({ date: today, amount: 0, payment_method: 'bank_transfer', bank_account_id: '' });
-const certifyForm = useForm({ date: today, cumulative_value: 0, vat_rate: taxRate(), supplier_invoice_number: '' });
+const subAdvanceForm = useForm({ date: today(), amount: 0, payment_method: 'bank_transfer', bank_account_id: '' });
+const certifyForm = useForm({ date: today(), cumulative_value: 0, vat_rate: taxRate(), supplier_invoice_number: '' });
 const openSub = (s, kind) => { selectedSub.value = s; certifyForm.cumulative_value = Number(s.certified_to_date); dialog.value = kind; };
 
 // Costs
-const costForm = useForm({ date: today, category: 'labour', description: '', amount: 0, vat_amount: 0, paid_from: 'accrued', supplier_id: null, bank_account_id: '', reference: '' });
-const materialForm = useForm({ direction: 'issue', date: today, warehouse_id: props.project.warehouse_id || '', reference: '', lines: [] });
+const costForm = useForm({ date: today(), category: 'labour', description: '', amount: 0, vat_amount: 0, paid_from: 'accrued', supplier_id: null, bank_account_id: '', reference: '' });
+const materialForm = useForm({ direction: 'issue', date: today(), warehouse_id: props.project.warehouse_id || '', reference: '', lines: [] });
 const lookup = ref('');
 const results = ref([]);
 const searchProducts = async () => { results.value = lookup.value.length < 2 ? [] : (await axios.get(route('lookup.products'), { params: { q: lookup.value } })).data.data; };
 const addMaterial = (p) => { materialForm.lines.push({ product_id: p.id, name: p.name_ar, quantity: 1 }); results.value = []; lookup.value = ''; };
 
 // Daily report & project details
-const dailyForm = useForm({ date: today, weather: '', manpower: 0, equipment: '', work_done: '', issues: '' });
+const dailyForm = useForm({ date: today(), weather: '', manpower: 0, equipment: '', work_done: '', issues: '' });
 const editForm = useForm({ name: props.project.name, status: props.project.status, manager_id: props.project.manager_id, warehouse_id: props.project.warehouse_id, start_date: props.project.start_date?.substring(0, 10), end_date: props.project.end_date?.substring(0, 10), advance_percent: props.project.advance_percent, retention_percent: props.project.retention_percent, location: props.project.location });
 </script>
 

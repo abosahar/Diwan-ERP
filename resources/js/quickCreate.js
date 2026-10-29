@@ -1,4 +1,5 @@
 import { taxRate, taxInfo } from '@/utils/tax';
+import { today } from '@/utils/format';
 
 /**
  * Entities that can be created on the fly from any dropdown ("إنشاء «...»").
@@ -159,7 +160,7 @@ export const quickCreate = {
             text('national_id', 'رقم الهوية'),
             text('phone', 'الجوال'),
             { key: 'email', label: 'البريد الإلكتروني', type: 'email' },
-            { key: 'hire_date', label: 'تاريخ المباشرة', type: 'date', required: true, default: new Date().toISOString().slice(0, 10) },
+            { key: 'hire_date', label: 'تاريخ المباشرة', type: 'date', required: true, default: today() },
             { key: 'contract_type', label: 'نوع العقد', type: 'select', default: 'unlimited', options: [{ value: 'unlimited', label: 'غير محدد المدة' }, { value: 'limited', label: 'محدد المدة' }] },
             { key: 'contract_end', label: 'نهاية العقد', type: 'date', show: (f) => f.contract_type === 'limited', required: true },
             num('basic_salary', 'الراتب الأساسي', { required: true }),

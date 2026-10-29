@@ -9,6 +9,7 @@ import Field from '@/Components/UI/Field.vue';
 import PartyPicker from '@/Components/Documents/PartyPicker.vue';
 import DocumentTable from '@/Components/Documents/DocumentTable.vue';
 import { PlusIcon } from '@heroicons/vue/24/outline';
+import { today } from '@/utils/format';
 
 defineProps({ costs: Object, invoices: Array, bankAccounts: Array });
 const columns = [
@@ -20,7 +21,7 @@ const columns = [
     { key: 'amount', label: 'المبلغ', type: 'money' },
 ];
 const open = ref(false);
-const form = useForm({ purchase_invoice_id: '', date: new Date().toISOString().substring(0, 10), description: '', amount: 0, tax_amount: 0, paid_from: 'payables', supplier_id: null, bank_account_id: '' });
+const form = useForm({ purchase_invoice_id: '', date: today(), description: '', amount: 0, tax_amount: 0, paid_from: 'payables', supplier_id: null, bank_account_id: '' });
 const save = () => form.post(route('purchases.landed-costs.store'), { onSuccess: () => { open.value = false; form.reset(); } });
 </script>
 

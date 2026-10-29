@@ -21,6 +21,7 @@ import {
     FunnelIcon,
     DocumentTextIcon,
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 const props = defineProps({
     invoices: Object,
@@ -76,7 +77,8 @@ const formatDateArabic = (dateStr) => {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
+            timeZone: timeZone()
         });
     } catch {
         return dateStr;

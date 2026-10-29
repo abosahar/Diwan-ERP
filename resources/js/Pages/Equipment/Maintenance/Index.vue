@@ -7,11 +7,10 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
-import { money, date } from '@/utils/format';
+import { money, date, today } from '@/utils/format';
 
 const props = defineProps({ orders: Object, filters: Object, equipment: Array, warehouses: Array, prefill: Number });
-const today = new Date().toLocaleDateString('en-CA');
-const blank = () => ({ equipment_id: props.prefill || '', type: 'preventive', date: today, hours_reading: '', km_reading: '', technician: '', warehouse_id: props.warehouses[0]?.id || '', notes: '' });
+const blank = () => ({ equipment_id: props.prefill || '', type: 'preventive', date: today(), hours_reading: '', km_reading: '', technician: '', warehouse_id: props.warehouses[0]?.id || '', notes: '' });
 const form = useForm(blank());
 const open = ref(false);
 const create = () => { form.defaults(blank()).reset(); form.clearErrors(); open.value = true; };

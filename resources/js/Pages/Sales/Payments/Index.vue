@@ -18,6 +18,7 @@ import {
     ArrowPathIcon,
     MagnifyingGlassIcon,
 } from '@heroicons/vue/24/outline';
+import { today } from '@/utils/format';
 
 const props = defineProps({
     payments: Object,
@@ -30,7 +31,7 @@ const props = defineProps({
 const showForm = ref(false);
 const openInvoices = ref([]);
 const form = useForm({
-    customer_id: null, invoice_id: '', amount: '', payment_date: new Date().toISOString().substring(0, 10),
+    customer_id: null, invoice_id: '', amount: '', payment_date: today(),
     payment_method: 'bank_transfer', bank_account_id: '', reference_number: '', notes: '', currency_code: '', exchange_rate: '', auto_allocate: true,
 });
 const loadInvoices = async (customerId) => {

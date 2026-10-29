@@ -5,11 +5,11 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import StatCard from '@/Components/UI/StatCard.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
-import { money } from '@/utils/format';
+import { money, thisMonth } from '@/utils/format';
 
 defineProps({ payrolls: Object, stats: Object });
-const now = new Date();
-const form = useForm({ month: now.getMonth() + 1, year: now.getFullYear(), notes: '' });
+const [year, month] = thisMonth().split('-').map(Number);
+const form = useForm({ month, year, notes: '' });
 </script>
 
 <template>

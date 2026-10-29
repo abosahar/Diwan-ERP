@@ -3,11 +3,11 @@ import { ref } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
-import { date } from '@/utils/format';
+import { date, today } from '@/utils/format';
 
 defineProps({ years: Array });
 
-const form = useForm({ start_date: new Date().getFullYear() + 1 + '-01-01' });
+const form = useForm({ start_date: `${Number(today().substring(0, 4)) + 1}-01-01` });
 const create = () => form.post(route('accounting.fiscal-years.store'), { preserveScroll: true });
 const setStatus = (period, status) => router.put(route('accounting.fiscal-periods.update', period.id), { status }, { preserveScroll: true });
 const closeYear = (year) => confirm(`إقفال السنة المالية ${year.name}؟ سيتم ترحيل صافي الربح/الخسارة إلى الأرباح المحتجزة وإغلاق جميع الفترات.`) && router.post(route('accounting.fiscal-years.close', year.id), {}, { preserveScroll: true });

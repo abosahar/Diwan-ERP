@@ -31,6 +31,7 @@ import {
     TagIcon,
 } from '@heroicons/vue/24/outline';
 import CustomerModal from '../Clients/CustomerModal.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({
     customers: Array,
@@ -46,7 +47,6 @@ const props = defineProps({
     defaultBranchId: Number,
 });
 
-const today = new Date().toISOString().split('T')[0];
 
 // Tax rules of the chosen branch (its country): default rate of new lines and the totals label.
 const selectedBranchId = ref(props.defaultBranchId || props.branches?.[0]?.id || '');
@@ -68,9 +68,9 @@ const form = useForm({
     branch_id: selectedBranchId.value,
     invoice_number: props.suggestedNumber || 'INV-26-1-000001',
     reference_number: '',
-    invoice_date: today,
-    due_date: today,
-    supply_date: today,
+    invoice_date: today(),
+    due_date: today(),
+    supply_date: today(),
     payment_method: 'bank_transfer',
     currency_code: '',
     exchange_rate: '',

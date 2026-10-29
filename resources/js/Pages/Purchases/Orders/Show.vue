@@ -8,7 +8,7 @@ import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
 import ApprovalTimeline from '@/Components/Documents/ApprovalTimeline.vue';
-import { money, date, qty } from '@/utils/format';
+import { money, date, qty, today } from '@/utils/format';
 
 const props = defineProps({ order: Object, receipts: Array, invoices: Array, approvals: Array, warehouses: Array });
 const canReceive = computed(() => ['approved', 'pending', 'partially_received'].includes(props.order.status));
@@ -17,7 +17,7 @@ const printPage = () => window.print();
 
 const open = ref(false);
 const form = useForm({
-    receipt_date: new Date().toISOString().substring(0, 10),
+    receipt_date: today(),
     warehouse_id: props.order.warehouse_id || '',
     supplier_delivery_number: '',
     lines: props.order.items.filter((i) => i.product_id).map((i) => {

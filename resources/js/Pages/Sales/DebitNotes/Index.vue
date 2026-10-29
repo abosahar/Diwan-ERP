@@ -9,7 +9,7 @@ import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
 import PartyPicker from '@/Components/Documents/PartyPicker.vue';
 import DocumentTable from '@/Components/Documents/DocumentTable.vue';
-import { money } from '@/utils/format';
+import { money, today } from '@/utils/format';
 import { PlusIcon } from '@heroicons/vue/24/outline';
 
 defineProps({ notes: Object, filters: Object });
@@ -22,7 +22,7 @@ const columns = [
     { key: 'total', label: 'الإجمالي', type: 'money' },
 ];
 const open = ref(false);
-const form = useForm({ customer_id: null, invoice_id: '', debit_note_date: new Date().toISOString().substring(0, 10), reason: '', subtotal: 0, tax_rate: taxRate() });
+const form = useForm({ customer_id: null, invoice_id: '', debit_note_date: today(), reason: '', subtotal: 0, tax_rate: taxRate() });
 const save = () => form.post(route('sales.debit-notes.store'), { onSuccess: () => { open.value = false; form.reset(); } });
 </script>
 

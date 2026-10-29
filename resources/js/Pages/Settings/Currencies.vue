@@ -3,11 +3,12 @@ import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ base: String, currencies: Array, history: Array });
 
 const currency = useForm({ code: '', name_ar: '', name_en: '', symbol_ar: '', exchange_rate: '' });
-const rate = useForm({ currency_code: props.currencies.find((c) => c.code !== props.base)?.code || '', date: new Date().toISOString().substring(0, 10), rate: '' });
+const rate = useForm({ currency_code: props.currencies.find((c) => c.code !== props.base)?.code || '', date: today(), rate: '' });
 
 const addCurrency = () => currency.post(route('settings.currencies.store'), { preserveScroll: true, onSuccess: () => currency.reset() });
 const addRate = () => rate.post(route('settings.currencies.rates'), { preserveScroll: true, onSuccess: () => rate.reset('rate') });
