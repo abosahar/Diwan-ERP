@@ -15,7 +15,15 @@ use Illuminate\Support\Facades\Http;
  */
 class SelfUpdate
 {
-    public const REPO = 'turkialawlqy/Diwan-ERP';
+    public const DEFAULT_REPO = 'abosahar/Diwan-ERP';
+
+    /** owner/name of the GitHub repository whose releases are this copy's updates (DIWAN_REPO in .env). */
+    public static function repo(): string
+    {
+        $repo = trim((string) config('app.repository'));
+
+        return preg_match('#^[\w.-]+/[\w.-]+$#', $repo) ? $repo : self::DEFAULT_REPO;
+    }
 
     /** Local installs only: the script that applies updates exists nowhere else. */
     public function enabled(): bool
@@ -34,7 +42,7 @@ class SelfUpdate
         return Cache::remember('self-update:latest', now()->addHours(6), function () {
             try {
                 $response = Http::timeout(5)->withHeaders(['Accept' => 'application/vnd.github+json'])
-                    ->get('https://api.github.com/repos/'.self::REPO.'/releases/latest');
+                    ->get('https://api.github.com/repos/'.self::repo().'/releases/latest');
             } catch (\Throwable) {
                 return null;
             }

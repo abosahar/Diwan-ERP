@@ -31,6 +31,10 @@ return [
     // Release of this copy (the VERSION file, written into each release package).
     'version' => trim((string) @file_get_contents(base_path('VERSION'))) ?: 'dev',
 
+    // GitHub repository (owner/name) whose releases are this copy's updates and whose issues
+    // receive feature requests. Empty: SelfUpdate::DEFAULT_REPO. The update scripts read it too.
+    'repository' => env('DIWAN_REPO'),
+
     'brand' => [
         'name_en' => env('APP_NAME_EN', 'Diwan'),
         'subtitle' => env('APP_SUBTITLE', 'نظام إدارة الأعمال المتكامل'),

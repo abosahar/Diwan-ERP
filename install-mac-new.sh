@@ -24,15 +24,14 @@
 #
 # Options: DIWAN_PORT=8000  DIWAN_PACKAGE=path-or-url-of-the-zip  DIWAN_DIR=~/Diwan
 #          DIWAN_PHP=path-of-php  DIWAN_NEW_KEY=1 (start over beside an earlier database)
+#          DIWAN_REPO=owner/name (whose releases to install; kept in .env for later updates)
 
 set -Eeuo pipefail
 
 # Raised whenever this file changes: an update whose release carries a newer copy installs it.
-DIWAN_SCRIPT_VERSION=2
+DIWAN_SCRIPT_VERSION=3
 
-REPO=turkialawlqy/Diwan-ERP
-DEFAULT_PACKAGE=https://github.com/$REPO/releases/latest/download/diwan-erp.zip
-PACKAGE=${DIWAN_PACKAGE:-$DEFAULT_PACKAGE}
+DEFAULT_REPO=abosahar/Diwan-ERP
 PHP_FORMULA=php@8.3
 MYSQL_FORMULA=mysql@8.4
 # The release's libraries run on PHP 8.2 to 8.4 (PhpSpreadsheet 1.30 refuses 8.5).
@@ -63,6 +62,11 @@ init_paths() {
     BIN="$DIR/bin/diwan"
     SHARED="$DIR/shared"
     ENV_FILE="$SHARED/.env"
+    # Releases come from DIWAN_REPO (owner/name): the environment, else the install's .env, else this fork.
+    REPO=${DIWAN_REPO:-$(sed -nE "s/^DIWAN_REPO=[\"']?([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+).*/\1/p" "$ENV_FILE" 2> /dev/null | tail -n 1 || true)}
+    [[ $REPO =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || REPO=$DEFAULT_REPO
+    DEFAULT_PACKAGE=https://github.com/$REPO/releases/latest/download/diwan-erp.zip
+    PACKAGE=${DIWAN_PACKAGE:-$DEFAULT_PACKAGE}
     CONF="$SHARED/diwan.conf"
     LOGS="$SHARED/storage/logs"
     QUEUE_DIR="$SHARED/storage/app/update-queue"
@@ -121,6 +125,7 @@ new_env() { # template: a new settings file with fresh passwords, written in one
         -e "s#__BACKUP_PASSWORD__#$backup_pass#g" -e "s#__MYSQLDUMP__#$MYSQL_BIN/mysqldump#g" -e "s#__MYSQL__#$MYSQL_BIN/mysql#g" \
         "$1" > "$ENV_FILE.tmp" || die "Could not write the settings file."
     if grep -qE '__[A-Z_]+__' "$ENV_FILE.tmp"; then die "This release's settings template has fields this installer does not know: use a newer installer."; fi
+    [[ -z ${DIWAN_REPO:-} ]] || echo "DIWAN_REPO=$REPO" >> "$ENV_FILE.tmp"
     chmod 600 "$ENV_FILE.tmp"
     mv -f "$ENV_FILE.tmp" "$ENV_FILE"
     {

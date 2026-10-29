@@ -59,7 +59,7 @@
 ## تحتاج مساعدة؟
 
 صوّر الشاشة التي ظهرت فيها المشكلة، وافتح طلباً في صفحة المشروع:
-[github.com/turkialawlqy/Diwan-ERP/issues](https://github.com/turkialawlqy/Diwan-ERP/issues)
+[github.com/abosahar/Diwan-ERP/issues](https://github.com/abosahar/Diwan-ERP/issues)
 
 ---
 

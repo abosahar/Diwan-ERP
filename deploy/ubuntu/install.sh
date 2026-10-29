@@ -2,7 +2,7 @@
 #
 # Diwan ERP - complete install on one Ubuntu server (DigitalOcean or any other).
 #
-#   sudo bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/install-server.sh)"
+#   sudo bash -c "$(curl -fsSL https://github.com/abosahar/Diwan-ERP/releases/latest/download/install-server.sh)"
 #
 # Installs Nginx, PHP-FPM, MySQL, Redis and Supervisor, pulls the code from GitHub
 # (the public repository directly, or with a deploy key for a private copy), builds the interface, writes .env, creates the database
@@ -100,7 +100,7 @@ DOMAIN=${DOMAIN#http*://}; DOMAIN=${DOMAIN%%/*}; DOMAIN=${DOMAIN,,}
 [[ $DOMAIN =~ ^[a-z0-9.-]+\.[a-z]{2,}$ ]] || die "Invalid domain: $DOMAIN"
 ask ADMIN_EMAIL "Platform administrator email"
 # The public repository needs no key; a private fork (git@github.com:...) gets a deploy key below.
-ask REPO "Code repository" "https://github.com/turkialawlqy/Diwan-ERP.git"
+ask REPO "Code repository" "https://github.com/abosahar/Diwan-ERP.git"
 DEFAULT_BRANCH=$(git ls-remote --symref "$REPO" HEAD 2> /dev/null | awk '/^ref:/ {sub("refs/heads/", "", $2); print $2; exit}' || true)
 ask BRANCH "Branch" "${DEFAULT_BRANCH:-main}"
 if [[ -z ${DO_TOKEN+x} ]]; then

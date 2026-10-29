@@ -38,6 +38,10 @@ class ReleaseNotesTest extends TestCase
     public function test_feature_requests_page_points_to_the_developer_repository(): void
     {
         $this->get(route('feature-requests.index'))->assertOk()
-            ->assertInertia(fn ($page) => $page->component('FeatureRequests/Index')->where('repo', SelfUpdate::REPO));
+            ->assertInertia(fn ($page) => $page->component('FeatureRequests/Index')->where('repo', SelfUpdate::DEFAULT_REPO));
+
+        config(['app.repository' => 'someone/Diwan-Fork']);
+        $this->get(route('feature-requests.index'))
+            ->assertInertia(fn ($page) => $page->where('repo', 'someone/Diwan-Fork'));
     }
 }

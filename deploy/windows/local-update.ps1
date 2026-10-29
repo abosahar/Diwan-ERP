@@ -18,7 +18,12 @@ $ProgressPreference = 'SilentlyContinue'
 $Root = Split-Path (Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent) -Parent
 if (-not (Test-Path (Join-Path $Root 'diwan.json'))) { $Root = 'C:\Diwan' }
 $config = Get-Content (Join-Path $Root 'diwan.json') -Raw | ConvertFrom-Json
-$PackageUrl = if ($env:DIWAN_PACKAGE) { $env:DIWAN_PACKAGE } else { 'https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/diwan-erp.zip' }
+# Releases come from DIWAN_REPO (owner/name): the environment, else the install's .env, else this fork.
+$Repo = $env:DIWAN_REPO
+$repoLine = Select-String -Path (Join-Path $Root 'shared\.env') -Pattern '^DIWAN_REPO=["'']?([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)' -ErrorAction SilentlyContinue | Select-Object -Last 1
+if (-not $Repo -and $repoLine) { $Repo = $repoLine.Matches[0].Groups[1].Value }
+if (-not $Repo) { $Repo = 'abosahar/Diwan-ERP' }
+$PackageUrl = if ($env:DIWAN_PACKAGE) { $env:DIWAN_PACKAGE } else { "https://github.com/$Repo/releases/latest/download/diwan-erp.zip" }
 $Php = Join-Path $Root 'bin\php\php.exe'
 $Current = Join-Path $Root 'current'
 $Releases = Join-Path $Root 'releases'

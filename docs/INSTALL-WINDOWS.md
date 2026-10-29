@@ -13,7 +13,7 @@
 
 افتح هذا الرابط في المتصفح:
 
-**https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/Diwan-Setup.bat**
+**https://github.com/abosahar/Diwan-ERP/releases/latest/download/Diwan-Setup.bat**
 
 سيُنزَّل ملف صغير اسمه `Diwan-Setup.bat` إلى مجلد **التنزيلات** (Downloads).
 
@@ -135,6 +135,6 @@
 | النظام لا يفتح بعد إعادة تشغيل الجهاز | انتظر دقيقة بعد التشغيل، ثم جرّب. إن لم يعمل، شغّل «إعادة تشغيل الديوان». |
 | نسيت كلمة مرور المدير | من صفحة الدخول اضغط «نسيت كلمة المرور» إن كان البريد مضبوطاً. أو اطلب من مستخدم مدير آخر تغييرها من **الإعدادات ← المستخدمين**. |
 
-لأي مشكلة أخرى: صوّر النافذة وافتح طلباً في [صفحة المشروع](https://github.com/turkialawlqy/Diwan-ERP/issues).
+لأي مشكلة أخرى: صوّر النافذة وافتح طلباً في [صفحة المشروع](https://github.com/abosahar/Diwan-ERP/issues).
 
 > **ملاحظة لمن ثبّت سابقاً على MAMP أو Laragon:** الطريقة القديمة موثقة في [WINDOWS-LOCAL.md](WINDOWS-LOCAL.md). الطريقة في هذا الدليل أبسط ولا تحتاج أي برنامج مسبق.

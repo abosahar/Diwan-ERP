@@ -13,7 +13,9 @@ if %errorlevel% neq 0 (
 title Diwan ERP setup
 echo Downloading the Diwan installer...
 set "PS1=%TEMP%\diwan-install.ps1"
-set "URL=https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/install-windows.ps1"
+set "REPO=abosahar/Diwan-ERP"
+if defined DIWAN_REPO set "REPO=%DIWAN_REPO%"
+set "URL=https://github.com/%REPO%/releases/latest/download/install-windows.ps1"
 curl.exe -fsSL -o "%PS1%" "%URL%"
 if %errorlevel% neq 0 powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing -Uri '%URL%' -OutFile '%PS1%'"
 if not exist "%PS1%" (

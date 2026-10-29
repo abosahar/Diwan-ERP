@@ -10,9 +10,11 @@
 
 set -Eeuo pipefail
 
-REPO=turkialawlqy/Diwan-ERP
-PACKAGE_URL=${DIWAN_PACKAGE:-https://github.com/$REPO/releases/latest/download/diwan-erp.zip}
 DIR=${DIWAN_DIR:-/opt/diwan}
+# Releases come from DIWAN_REPO (owner/name): the environment, else the install's .env, else this fork.
+REPO=${DIWAN_REPO:-$(sed -nE "s/^DIWAN_REPO=[\"']?([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+).*/\1/p" "$DIR/shared/.env" 2> /dev/null | tail -n 1 || true)}
+REPO=${REPO:-abosahar/Diwan-ERP}
+PACKAGE_URL=${DIWAN_PACKAGE:-https://github.com/$REPO/releases/latest/download/diwan-erp.zip}
 APP_USER=diwan
 KEEP=3
 

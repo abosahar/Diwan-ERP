@@ -19,12 +19,12 @@
     Prepare again even when there is nothing new to pull, and continue even
     when the pre-update database backup fails.
 .PARAMETER Branch
-    Branch to follow. Default: UPDATE_BRANCH in .env, else the development branch.
+    Branch to follow. Default: UPDATE_BRANCH in .env, else main.
 #>
 param(
     [string]$Path = '',
     [string]$Branch = '',
-    [string]$Repository = 'https://github.com/turkialawlqy/Diwan-ERP.git',
+    [string]$Repository = 'https://github.com/abosahar/Diwan-ERP.git',
     [switch]$Auto,
     [switch]$Force
 )
@@ -72,7 +72,7 @@ function Add-EnvValue([string]$Key, [string]$Value) {
 }
 
 if (-not $Branch) { $Branch = Get-EnvValue 'UPDATE_BRANCH' }
-if (-not $Branch) { $Branch = 'claude/vigilant-cerf-uwqevd' }
+if (-not $Branch) { $Branch = 'main' }
 
 # Keep update.log to its last 5000 lines.
 if ((Test-Path $logFile) -and ((Get-Item $logFile).Length -gt 2MB)) {
@@ -235,7 +235,7 @@ try {
     if ($isRepo -and (@(Invoke-Tool $git @('remote') -AllowFail) | ForEach-Object { "$_".Trim() }) -contains 'origin') {
         $origin = "$(@(Invoke-Tool $git @('remote', 'get-url', 'origin') -AllowFail)[0])".Trim()
     }
-    $linked = $isRepo -and ($origin -match 'turkialawlqy/(AlOstaz|Diwan)' -or $origin -eq $Repository)
+    $linked = $isRepo -and ($origin -match 'abosahar/Diwan' -or $origin -eq $Repository)
     if (-not $linked) {
         if ($Auto) { Write-Log 'The folder is not linked to the repository yet; run update.bat by hand the first time.' 'Yellow' -Always; exit 3 }
         Copy-Backup 'first link to the repository' | Out-Null

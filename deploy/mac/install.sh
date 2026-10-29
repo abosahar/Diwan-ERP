@@ -5,7 +5,7 @@
 #
 # Open Terminal (Launchpad > Other > Terminal), paste this line and press Enter:
 #
-#   /bin/bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/install-mac.sh)"
+#   /bin/bash -c "$(curl -fsSL https://github.com/abosahar/Diwan-ERP/releases/latest/download/install-mac.sh)"
 #
 # Installs Homebrew (the standard Mac package manager) if missing, then PHP and a
 # MySQL database, downloads the latest ready-built release into ~/Diwan and runs
@@ -16,7 +16,9 @@
 
 set -Eeuo pipefail
 
-REPO=turkialawlqy/Diwan-ERP
+# Releases come from DIWAN_REPO (owner/name), else this fork; a DIWAN_REPO given here is kept in .env.
+REPO=${DIWAN_REPO:-abosahar/Diwan-ERP}
+[[ $REPO =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || { echo "DIWAN_REPO must look like owner/name" >&2; exit 1; }
 PACKAGE_URL=${DIWAN_PACKAGE:-https://github.com/$REPO/releases/latest/download/diwan-erp.zip}
 DIR="$HOME/Diwan"
 PORT=${DIWAN_PORT:-8000}
@@ -98,6 +100,7 @@ if [[ ! -f $ENV_FILE ]]; then
     sed -e "s#__PORT__#$PORT#g" -e "s#__DB_PORT__#3306#g" -e "s#__DB_PASSWORD__#$DB_PASS#g" \
         -e "s#__BACKUP_PASSWORD__#$BACKUP_PASS#g" -e "s#__MYSQLDUMP__#$MYSQL_BIN/mysqldump#g" -e "s#__MYSQL__#$MYSQL_BIN/mysql#g" \
         "$RELEASE/.env.local-install.example" > "$ENV_FILE"
+    [[ -z ${DIWAN_REPO:-} ]] || echo "DIWAN_REPO=$REPO" >> "$ENV_FILE"
     {
         echo "# Diwan ERP - keep these passwords somewhere safe, outside this computer."
         echo "DB_PASSWORD=$DB_PASS"

@@ -20,7 +20,7 @@
 انسخ السطر كاملاً، والصقه في الطرفية بـ **Ctrl + Shift + V**، ثم اضغط **Enter**:
 
 ```bash
-sudo bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/install-linux.sh)"
+sudo bash -c "$(curl -fsSL https://github.com/abosahar/Diwan-ERP/releases/latest/download/install-linux.sh)"
 ```
 
 - **إن ظهر `curl: command not found`:** نفّذ أولاً `sudo apt install -y curl`، ثم الصق الأمر مرة أخرى.
@@ -83,4 +83,4 @@ cd /opt/diwan/current && sudo -u diwan php artisan optimize && sudo systemctl re
 | أجهزة المكتب لا تفتح العنوان | تأكد أنها على نفس الراوتر. إن كان لديك جدار حماية غير `ufw`، اسمح بالمنفذ 8000. |
 | النظام لا يفتح | `sudo systemctl restart diwan-web`، ثم راجع: `journalctl -u diwan-web -n 50`. |
 
-لأي مشكلة أخرى: صوّر الطرفية وافتح طلباً في [صفحة المشروع](https://github.com/turkialawlqy/Diwan-ERP/issues).
+لأي مشكلة أخرى: صوّر الطرفية وافتح طلباً في [صفحة المشروع](https://github.com/abosahar/Diwan-ERP/issues).

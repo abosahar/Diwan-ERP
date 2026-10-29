@@ -18,14 +18,16 @@
 
 .NOTES
     Options (environment variables): DIWAN_DIR (C:\Diwan), DIWAN_PORT (8000),
-    DIWAN_PACKAGE (path or URL of diwan-erp.zip).
+    DIWAN_PACKAGE (path or URL of diwan-erp.zip), DIWAN_REPO (owner/name whose
+    releases to install, else abosahar/Diwan-ERP; kept in .env for later updates).
 #>
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue' # Invoke-WebRequest is very slow with a progress bar
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$Repo = 'turkialawlqy/Diwan-ERP'
+$Repo = if ($env:DIWAN_REPO) { $env:DIWAN_REPO } else { 'abosahar/Diwan-ERP' }
+if ($Repo -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') { throw 'DIWAN_REPO must look like owner/name' }
 $Root = if ($env:DIWAN_DIR) { $env:DIWAN_DIR } else { 'C:\Diwan' }
 $PackageUrl = if ($env:DIWAN_PACKAGE) { $env:DIWAN_PACKAGE } else { "https://github.com/$Repo/releases/latest/download/diwan-erp.zip" }
 $Bin = Join-Path $Root 'bin'
@@ -266,6 +268,7 @@ if (-not (Test-Path $envFile)) {
     $text = $text.Replace('__PORT__', [string]$config.port).Replace('__DB_PORT__', [string]$config.db_port)
     $text = $text.Replace('__DB_PASSWORD__', $config.db_password).Replace('__BACKUP_PASSWORD__', $config.backup_password)
     $text = $text.Replace('__MYSQLDUMP__', "'$dumpExe'").Replace('__MYSQL__', "'$dbCli'")
+    if ($env:DIWAN_REPO) { $text = $text.TrimEnd() + "`nDIWAN_REPO=$Repo`n" }
     Write-Utf8 $envFile $text
 }
 # Linking a single file needs developer mode: each release gets a copy, refreshed on update and restart.

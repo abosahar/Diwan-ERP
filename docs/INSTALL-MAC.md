@@ -20,7 +20,7 @@
 انسخ هذا السطر كاملاً، والصقه في Terminal بـ **⌘ + V**، ثم اضغط **Enter**:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/install-mac.sh)"
+/bin/bash -c "$(curl -fsSL https://github.com/abosahar/Diwan-ERP/releases/latest/download/install-mac.sh)"
 ```
 
 ## الخطوة 3: أجب عن طلبين فقط
@@ -95,4 +95,4 @@ cd ~/Diwan/current && $(brew --prefix php@8.3)/bin/php artisan optimize && launc
 | أجهزة المكتب لا تفتح العنوان | تأكد أنك اخترت **Allow** لاتصالات php. أو: **إعدادات النظام ← الشبكة ← جدار الحماية ← خيارات**، وأضف php واسمح له. |
 | النظام لا يفتح | نفّذ أمر «إعادة تشغيل النظام» من الجدول أعلاه. |
 
-لأي مشكلة أخرى: صوّر Terminal وافتح طلباً في [صفحة المشروع](https://github.com/turkialawlqy/Diwan-ERP/issues).
+لأي مشكلة أخرى: صوّر Terminal وافتح طلباً في [صفحة المشروع](https://github.com/abosahar/Diwan-ERP/issues).

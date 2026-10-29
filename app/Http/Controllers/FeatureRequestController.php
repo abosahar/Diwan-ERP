@@ -15,6 +15,6 @@ class FeatureRequestController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('FeatureRequests/Index', ['repo' => SelfUpdate::REPO]);
+        return Inertia::render('FeatureRequests/Index', ['repo' => SelfUpdate::repo()]);
     }
 }

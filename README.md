@@ -8,7 +8,7 @@
 
 | الجهاز | طريقة التثبيت | الدليل |
 |---|---|---|
-| **ويندوز 10/11** | نزّل [Diwan-Setup.bat](https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/Diwan-Setup.bat) وانقر عليه نقراً مزدوجاً | [INSTALL-WINDOWS.md](docs/INSTALL-WINDOWS.md) |
+| **ويندوز 10/11** | نزّل [Diwan-Setup.bat](https://github.com/abosahar/Diwan-ERP/releases/latest/download/Diwan-Setup.bat) وانقر عليه نقراً مزدوجاً | [INSTALL-WINDOWS.md](docs/INSTALL-WINDOWS.md) |
 | **ماك** | سطر واحد في Terminal | [INSTALL-MAC.md](docs/INSTALL-MAC.md) |
 | **لينكس** (Ubuntu / Mint / Debian) | سطر واحد في الطرفية | [INSTALL-LINUX.md](docs/INSTALL-LINUX.md) |
 | **خادم على الإنترنت** (عدة منشآت بنطاقات فرعية) | سطر واحد على الخادم | [SERVER-SETUP.md](docs/SERVER-SETUP.md) |

@@ -163,7 +163,7 @@ ssh root@IP-الخادم
 
 الصق هذا السطر في الخادم واضغط Enter. ينزّل سكربت التثبيت من آخر إصدار ويشغّله:
 ```bash
-sudo bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/install-server.sh)"
+sudo bash -c "$(curl -fsSL https://github.com/abosahar/Diwan-ERP/releases/latest/download/install-server.sh)"
 ```
 
 ### الأسئلة وإجاباتها
@@ -205,7 +205,7 @@ sudo bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/la
 
 إن لم ينتشر نطاقك بعد، يمكنك التثبيت والتجربة الآن بنطاق تجربة مجاني يعمل فوراً مع النطاقات الفرعية (بلا SSL):
 ```bash
-DIWAN_DOMAIN=IP-الخادم.sslip.io sudo -E bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/install-server.sh)"
+DIWAN_DOMAIN=IP-الخادم.sslip.io sudo -E bash -c "$(curl -fsSL https://github.com/abosahar/Diwan-ERP/releases/latest/download/install-server.sh)"
 ```
 مثال: `DIWAN_DOMAIN=167.71.196.39.sslip.io`. ثم افتح `http://167.71.196.39.sslip.io/register`.
 

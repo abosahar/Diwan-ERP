@@ -62,6 +62,23 @@ class SelfUpdateTest extends TestCase
         $this->assertTrue(app(SelfUpdate::class)->running());
     }
 
+    public function test_releases_come_from_the_configured_repository(): void
+    {
+        config(['app.repository' => null]);
+        $this->release('v9.9.9');
+        app(SelfUpdate::class)->latest();
+        Http::assertSent(fn ($request) => $request->url() === 'https://api.github.com/repos/'.SelfUpdate::DEFAULT_REPO.'/releases/latest');
+
+        config(['app.repository' => 'someone/Diwan-Fork']);
+        $this->release('v9.9.9');
+        app(SelfUpdate::class)->latest();
+        Http::assertSent(fn ($request) => $request->url() === 'https://api.github.com/repos/someone/Diwan-Fork/releases/latest');
+
+        // Anything that is not owner/name falls back to the default rather than reaching another URL.
+        config(['app.repository' => 'evil.example/x/../y']);
+        $this->assertSame(SelfUpdate::DEFAULT_REPO, SelfUpdate::repo());
+    }
+
     public function test_nothing_happens_when_already_current(): void
     {
         config(['app.local_install' => true]);
