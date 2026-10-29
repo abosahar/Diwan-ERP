@@ -1,5 +1,6 @@
 <script setup>
 import GlobalSearch from '@/Components/GlobalSearch.vue';
+import QuickMenus from '@/Components/QuickMenus.vue';
 import { computed, ref } from 'vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import { 
@@ -57,7 +58,7 @@ const logout = () => {
 <template>
     <header class="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 lg:px-8 flex items-center justify-between shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
         <!-- Left / Right depending on RTL: Sidebar Toggle & Search Bar -->
-        <div class="flex items-center gap-2 lg:gap-4 flex-1 min-w-0 max-w-3xl">
+        <div class="flex items-center gap-2 lg:gap-3 flex-1 min-w-0">
             <button 
                 @click="$emit('toggleSidebar')" 
                 type="button" 
@@ -68,10 +69,11 @@ const logout = () => {
 
             <!-- Global search palette (Ctrl+K) -->
             <GlobalSearch />
+            <QuickMenus />
 
             <!-- Fiscal year and working branch -->
             <div v-if="branchSwitcher" class="flex items-center gap-2 sm:border-s sm:border-slate-200 sm:ps-4 shrink-0" data-context-selects>
-                <label v-if="fiscalSwitcher?.items.length" class="hidden lg:flex items-center" :title="'السنة المالية'">
+                <label v-if="fiscalSwitcher?.items.length" class="hidden xl:flex items-center" :title="'السنة المالية'">
                     <CalendarDaysIcon class="w-4 h-4 text-slate-400 -me-6 ms-2 relative z-10 pointer-events-none" />
                     <select data-fiscal-select :value="fiscalSwitcher.active" @change="switchYear"
                         class="bg-slate-100 border border-slate-200 text-xs font-semibold rounded-lg ps-8 pe-7 py-2 text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
@@ -96,7 +98,7 @@ const logout = () => {
         <!-- Center / End: Company Badge, POS Button, Language, Notifications, User Menu -->
         <div class="flex items-center gap-2 sm:gap-3">
             <!-- Active Company & Branch Pill -->
-            <div v-if="tenant" class="hidden xl:flex items-center gap-2 bg-indigo-50/80 text-indigo-900 border border-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium">
+            <div v-if="tenant" class="hidden 2xl:flex items-center gap-2 bg-indigo-50/80 text-indigo-900 border border-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <BuildingStorefrontIcon class="w-4 h-4 text-indigo-600" />
                 <span class="font-bold">{{ tenant.name }}</span>
@@ -104,7 +106,7 @@ const logout = () => {
 
             <!-- Full screen -->
             <button type="button" @click="toggleFullscreen" title="ملء الشاشة"
-                class="hidden md:flex w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 items-center justify-center transition-colors">
+                class="hidden 2xl:flex w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 items-center justify-center transition-colors">
                 <component :is="isFullscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon" class="w-4 h-4" />
             </button>
 
@@ -115,7 +117,7 @@ const logout = () => {
                 title="فتح نقطة البيع (الكاشير)"
             >
                 <DeviceTabletIcon class="w-4 h-4" />
-                <span class="hidden sm:inline">نقطة البيع (POS)</span>
+                <span class="hidden 2xl:inline">نقطة البيع (POS)</span>
             </Link>
 
             <!-- Language Switcher -->
