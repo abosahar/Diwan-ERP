@@ -2,13 +2,13 @@
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
+import { dateTime } from '@/utils/format';
 
 const props = defineProps({ runs: Array, files: Array, config: Object });
 const flash = computed(() => usePage().props.flash || {});
 const lastOk = computed(() => props.runs.find((r) => r.type === 'backup' && r.status === 'ok'));
 const lastVerify = computed(() => props.runs.find((r) => r.type === 'verify'));
 const mb = (b) => (b == null ? '—' : (b / 1048576).toFixed(2) + ' MB');
-const time = (t) => String(t || '').substring(0, 16).replace('T', ' ');
 const run = (verify) => router.post(route('super-admin.backups.run'), { verify }, { preserveScroll: true });
 const ageHours = computed(() => (lastOk.value ? Math.round((Date.now() - new Date(lastOk.value.created_at)) / 36e5) : null));
 </script>
@@ -23,12 +23,12 @@ const ageHours = computed(() => (lastOk.value ? Math.round((Date.now() - new Dat
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div class="bg-white border rounded-2xl p-4">
                     <div class="text-slate-500">آخر نسخة ناجحة</div>
-                    <div class="text-base font-black mt-1" :class="ageHours === null || ageHours > 26 ? 'text-rose-600' : 'text-slate-800'">{{ lastOk ? time(lastOk.created_at) : 'لا توجد' }}</div>
+                    <div class="text-base font-black mt-1" :class="ageHours === null || ageHours > 26 ? 'text-rose-600' : 'text-slate-800'">{{ lastOk ? dateTime(lastOk.created_at) : 'لا توجد' }}</div>
                     <div v-if="ageHours !== null && ageHours > 26" class="text-rose-600 mt-1">أقدم من يوم — تحقق من المجدول</div>
                 </div>
                 <div class="bg-white border rounded-2xl p-4">
                     <div class="text-slate-500">آخر اختبار استعادة</div>
-                    <div class="text-base font-black mt-1" :class="lastVerify?.status === 'ok' ? 'text-emerald-700' : 'text-rose-600'">{{ lastVerify ? (lastVerify.status === 'ok' ? 'ناجح' : 'فشل') + ' · ' + time(lastVerify.created_at) : 'لم يُجرَ بعد' }}</div>
+                    <div class="text-base font-black mt-1" :class="lastVerify?.status === 'ok' ? 'text-emerald-700' : 'text-rose-600'">{{ lastVerify ? (lastVerify.status === 'ok' ? 'ناجح' : 'فشل') + ' · ' + dateTime(lastVerify.created_at) : 'لم يُجرَ بعد' }}</div>
                 </div>
                 <div class="bg-white border rounded-2xl p-4">
                     <div class="text-slate-500">التشفير</div>
@@ -53,7 +53,7 @@ const ageHours = computed(() => (lastOk.value ? Math.round((Date.now() - new Dat
                         <thead class="bg-slate-50 text-slate-500"><tr><th class="px-3 py-2 text-start">الوقت</th><th class="px-3 py-2">النوع</th><th class="px-3 py-2">الحالة</th><th class="px-3 py-2">الحجم</th><th class="px-3 py-2 text-start">تفاصيل</th></tr></thead>
                         <tbody>
                             <tr v-for="r in runs" :key="r.id" class="border-t">
-                                <td class="px-3 py-2 font-mono">{{ time(r.created_at) }}</td>
+                                <td class="px-3 py-2 font-mono">{{ dateTime(r.created_at) }}</td>
                                 <td class="px-3 py-2 text-center">{{ r.type === 'verify' ? 'اختبار استعادة' : 'نسخ' }}</td>
                                 <td class="px-3 py-2 text-center font-bold" :class="r.status === 'ok' ? 'text-emerald-700' : 'text-rose-600'">{{ r.status === 'ok' ? 'ناجح' : 'فشل' }}</td>
                                 <td class="px-3 py-2 text-center font-mono">{{ mb(r.size) }}</td>

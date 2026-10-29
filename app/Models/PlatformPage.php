@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\SerializesLocalDates;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -11,6 +12,8 @@ use Illuminate\Support\Str;
  */
 class PlatformPage extends Model
 {
+    use SerializesLocalDates;
+
     public const PAGES = ['terms' => 'الشروط والأحكام', 'privacy' => 'سياسة الخصوصية وحماية البيانات'];
 
     protected $fillable = ['slug', 'title', 'body', 'updated_by'];
