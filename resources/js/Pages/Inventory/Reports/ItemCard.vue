@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { reactive, ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
@@ -28,8 +29,8 @@ const apply = () => router.get(route('inventory.reports.item-card'), Object.from
                 <div v-if="results.length" class="absolute z-10 mt-1 w-full bg-white border rounded-xl shadow max-h-48 overflow-y-auto"><button type="button" v-for="p in results" :key="p.id" @mousedown.prevent="pick(p)" @keydown.enter.prevent="pick(p)" class="block w-full text-start px-3 py-2 hover:bg-indigo-50">{{ p.name_ar }}</button></div>
             </div>
             <label><span class="block font-bold text-slate-600 mb-1">المستودع</span><select v-model="form.warehouse_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">الكل</option><option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name_ar }}</option></select></label>
-            <label><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.from') }}</span><input v-model="form.start_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
-            <div class="flex items-end gap-2"><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /><button class="rounded-xl bg-indigo-600 text-white font-bold px-4 py-2">{{ $t('ui.apply') }}</button></div>
+            <label><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.from') }}</span><DatePicker v-model="form.start_date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+            <div class="flex items-end gap-2"><DatePicker v-model="form.end_date" class="w-full rounded-xl border-slate-200 text-xs" /><button class="rounded-xl bg-indigo-600 text-white font-bold px-4 py-2">{{ $t('ui.apply') }}</button></div>
         </form>
 
         <div v-if="data" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">

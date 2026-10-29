@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
@@ -212,12 +213,10 @@ const submit = () => {
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">تاريخ الإشعار الدائن *</label>
-                            <input 
+                            <DatePicker 
                                 v-model="form.credit_note_date"
-                                type="date"
                                 class="w-full font-mono text-xs rounded-xl border-slate-200 focus:border-rose-500 focus:ring-rose-500 py-2.5 bg-slate-50/50"
-                                required
-                            />
+                                required />
                             <p v-if="form.errors.credit_note_date" class="text-2xs text-rose-500 mt-1">{{ form.errors.credit_note_date }}</p>
                         </div>
 

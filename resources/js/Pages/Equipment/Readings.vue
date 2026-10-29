@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { computed } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -43,7 +44,7 @@ const today = new Date().toLocaleDateString('en-CA');
         <Head title="قراءات العدادات اليومية" />
         <PageHeader title="قراءات العدادات اليومية" subtitle="قراءة العداد تُحدّث مواعيد الصيانة، وساعات العمل تُحسب عليها فواتير التأجير بالساعة" :crumbs="[{ label: 'المعدات', href: route('equipment.index') }, { label: 'القراءات' }]">
             <template #actions>
-                <label class="text-xs font-bold text-slate-600 flex items-center gap-2">التاريخ <input :value="date" :max="today" @change="changeDate($event.target.value)" type="date" class="rounded-xl border-slate-200 text-xs" /></label>
+                <label class="text-xs font-bold text-slate-600 flex items-center gap-2">التاريخ <DatePicker :model-value="date" :max="today" @change="changeDate($event.target.value)" class="rounded-xl border-slate-200 text-xs" /></label>
             </template>
         </PageHeader>
 

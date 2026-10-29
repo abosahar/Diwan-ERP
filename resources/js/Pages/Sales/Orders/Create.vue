@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -20,8 +21,8 @@ const save = () => form.post(route('sales.orders.store'));
         <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="العميل" :error="form.errors.customer_id" class="md:col-span-2"><PartyPicker v-model="form.customer_id" /></Field>
-                <Field label="تاريخ الأمر" :error="form.errors.order_date"><input v-model="form.order_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ التسليم المتوقع" :error="form.errors.delivery_date"><input v-model="form.delivery_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الأمر" :error="form.errors.order_date"><DatePicker v-model="form.order_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ التسليم المتوقع" :error="form.errors.delivery_date"><DatePicker v-model="form.delivery_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المستودع"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="ملاحظات" class="md:col-span-3"><input v-model="form.notes" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>

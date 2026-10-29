@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -75,12 +76,10 @@ const submitPayment = () => form.post(route('purchases.payments.store'));
                                 </div>
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1">تاريخ السند <span class="text-rose-500">*</span></label>
-                                    <input 
+                                    <DatePicker 
                                         v-model="form.payment_date" 
-                                        type="date" 
                                         required 
-                                        class="w-full rounded-xl border border-slate-200 px-3 py-2"
-                                    />
+                                        class="w-full rounded-xl border border-slate-200 px-3 py-2" />
                                 </div>
                             </div>
             

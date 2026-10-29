@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
 import { ref } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
@@ -60,8 +61,8 @@ const destroy = (list) => { if (confirm(`حذف قائمة "${list.name}"؟`)) r
         <Dialog :show="open" :title="editing ? 'تعديل قائمة الأسعار' : 'قائمة أسعار جديدة'" size="lg" @close="open = false">
             <div class="grid grid-cols-4 gap-3 mb-3">
                 <Field label="الاسم" :error="form.errors.name" class="col-span-2"><input v-model="form.name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="من"><input v-model="form.valid_from" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="إلى"><input v-model="form.valid_to" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="من"><DatePicker v-model="form.valid_from" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="إلى"><DatePicker v-model="form.valid_to" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <label class="text-xs flex items-center gap-2"><input v-model="form.is_default" type="checkbox" class="rounded" /> افتراضية لكل العملاء</label>
                 <label class="text-xs flex items-center gap-2"><input v-model="form.is_active" type="checkbox" class="rounded" /> فعالة</label>
             </div>

@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { reactive, computed } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -98,7 +99,7 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
                         <input v-model.number="rec.quantity" type="text" inputmode="decimal" data-num step="0.0001" placeholder="الكمية السليمة *" :class="input" />
                         <input v-model.number="rec.scrap_quantity" type="text" inputmode="decimal" data-num step="0.0001" placeholder="الهالك" :class="input" />
                         <input v-model="rec.batch_number" placeholder="رقم الدفعة" :class="input" />
-                        <input v-model="rec.date" type="date" :class="input" />
+                        <DatePicker v-model="rec.date" :class="input" />
                         <label class="col-span-2 inline-flex items-center gap-2 text-xs"><input v-model="rec.scrap_abnormal" type="checkbox" class="rounded" /> الهالك غير طبيعي (يُحمَّل خسارة لا على التكلفة)</label>
                         <button type="submit" :disabled="rec.processing" class="col-span-2 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">استلام</button>
                         <p v-if="rec.errors.quantity || rec.errors.order" class="col-span-2 text-xs text-rose-600">{{ rec.errors.quantity || rec.errors.order }}</p>

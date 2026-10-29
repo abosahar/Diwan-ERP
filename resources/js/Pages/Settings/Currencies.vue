@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -40,7 +41,7 @@ const foreign = () => props.currencies.filter((c) => c.code !== props.base);
                     <h3 class="font-black text-slate-700">سعر صرف بتاريخ</h3>
                     <p class="text-slate-500">المستند يأخذ آخر سعر في تاريخه أو قبله، ويمكن تعديله في المستند نفسه.</p>
                     <Field label="العملة" :error="rate.errors.currency_code"><select v-model="rate.currency_code" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="c in foreign()" :key="c.code" :value="c.code">{{ c.code }} — {{ c.name_ar }}</option></select></Field>
-                    <Field label="التاريخ" :error="rate.errors.date"><input v-model="rate.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="التاريخ" :error="rate.errors.date"><DatePicker v-model="rate.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field :label="`السعر (1 ${rate.currency_code || '...'} = ؟ ${base})`" :error="rate.errors.rate"><input v-model.number="rate.rate" type="text" inputmode="decimal" data-num step="0.000001" min="0" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                     <button @click="addRate" :disabled="rate.processing || !foreign().length" class="w-full px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold disabled:opacity-50">حفظ السعر</button>
                 </div>

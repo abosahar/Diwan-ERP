@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
@@ -46,8 +47,8 @@ const save = () => form.transform((d) => ({ ...d, lines: selected.value.map(({ g
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="المورد" class="md:col-span-2"><PartyPicker :model-value="form.supplier_id" route-name="lookup.suppliers" :initial="supplier" @update:model-value="pickSupplier" /></Field>
                 <Field label="رقم فاتورة المورد" :error="form.errors.supplier_invoice_number"><input v-model="form.supplier_invoice_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ الفاتورة"><input v-model="form.invoice_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="تاريخ الاستحقاق"><input v-model="form.due_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الفاتورة"><DatePicker v-model="form.invoice_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الاستحقاق"><DatePicker v-model="form.due_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="طريقة الدفع"><select v-model="form.payment_method" class="w-full rounded-xl border-slate-200 text-xs"><option value="credit">آجل</option><option value="cash">نقدي</option><option value="bank_transfer">تحويل بنكي</option><option value="card">بطاقة</option></select></Field>
                 <Field label="حالة السداد"><select v-model="form.payment_status" class="w-full rounded-xl border-slate-200 text-xs"><option value="unpaid">غير مدفوعة</option><option value="partially_paid">مدفوعة جزئياً</option><option value="paid">مدفوعة</option></select></Field>
                 <Field v-if="form.payment_status === 'partially_paid'" label="المبلغ المدفوع"><input v-model.number="form.paid_amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>

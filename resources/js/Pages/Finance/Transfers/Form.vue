@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -66,12 +67,10 @@ const submitTransfer = () => form.post(route('finance.transfers.store'));
             
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ التحويل *</label>
-                                    <input 
+                                    <DatePicker 
                                         v-model="form.transfer_date" 
-                                        type="date" 
                                         required
-                                        class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono"
-                                    />
+                                        class="w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600 font-mono" />
                                 </div>
                             </div>
             

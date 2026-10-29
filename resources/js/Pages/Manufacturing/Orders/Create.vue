@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -30,8 +31,8 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                 <Field label="مسار التشغيل"><select v-model="form.routing_id" :class="input"><option value="">— من القائمة —</option><option v-for="r in routings" :key="r.id" :value="r.id">{{ r.code }} — {{ r.name }}</option></select></Field>
                 <Field label="مستودع صرف المواد *" :error="form.errors.warehouse_id"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required /></Field>
                 <Field label="مستودع المنتج التام" hint="الافتراضي: نفس مستودع المواد"><SelectCreate v-model="form.output_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="—" /></Field>
-                <Field label="بداية مخططة"><input v-model="form.planned_start" type="date" :class="input" /></Field>
-                <Field label="نهاية مخططة" :error="form.errors.planned_end"><input v-model="form.planned_end" type="date" :class="input" /></Field>
+                <Field label="بداية مخططة"><DatePicker v-model="form.planned_start" :class="input" /></Field>
+                <Field label="نهاية مخططة" :error="form.errors.planned_end"><DatePicker v-model="form.planned_end" :class="input" /></Field>
                 <Field label="الأولوية"><select v-model="form.priority" :class="input"><option :value="1">عاجلة جداً</option><option :value="2">عالية</option><option :value="3">عادية</option><option :value="4">منخفضة</option><option :value="5">مؤجلة</option></select></Field>
                 <Field label="أمر بيع مرتبط"><select v-model="form.sales_order_id" :class="input"><option value="">—</option><option v-for="s in salesOrders" :key="s.id" :value="s.id">{{ s.order_number }}</option></select></Field>
             </div>

@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -19,7 +20,7 @@ const statusLabel = { present: 'حاضر', absent: 'غائب', leave: 'إجاز�
         <Head title="الحضور والانصراف" />
         <PageHeader title="الحضور والانصراف" subtitle="يُحتسب التأخير والإضافي حسب وردية الموظف؛ الغياب يُخصم في المسير" :crumbs="[{ label: 'الموارد البشرية' }, { label: 'الحضور' }]">
             <template #actions>
-                <input type="date" :value="date" @change="changeDate" class="rounded-xl border-slate-200 text-xs" />
+                <DatePicker :model-value="date" @change="changeDate" class="rounded-xl border-slate-200 text-xs" />
                 <div v-if="$can('hr.attendance.create')" class="flex items-center gap-2">
                 <input type="file" accept=".csv,.txt" @input="importForm.file = $event.target.files[0]" class="text-xs" />
                 <button @click="importForm.post(route('hr.attendance.import'), { forceFormData: true })" :disabled="!importForm.file" class="px-3 py-1.5 rounded-xl border border-slate-200 font-bold disabled:opacity-40">استيراد (رقم الموظف، التاريخ، دخول، خروج)</button>

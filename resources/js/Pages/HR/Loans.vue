@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ask } from '@/composables/useDialog';
 import { ref } from 'vue';
@@ -44,10 +45,10 @@ const decide = async (loan, approve) => {
             <div v-if="$can('hr.loans.create')" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
                 <h3 class="font-black text-slate-700">سلفة جديدة</h3>
                 <SelectCreate v-model="form.employee_id" :options="employees" entity="employee" label="name" placeholder="الموظف..." />
-                <label class="block">التاريخ<input v-model="form.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+                <label class="block">التاريخ<DatePicker v-model="form.date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
                 <label class="block">المبلغ<input v-model.number="form.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
                 <label class="block">القسط الشهري<input v-model.number="form.monthly_installment" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></label>
-                <label class="block">أول شهر استقطاع<input v-model="form.first_deduction_month" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+                <label class="block">أول شهر استقطاع<DatePicker v-model="form.first_deduction_month" class="w-full rounded-xl border-slate-200 text-xs" /></label>
                 <input v-model="form.reason" placeholder="السبب" class="w-full rounded-xl border-slate-200 text-xs" />
                 <p v-for="(m, k) in form.errors" :key="k" class="text-rose-600">{{ m }}</p>
                 <button @click="form.post(route('hr.loans.store'), { preserveScroll: true, onSuccess: () => form.reset('amount', 'monthly_installment', 'reason') })" class="w-full px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">تسجيل الطلب</button>

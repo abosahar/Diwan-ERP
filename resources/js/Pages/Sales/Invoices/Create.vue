@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
@@ -592,21 +593,17 @@ const importLines = (lines, replace) => {
                             <!-- Invoice Date -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">تاريخ الإصدار <span class="text-rose-500">*</span></label>
-                                <input 
-                                    v-model="form.invoice_date"
-                                    type="date" 
-                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                />
+                                <DatePicker 
+                                    v-model="form.invoice_date" 
+                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                             </div>
 
                             <!-- Supply Date -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1.5">تاريخ التوريد (الزكاة والضريبة)</label>
-                                <input 
-                                    v-model="form.supply_date"
-                                    type="date" 
-                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                />
+                                <DatePicker 
+                                    v-model="form.supply_date" 
+                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                             </div>
 
                             <div class="sm:col-span-2">

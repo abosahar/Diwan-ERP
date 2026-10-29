@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { taxRate } from '@/utils/tax';
 import { computed, ref } from 'vue';
@@ -228,7 +229,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
         <!-- Daily reports -->
         <div v-if="tab === 'daily'" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div v-if="$can('projects.daily_reports.create')" class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
-                <Field label="التاريخ"><input v-model="dailyForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="dailyForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <div class="grid grid-cols-2 gap-2">
                     <Field label="الطقس"><input v-model="dailyForm.weather" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="العمالة"><input v-model.number="dailyForm.manpower" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
@@ -250,9 +251,9 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
         <!-- Dialogs -->
         <Dialog :show="dialog === 'billing'" title="مستخلص جديد" size="xl" @close="close">
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <Field label="تاريخ المستخلص"><input v-model="billingForm.billing_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="الفترة من"><input v-model="billingForm.period_from" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="إلى"><input v-model="billingForm.period_to" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ المستخلص"><DatePicker v-model="billingForm.billing_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="الفترة من"><DatePicker v-model="billingForm.period_from" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="إلى"><DatePicker v-model="billingForm.period_to" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <div class="max-h-96 overflow-y-auto">
                 <table class="w-full text-xs">
@@ -272,7 +273,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
 
         <Dialog :show="dialog === 'advance'" title="دفعة مقدمة من العميل" @close="close">
             <div class="grid grid-cols-2 gap-3">
-                <Field label="التاريخ"><input v-model="advanceForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="advanceForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المبلغ قبل الضريبة" :error="advanceForm.errors.amount"><input v-model.number="advanceForm.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="طريقة الاستلام"><select v-model="advanceForm.payment_method" class="w-full rounded-xl border-slate-200 text-xs"><option value="bank_transfer">تحويل بنكي</option><option value="cheque">شيك</option><option value="cash">نقدي</option></select></Field>
                 <Field label="الحساب"><SelectCreate v-model="advanceForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
@@ -283,7 +284,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
 
         <Dialog :show="dialog === 'retention'" title="الإفراج عن المحتجزات" @close="close">
             <div class="grid grid-cols-2 gap-3">
-                <Field label="التاريخ"><input v-model="retentionForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="retentionForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المبلغ" :error="retentionForm.errors.amount"><input v-model.number="retentionForm.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
             </div>
             <template #footer><button @click="retentionForm.post(route('projects.retention.release', project.id), opts)" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">إفراج</button></template>
@@ -292,7 +293,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
         <Dialog :show="dialog === 'variation'" title="أمر تغيير" @close="close">
             <div class="grid grid-cols-2 gap-3">
                 <Field label="الوصف" :error="variationForm.errors.description" class="col-span-2"><input v-model="variationForm.description" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="التاريخ"><input v-model="variationForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="variationForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="القيمة (سالبة للحذف)"><input v-model.number="variationForm.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="أثر التكلفة"><input v-model.number="variationForm.cost_impact" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="تمديد المدة (يوم)"><input v-model.number="variationForm.time_impact_days" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
@@ -312,7 +313,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
 
         <Dialog :show="dialog === 'subAdvance'" :title="`دفعة مقدمة - ${selectedSub?.number}`" @close="close">
             <div class="grid grid-cols-2 gap-3">
-                <Field label="التاريخ"><input v-model="subAdvanceForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="subAdvanceForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المبلغ"><input v-model.number="subAdvanceForm.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="الحساب" class="col-span-2"><SelectCreate v-model="subAdvanceForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
@@ -321,7 +322,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
 
         <Dialog :show="dialog === 'certify'" :title="`مستخلص مقاول باطن - ${selectedSub?.number}`" @close="close">
             <div class="grid grid-cols-2 gap-3">
-                <Field label="التاريخ"><input v-model="certifyForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="certifyForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="القيمة التراكمية للأعمال" :error="certifyForm.errors.cumulative_value"><input v-model.number="certifyForm.cumulative_value" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="نسبة الضريبة"><input v-model.number="certifyForm.vat_rate" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="رقم فاتورة المقاول"><input v-model="certifyForm.supplier_invoice_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
@@ -333,7 +334,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
         <Dialog :show="dialog === 'cost'" title="تكلفة مباشرة على المشروع" @close="close">
             <div class="grid grid-cols-2 gap-3">
                 <Field label="النوع"><select v-model="costForm.category" class="w-full rounded-xl border-slate-200 text-xs"><option value="labour">عمالة</option><option value="equipment">معدات</option><option value="other">أخرى</option></select></Field>
-                <Field label="التاريخ"><input v-model="costForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="costForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="البيان" :error="costForm.errors.description" class="col-span-2"><input v-model="costForm.description" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المبلغ قبل الضريبة" :error="costForm.errors.amount"><input v-model.number="costForm.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="ضريبة المدخلات"><input v-model.number="costForm.vat_amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
@@ -346,7 +347,7 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
 
         <Dialog :show="dialog === 'materials'" :title="materialForm.direction === 'issue' ? 'صرف مواد للمشروع' : 'مرتجع مواد من المشروع'" size="lg" @close="close">
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <Field label="التاريخ"><input v-model="materialForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="materialForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المستودع"><SelectCreate v-model="materialForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="المرجع"><input v-model="materialForm.reference" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
@@ -364,8 +365,8 @@ const editForm = useForm({ name: props.project.name, status: props.project.statu
                 <Field label="الاسم" class="col-span-2"><input v-model="editForm.name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الحالة"><select v-model="editForm.status" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(label, key) in statusLabel" :key="key" :value="key">{{ label }}</option></select></Field>
                 <Field label="الموقع"><input v-model="editForm.location" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="البدء"><input v-model="editForm.start_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="الانتهاء"><input v-model="editForm.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="البدء"><DatePicker v-model="editForm.start_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="الانتهاء"><DatePicker v-model="editForm.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="استرداد المقدم %"><input v-model.number="editForm.advance_percent" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="المحتجزات %"><input v-model.number="editForm.retention_percent" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
             </div>

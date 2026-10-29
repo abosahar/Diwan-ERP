@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { computed, ref, watch } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -105,7 +106,7 @@ const saveRates = () => rateForm.post(route('branches.tax-rates'), { preserveScr
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                 <Field label="النسبة الأساسية %" :error="rateForm.errors.standard"><input v-model.number="rateForm.standard" type="text" inputmode="decimal" data-num step="0.01" min="0" max="100" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="نسب مخفضة (اختياري)" :error="rateForm.errors.rates" hint="مثل: 5, 10"><input v-model="rateForm.rates" dir="ltr" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
-                <Field label="تسري من *" :error="rateForm.errors.from"><input v-model="rateForm.from" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تسري من *" :error="rateForm.errors.from"><DatePicker v-model="rateForm.from" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <template #footer>
                 <button type="button" @click="saveRates" :disabled="rateForm.processing" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold disabled:opacity-50">حفظ</button>

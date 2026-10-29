@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -34,8 +35,8 @@ const save = (submit) => {
         <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <Field label="المورد" :error="form.errors.supplier_id" class="md:col-span-2"><PartyPicker v-model="form.supplier_id" route-name="lookup.suppliers" :initial="o?.supplier" /></Field>
-                <Field label="تاريخ الأمر"><input v-model="form.order_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="التوريد المتوقع"><input v-model="form.expected_delivery_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الأمر"><DatePicker v-model="form.order_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التوريد المتوقع"><DatePicker v-model="form.expected_delivery_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="مستودع الاستلام"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="ملاحظات" class="md:col-span-3"><input v-model="form.notes" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الشروط والأحكام" class="md:col-span-4"><textarea v-model="form.terms" rows="2" class="w-full rounded-xl border-slate-200 text-xs"></textarea></Field>

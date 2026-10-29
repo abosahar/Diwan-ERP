@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { taxRate } from '@/utils/tax';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -67,12 +68,10 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                 </div>
                                 <div>
                                     <label class="block font-medium text-slate-700 mb-1">تاريخ الصرف <span class="text-rose-500">*</span></label>
-                                    <input 
+                                    <DatePicker 
                                         v-model="form.expense_date" 
-                                        type="date" 
                                         required 
-                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500" 
-                                    />
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500" />
                                 </div>
                             </div>
             

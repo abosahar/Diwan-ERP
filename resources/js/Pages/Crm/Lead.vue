@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -28,7 +29,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
                 <Field label="الاسم"><input v-model="form.name" :class="inp" /></Field>
                 <Field label="الشركة"><input v-model="form.company_name" :class="inp" /></Field>
                 <div class="grid grid-cols-2 gap-2"><Field label="الجوال"><input v-model="form.phone" :class="inp" /></Field><Field label="البريد"><input v-model="form.email" :class="inp" /></Field></div>
-                <div class="grid grid-cols-2 gap-2"><Field label="القيمة المتوقعة"><input v-model.number="form.expected_value" type="text" inputmode="decimal" data-num :class="inp" /></Field><Field label="المتابعة"><input v-model="form.next_follow_up" type="date" :class="inp" /></Field></div>
+                <div class="grid grid-cols-2 gap-2"><Field label="القيمة المتوقعة"><input v-model.number="form.expected_value" type="text" inputmode="decimal" data-num :class="inp" /></Field><Field label="المتابعة"><DatePicker v-model="form.next_follow_up" :class="inp" /></Field></div>
                 <Field label="المسؤول"><select v-model="form.assigned_to" :class="inp"><option value="">—</option><option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option></select></Field>
                 <Field label="المصدر"><select v-model="form.source" :class="inp"><option v-for="(lb, k) in sources" :key="k" :value="k">{{ lb }}</option></select></Field>
                 <Field label="ملاحظات"><textarea v-model="form.notes" rows="3" :class="inp"></textarea></Field>
@@ -37,7 +38,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs';
             <div class="lg:col-span-2 space-y-3">
                 <div v-if="$can('crm.leads.edit')" class="bg-white border border-slate-200 rounded-2xl p-4 grid grid-cols-4 gap-2">
                     <select v-model="activity.type" class="rounded-xl border-slate-200 text-xs"><option v-for="(lb, k) in types" :key="k" :value="k">{{ lb }}</option></select>
-                    <input v-model="activity.next_follow_up" type="date" title="موعد المتابعة التالي" class="rounded-xl border-slate-200 text-xs" />
+                    <DatePicker v-model="activity.next_follow_up" title="موعد المتابعة التالي" class="rounded-xl border-slate-200 text-xs" />
                     <textarea v-model="activity.notes" rows="2" placeholder="ماذا حدث؟" class="col-span-4 rounded-xl border-slate-200 text-xs"></textarea>
                     <button @click="activity.post(route('crm.leads.activities.store', lead.id), { preserveScroll: true, onSuccess: () => activity.reset('notes') })" class="col-span-4 px-3 py-2 rounded-xl bg-slate-800 text-white font-bold">تسجيل نشاط</button>
                 </div>

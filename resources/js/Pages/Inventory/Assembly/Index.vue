@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -57,7 +58,7 @@ const run = () => orderForm.post(route('inventory.assembly.orders.store'), { pre
                 <Field label="قائمة المواد" :error="orderForm.errors.bom_id"><select v-model="orderForm.bom_id" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="b in boms" :key="b.id" :value="b.id">{{ b.name }}</option></select></Field>
                 <Field label="المستودع"><SelectCreate v-model="orderForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" /></Field>
                 <Field label="الكمية المنتجة" :error="orderForm.errors.quantity"><input v-model.number="orderForm.quantity" type="text" inputmode="decimal" data-num step="0.0001" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="التاريخ"><input v-model="orderForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="orderForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <p v-if="orderForm.errors.items" class="text-rose-600">{{ orderForm.errors.items }}</p>
                 <button :disabled="orderForm.processing" class="w-full rounded-xl bg-emerald-600 text-white font-bold py-2">تنفيذ</button>
             </form>

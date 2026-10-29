@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { reactive } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -39,8 +40,8 @@ const apply = () => {
                     <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.code }} - {{ a.name_ar }}</option>
                 </select>
             </label>
-            <label><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.from') }}</span><input v-model="form.start_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
-            <label><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.to') }}</span><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+            <label><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.from') }}</span><DatePicker v-model="form.start_date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+            <label><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.to') }}</span><DatePicker v-model="form.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
             <div class="flex items-end"><button type="submit" class="w-full rounded-xl bg-indigo-600 text-white font-bold py-2 hover:bg-indigo-700">{{ $t('ui.apply') }}</button></div>
         </form>
 

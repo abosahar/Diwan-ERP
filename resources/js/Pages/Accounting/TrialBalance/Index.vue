@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { reactive } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -43,8 +44,8 @@ const isBalanced = () => Math.abs(props.totals.closing_debit - props.totals.clos
         </PageHeader>
 
         <form @submit.prevent="apply" class="bg-white border border-slate-200 rounded-2xl p-4 grid grid-cols-2 md:grid-cols-6 gap-3 text-xs mb-4 print:hidden">
-            <label class="col-span-1"><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.from') }}</span><input v-model="form.start_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
-            <label class="col-span-1"><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.to') }}</span><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+            <label class="col-span-1"><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.from') }}</span><DatePicker v-model="form.start_date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
+            <label class="col-span-1"><span class="block font-bold text-slate-600 mb-1">{{ $t('ui.to') }}</span><DatePicker v-model="form.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></label>
             <label><span class="block font-bold text-slate-600 mb-1">المستوى</span>
                 <select v-model="form.level" class="w-full rounded-xl border-slate-200 text-xs">
                     <option value="">كل المستويات</option>

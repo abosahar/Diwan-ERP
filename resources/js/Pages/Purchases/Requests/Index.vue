@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -34,8 +35,8 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.map((i) => ({ p
         <DocumentTable :paginator="requests" :columns="columns" :filters="filters" :statuses="statuses" search-route="purchases.requests.index" :link="(r) => route('purchases.requests.show', r.id)" />
         <Dialog :show="open" title="طلب شراء" size="xl" @close="open = false">
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <Field label="التاريخ"><input v-model="form.request_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="مطلوب بتاريخ"><input v-model="form.required_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="form.request_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="مطلوب بتاريخ"><DatePicker v-model="form.required_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="ملاحظات"><input v-model="form.notes" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
             <LineItemsEditor v-model="form.items" price-field="purchase_price" price-key="estimated_price" price-label="السعر التقديري" :allow-discount="false" />

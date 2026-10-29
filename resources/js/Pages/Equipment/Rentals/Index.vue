@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { taxRate } from '@/utils/tax';
 import { onMounted, ref, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -89,8 +90,8 @@ onMounted(() => { if (props.prefillEquipment) create(); });
                     <Field :label="`السعر لكل ${bases[form.billing_basis]}`" :error="form.errors.rate"><input v-model.number="form.rate" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field v-if="form.billing_basis === 'hourly'" label="حد أدنى للساعات في اليوم" :error="form.errors.min_hours_per_day" hint="يُحتسب لكل يوم عمل حتى لو قلّت الساعات"><input v-model.number="form.min_hours_per_day" type="text" inputmode="decimal" data-num min="0" max="24" step="0.5" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field v-if="form.type === 'customer'" label="نسبة الضريبة %" :error="form.errors.tax_rate"><input v-model.number="form.tax_rate" type="text" inputmode="decimal" data-num min="0" max="100" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="تاريخ البداية" :error="form.errors.start_date"><input v-model="form.start_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="تاريخ النهاية (اختياري)" :error="form.errors.end_date"><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="تاريخ البداية" :error="form.errors.start_date"><DatePicker v-model="form.start_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="تاريخ النهاية (اختياري)" :error="form.errors.end_date"><DatePicker v-model="form.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="موقع العمل" class="md:col-span-2"><input v-model="form.site" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
                 <label class="flex items-center gap-2 font-bold text-slate-700"><input v-model="form.with_operator" type="checkbox" class="rounded border-slate-300" /> مع مشغّل</label>

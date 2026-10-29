@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { computed, ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -41,7 +42,7 @@ const masterTypes = computed(() => props.types.filter((t) => !t.opening));
                     <p class="text-indigo-800/80 mt-1">تُرحَّل الأرصدة مقابل حساب «أرصدة افتتاحية» بتاريخ بدء التشغيل، وللسجلات الجديدة فقط. بعد الخطوات الأربع يجب أن يصبح رصيد حساب الأرصدة الافتتاحية مساوياً لحقوق الملكية الافتتاحية.</p>
                 </div>
                 <label class="flex items-center gap-2 font-bold text-indigo-900">تاريخ بدء التشغيل
-                    <input v-model="openingDate" type="date" class="rounded-xl border-indigo-200 text-xs" />
+                    <DatePicker v-model="openingDate" class="rounded-xl border-indigo-200 text-xs" />
                 </label>
             </div>
             <ol class="space-y-2">

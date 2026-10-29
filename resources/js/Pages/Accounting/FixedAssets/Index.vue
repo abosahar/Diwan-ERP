@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ImportButton from '@/Components/UI/ImportButton.vue';
 import { computed, ref, reactive } from 'vue';
@@ -97,7 +98,7 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
                 <Field label="الرقم التسلسلي"><input v-model="assetForm.serial_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الموقع"><input v-model="assetForm.location" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="مركز التكلفة"><SelectCreate v-model="assetForm.cost_center_id" :options="costCenters" entity="cost_center" label="name_ar" placeholder="—" /></Field>
-                <Field label="تاريخ الشراء" :error="assetForm.errors.acquisition_date"><input v-model="assetForm.acquisition_date" type="date" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الشراء" :error="assetForm.errors.acquisition_date"><DatePicker v-model="assetForm.acquisition_date" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="التكلفة" :error="assetForm.errors.cost"><input v-model.number="assetForm.cost" type="text" inputmode="decimal" data-num step="0.01" required class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="القيمة التخريدية" :error="assetForm.errors.salvage_value"><input v-model.number="assetForm.salvage_value" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="العمر الإنتاجي (شهر)" hint="فارغ = حسب الفئة"><input v-model.number="assetForm.useful_life_months" type="text" inputmode="decimal" data-num class="w-full rounded-xl border-slate-200 text-xs" /></Field>
@@ -136,7 +137,7 @@ const statusLabel = { active: 'نشط', fully_depreciated: 'مهلك بالكا�
         </Dialog>
 
         <Dialog :show="depreciateOpen" title="ترحيل الإهلاك الشهري" size="sm" @close="depreciateOpen = false">
-            <Field label="الشهر" hint="يتم ترحيل إهلاك كل الأصول النشطة لهذا الشهر (لا يتكرر لنفس الشهر)"><input v-model="depreciateForm.month" type="month" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+            <Field label="الشهر" hint="يتم ترحيل إهلاك كل الأصول النشطة لهذا الشهر (لا يتكرر لنفس الشهر)"><DatePicker v-model="depreciateForm.month" type="month" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             <template #footer>
                 <button @click="runDepreciation" :disabled="depreciateForm.processing" class="px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold">ترحيل</button>
             </template>

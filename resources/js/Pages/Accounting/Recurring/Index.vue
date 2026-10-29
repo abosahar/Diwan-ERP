@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref, computed } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
@@ -50,8 +51,8 @@ const freq = { monthly: 'شهري', quarterly: 'ربع سنوي', yearly: 'سن�
                 <Field label="الاسم" :error="form.errors.name"><input v-model="form.name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <label class="flex items-center gap-2 text-xs col-span-full"><input v-model="form.auto_reverse" type="checkbox" class="rounded" /> قيد استحقاق: يُعكس تلقائياً في اليوم التالي</label>
                 <Field label="التكرار"><select v-model="form.frequency" class="w-full rounded-xl border-slate-200 text-xs"><option v-for="(l, k) in freq" :key="k" :value="k">{{ l }}</option></select></Field>
-                <Field label="أول تشغيل"><input v-model="form.next_run_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="ينتهي في (اختياري)"><input v-model="form.end_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="أول تشغيل"><DatePicker v-model="form.next_run_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="ينتهي في (اختياري)"><DatePicker v-model="form.end_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <div class="col-span-2 md:col-span-4"><Field label="بيان القيد" :error="form.errors.description"><input v-model="form.description" class="w-full rounded-xl border-slate-200 text-xs" /></Field></div>
             </div>
             <div class="overflow-x-auto"><table class="w-full text-xs">

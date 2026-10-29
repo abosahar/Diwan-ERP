@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -41,11 +42,11 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
                     <Field label="الجنسية (رمز دولة)" :error="form.errors.nationality"><input v-model="form.nationality" maxlength="2" :class="input" class="uppercase font-mono" /></Field>
                     <Field label="نوع الهوية"><select v-model="form.id_type" :class="input"><option value="national_id">هوية وطنية</option><option value="iqama">إقامة</option><option value="border_number">رقم حدود</option></select></Field>
                     <Field label="رقم الهوية / الإقامة"><input v-model="form.national_id" :class="input" class="font-mono" /></Field>
-                    <Field label="انتهاء الهوية / الإقامة"><input v-model="form.id_expiry" type="date" :class="input" /></Field>
+                    <Field label="انتهاء الهوية / الإقامة"><DatePicker v-model="form.id_expiry" :class="input" /></Field>
                     <Field label="الجنس"><select v-model="form.gender" :class="input"><option value="">—</option><option value="M">ذكر</option><option value="F">أنثى</option></select></Field>
                     <Field label="رقم الجواز"><input v-model="form.passport_number" :class="input" /></Field>
-                    <Field label="انتهاء الجواز"><input v-model="form.passport_expiry" type="date" :class="input" /></Field>
-                    <Field label="تاريخ الميلاد"><input v-model="form.birth_date" type="date" :class="input" /></Field>
+                    <Field label="انتهاء الجواز"><DatePicker v-model="form.passport_expiry" :class="input" /></Field>
+                    <Field label="تاريخ الميلاد"><DatePicker v-model="form.birth_date" :class="input" /></Field>
                     <Field label="الجوال"><input v-model="form.phone" :class="input" /></Field>
                     <Field label="البريد" :error="form.errors.email" class="md:col-span-2"><input v-model="form.email" :class="input" /></Field>
                     <Field label="حساب المستخدم (للخدمة الذاتية)" class="md:col-span-2"><select v-model="form.user_id" :class="input"><option value="">—</option><option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }} ({{ u.email }})</option></select></Field>
@@ -62,10 +63,10 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
                     <Field label="الفرع"><select v-model="form.branch_id" :class="input"><option value="">—</option><option v-for="x in branches" :key="x.id" :value="x.id">{{ x.name_ar }}</option></select></Field>
                     <Field label="الوردية"><SelectCreate v-model="form.shift_id" :options="shifts" entity="shift" label="name" placeholder="الافتراضية" /></Field>
                     <Field label="مركز التكلفة" hint="لتحميل الراتب على مشروع/إدارة"><SelectCreate v-model="form.cost_center_id" :options="costCenters" entity="cost_center" :label="(x) => `${x.code} ${x.name_ar}`" placeholder="—" /></Field>
-                    <Field label="تاريخ المباشرة" :error="form.errors.hire_date"><input v-model="form.hire_date" type="date" :class="input" /></Field>
+                    <Field label="تاريخ المباشرة" :error="form.errors.hire_date"><DatePicker v-model="form.hire_date" :class="input" /></Field>
                     <Field label="نوع العقد"><select v-model="form.contract_type" :class="input"><option value="unlimited">غير محدد المدة</option><option value="limited">محدد المدة</option></select></Field>
-                    <Field label="نهاية العقد" :error="form.errors.contract_end"><input v-model="form.contract_end" type="date" :class="input" /></Field>
-                    <Field label="نهاية التجربة"><input v-model="form.probation_end" type="date" :class="input" /></Field>
+                    <Field label="نهاية العقد" :error="form.errors.contract_end"><DatePicker v-model="form.contract_end" :class="input" /></Field>
+                    <Field label="نهاية التجربة"><DatePicker v-model="form.probation_end" :class="input" /></Field>
                     <Field label="الحالة"><select v-model="form.status" :class="input"><option value="active">على رأس العمل</option><option value="on_leave">في إجازة</option><option value="suspended">موقوف</option><option value="terminated">منتهية خدمته</option></select></Field>
                 </div>
             </div>
@@ -77,12 +78,12 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
                     <Field label="بدل النقل"><input v-model.number="form.transport_allowance" type="text" inputmode="decimal" data-num step="0.01" :class="input" class="font-mono" /></Field>
                     <Field label="بدلات أخرى" :hint="`الإجمالي: ${money(total())}`"><input v-model.number="form.other_allowances" type="text" inputmode="decimal" data-num step="0.01" :class="input" class="font-mono" /></Field>
                     <template v-if="payChanged()">
-                        <Field label="تاريخ سريان تعديل الراتب" :error="form.errors.salary_effective_date" hint="يُجزّأ المسير إن كان التاريخ في منتصف الشهر"><input v-model="form.salary_effective_date" type="date" :class="input" /></Field>
+                        <Field label="تاريخ سريان تعديل الراتب" :error="form.errors.salary_effective_date" hint="يُجزّأ المسير إن كان التاريخ في منتصف الشهر"><DatePicker v-model="form.salary_effective_date" :class="input" /></Field>
                         <Field label="سبب التعديل" class="md:col-span-3"><input v-model="form.salary_change_reason" placeholder="زيادة سنوية، ترقية..." :class="input" /></Field>
                     </template>
                     <label v-if="$feature('gosi')" class="text-xs flex items-center gap-2"><input v-model="form.gosi_registered" type="checkbox" class="rounded" /> مسجل في التأمينات</label>
                     <Field v-if="$feature('gosi')" label="رقم التأمينات"><input v-model="form.gosi_number" :class="input" /></Field>
-                    <Field v-if="$feature('gosi')" label="تاريخ أول تسجيل" hint="من 3 يوليو 2024 تُطبّق نسب النظام الجديد"><input v-model="form.gosi_join_date" type="date" :class="input" /></Field>
+                    <Field v-if="$feature('gosi')" label="تاريخ أول تسجيل" hint="من 3 يوليو 2024 تُطبّق نسب النظام الجديد"><DatePicker v-model="form.gosi_join_date" :class="input" /></Field>
                     <Field label="أيام الإجازة السنوية"><input v-model.number="form.annual_leave_days" type="text" inputmode="decimal" data-num min="21" :class="input" /></Field>
                     <Field label="رصيد إجازات افتتاحي"><input v-model.number="form.leave_opening_balance" type="text" inputmode="decimal" data-num step="0.5" :class="input" /></Field>
                     <Field label="البنك"><input v-model="form.bank_name" :class="input" /></Field>

@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
@@ -620,28 +621,22 @@ const importLines = (lines, replace) => {
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
                             <div>
                                 <label class="block font-bold text-slate-600 mb-1">تاريخ الفاتورة</label>
-                                <input 
+                                <DatePicker 
                                     v-model="form.invoice_date" 
-                                    type="date" 
                                     required 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
+                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500" />
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-600 mb-1">تاريخ الاستحقاق</label>
-                                <input 
+                                <DatePicker 
                                     v-model="form.due_date" 
-                                    type="date" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
+                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500" />
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-600 mb-1">تاريخ استلام البضاعة</label>
-                                <input 
+                                <DatePicker 
                                     v-model="form.supply_date" 
-                                    type="date" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500"
-                                />
+                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500" />
                             </div>
                         </div>
                         <CurrencyPicker v-model:code="form.currency_code" v-model:rate="form.exchange_rate" :errors="form.errors" class="pt-2" />

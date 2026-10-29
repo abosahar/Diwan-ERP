@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -47,7 +48,7 @@ const card = 'bg-white border border-slate-200/80 rounded-2xl p-5';
                     <tr v-if="!o.receipts.length"><td colspan="5" class="p-4 text-center text-slate-400">لا استلامات.</td></tr></tbody></table>
                 <form v-if="['sent', 'partially_received'].includes(o.status) && $can('manufacturing.subcontracting.post')" @submit.prevent="receive" class="grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
                     <input v-model.number="rec.quantity" type="text" inputmode="decimal" data-num step="0.0001" :placeholder="`الكمية (المتبقي ${num(left)})`" :class="input" required />
-                    <input v-model="rec.date" type="date" :class="input" />
+                    <DatePicker v-model="rec.date" :class="input" />
                     <button type="submit" :disabled="rec.processing" class="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">استلام</button>
                     <p v-if="rec.errors.quantity || rec.errors.order" class="col-span-3 text-xs text-rose-600">{{ rec.errors.quantity || rec.errors.order }}</p>
                 </form>

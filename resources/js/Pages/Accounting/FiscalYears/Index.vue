@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ref } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -24,7 +25,7 @@ const expanded = ref(null);
         <PageHeader title="السنوات والفترات المالية" subtitle="إغلاق الفترات يمنع الترحيل بتواريخها، والإقفال السنوي يرحل نتيجة السنة للأرباح المحتجزة" :crumbs="[{ label: 'المحاسبة' }, { label: 'السنوات المالية' }]">
             <template #actions>
                 <form v-if="$can('accounting.fiscal_years.create')" @submit.prevent="create" class="flex items-center gap-2 text-xs">
-                    <input v-model="form.start_date" type="date" class="rounded-xl border-slate-200 text-xs" />
+                    <DatePicker v-model="form.start_date" class="rounded-xl border-slate-200 text-xs" />
                     <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">إنشاء سنة مالية</button>
                 </form>
             </template>

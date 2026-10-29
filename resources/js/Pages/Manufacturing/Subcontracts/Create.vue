@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -30,8 +31,8 @@ const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-60
                 <Field label="مستودع صرف الخامات *"><SelectCreate v-model="form.source_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required /></Field>
                 <Field label="مستودع «عند المصنّع» *" hint="مستودع يمثل ما في حوزة المصنّع" :error="form.errors.vendor_warehouse_id"><SelectCreate v-model="form.vendor_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="— اختر —" required /></Field>
                 <Field label="مستودع المنتج التام *"><SelectCreate v-model="form.output_warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" required /></Field>
-                <Field label="تاريخ الأمر *"><input v-model="form.order_date" type="date" :class="input" /></Field>
-                <Field label="موعد التسليم" :error="form.errors.expected_date"><input v-model="form.expected_date" type="date" :class="input" /></Field>
+                <Field label="تاريخ الأمر *"><DatePicker v-model="form.order_date" :class="input" /></Field>
+                <Field label="موعد التسليم" :error="form.errors.expected_date"><DatePicker v-model="form.expected_date" :class="input" /></Field>
             </div>
             <Field label="ملاحظات"><textarea v-model="form.notes" rows="2" :class="input"></textarea></Field>
             <div class="flex gap-2 pt-2 border-t border-slate-100"><button type="submit" :disabled="form.processing" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold disabled:opacity-50">إنشاء الأمر</button><Link :href="route('manufacturing.subcontracts.index')" class="px-6 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">إلغاء</Link></div>

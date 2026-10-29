@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { confirmAction } from '@/composables/useDialog';
 import { ref } from 'vue';
@@ -94,7 +95,7 @@ const remove = async (url, message) => { if (await confirmAction(message, { dang
 
         <Dialog :show="payOpen" title="صرف الرواتب" @close="payOpen = false">
             <div class="grid grid-cols-2 gap-3">
-                <Field label="تاريخ الصرف"><input v-model="payForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الصرف"><DatePicker v-model="payForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="الحساب البنكي"><SelectCreate v-model="payForm.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الافتراضي" /></Field>
             </div>
             <p class="text-xs mt-2">المبلغ: <b class="font-mono">{{ money(payroll.net_total) }}</b></p>

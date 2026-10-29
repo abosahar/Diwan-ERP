@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { reactive } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { confirmAction } from '@/composables/useDialog';
@@ -52,11 +53,11 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
                         <input v-model.number="forms['hr.gosi'][k]" type="text" inputmode="decimal" data-num step="0.01" :class="inp" />
                         <span v-if="err(k)" class="text-rose-600">{{ err(k)[0] }}</span>
                     </label>
-                    <label class="block">بدء النظام الجديد (المشتركون الجدد)<input v-model="forms['hr.gosi'].new_law_start" type="date" :class="inp" /></label>
+                    <label class="block">بدء النظام الجديد (المشتركون الجدد)<DatePicker v-model="forms['hr.gosi'].new_law_start" :class="inp" /></label>
                 </div>
                 <h4 class="font-bold mt-4 mb-2">تدرّج نسبة المعاش للمشتركين الجدد (لكل طرف)</h4>
                 <div v-for="(row, i) in forms['hr.gosi'].new_entrant_annuity" :key="i" class="flex gap-2 mb-1.5 items-center">
-                    <span>من</span><input v-model="row.from" type="date" class="rounded-xl border-slate-200 text-xs" />
+                    <span>من</span><DatePicker v-model="row.from" class="rounded-xl border-slate-200 text-xs" />
                     <input v-model.number="row.rate" type="text" inputmode="decimal" data-num step="0.01" class="w-24 rounded-xl border-slate-200 text-xs font-mono" /><span>%</span>
                     <button @click="forms['hr.gosi'].new_entrant_annuity.splice(i, 1)" class="text-rose-600">✕</button>
                 </div>
@@ -135,8 +136,8 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
                 <div class="flex flex-wrap gap-1.5 mb-2"><button v-for="p in presets" :key="p[0]" @click="usePreset(p)" class="px-2 py-1 rounded-lg border border-slate-200">{{ p[0] }}</button></div>
                 <div v-if="$can('hr.settings.manage')" class="grid grid-cols-2 sm:grid-cols-4 gap-2 items-end">
                     <input v-model="holiday.name" placeholder="الاسم" class="col-span-2 sm:col-span-1 rounded-xl border-slate-200 text-xs" />
-                    <input v-model="holiday.start_date" type="date" class="rounded-xl border-slate-200 text-xs" />
-                    <input v-model="holiday.end_date" type="date" class="rounded-xl border-slate-200 text-xs" />
+                    <DatePicker v-model="holiday.start_date" class="rounded-xl border-slate-200 text-xs" />
+                    <DatePicker v-model="holiday.end_date" class="rounded-xl border-slate-200 text-xs" />
                     <button @click="holiday.post(route('hr.holidays.store'), { preserveScroll: true, onSuccess: () => holiday.reset() })" :disabled="holiday.processing" class="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">إضافة</button>
                 </div>
                 <p v-for="k in ['name', 'start_date', 'end_date']" :key="k" class="text-rose-600">{{ holiday.errors[k] }}</p>

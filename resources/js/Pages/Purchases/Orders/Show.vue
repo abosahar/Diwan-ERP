@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
@@ -89,7 +90,7 @@ const receive = () => form.transform((d) => ({ ...d, lines: d.lines.map(({ name,
         </div>
         <Dialog :show="open" title="استلام بضاعة (GRN)" size="xl" @close="open = false">
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <Field label="تاريخ الاستلام"><input v-model="form.receipt_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ الاستلام"><DatePicker v-model="form.receipt_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المستودع"><SelectCreate v-model="form.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="رقم إشعار تسليم المورد"><input v-model="form.supplier_delivery_number" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
@@ -100,7 +101,7 @@ const receive = () => form.transform((d) => ({ ...d, lines: d.lines.map(({ name,
                     <td class="text-center font-mono">{{ qty(l.open) }}</td>
                     <td><input v-model.number="l.quantity" type="text" inputmode="decimal" data-num min="0" step="0.0001" class="w-full rounded-lg border-slate-200 text-xs font-mono" /></td>
                     <td><input v-model="l.batch_number" class="w-full rounded-lg border-slate-200 text-xs" /></td>
-                    <td><input v-model="l.expiry_date" type="date" class="w-full rounded-lg border-slate-200 text-xs" /></td>
+                    <td><DatePicker v-model="l.expiry_date" class="w-full rounded-lg border-slate-200 text-xs" /></td>
                 </tr>
             </table></div>
             <p v-for="(msg, key) in form.errors" :key="key" class="text-xs text-rose-600 mt-1">{{ msg }}</p>

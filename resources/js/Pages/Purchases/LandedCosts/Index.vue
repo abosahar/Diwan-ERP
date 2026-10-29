@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -37,7 +38,7 @@ const save = () => form.post(route('purchases.landed-costs.store'), { onSuccess:
                     <select v-model="form.purchase_invoice_id" class="w-full rounded-xl border-slate-200 text-xs"><option value="">اختر...</option><option v-for="i in invoices" :key="i.id" :value="i.id">{{ i.invoice_number }} {{ i.supplier_invoice_number ? `(${i.supplier_invoice_number})` : '' }}</option></select>
                 </Field>
                 <Field label="البيان" :error="form.errors.description" class="col-span-2"><input v-model="form.description" placeholder="شحن بحري، رسوم جمركية..." class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                <Field label="التاريخ"><input v-model="form.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="form.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المبلغ قبل الضريبة" :error="form.errors.amount"><input v-model.number="form.amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="ضريبة المدخلات"><input v-model.number="form.tax_amount" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="السداد"><select v-model="form.paid_from" class="w-full rounded-xl border-slate-200 text-xs"><option value="payables">آجل على مورد الخدمة</option><option value="cash">نقدي</option><option value="bank_transfer">بنكي</option></select></Field>

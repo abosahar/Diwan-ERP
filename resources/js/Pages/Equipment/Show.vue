@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { taxRate } from '@/utils/tax';
 import { computed, ref } from 'vue';
 import axios from 'axios';
@@ -256,7 +257,7 @@ const saveSupplier = () => supplierForm.post(route('equipment.supplier.bill', e.
                 </div>
                 <p class="font-bold text-slate-700">آخر تنفيذ <span class="font-normal text-slate-400">(فارغ = القراءة الحالية واليوم)</span></p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Field label="التاريخ"><input v-model="scheduleForm.last_done_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="التاريخ"><DatePicker v-model="scheduleForm.last_done_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field v-if="usesHours" label="عند قراءة ساعات"><input v-model.number="scheduleForm.last_done_hours" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field v-if="usesKm" label="عند قراءة كم"><input v-model.number="scheduleForm.last_done_km" type="text" inputmode="decimal" data-num min="0" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 </div>
@@ -270,8 +271,8 @@ const saveSupplier = () => supplierForm.post(route('equipment.supplier.bill', e.
         <Dialog :show="supplierOpen" title="تسجيل إيجار المورد" size="md" @close="supplierOpen = false">
             <div class="space-y-3 text-xs">
                 <div class="grid grid-cols-2 gap-3">
-                    <Field label="من" :error="supplierForm.errors.period_from"><input v-model="supplierForm.period_from" @change="loadSupplierPreview" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="إلى" :error="supplierForm.errors.period_to"><input v-model="supplierForm.period_to" @change="loadSupplierPreview" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="من" :error="supplierForm.errors.period_from"><DatePicker v-model="supplierForm.period_from" @change="loadSupplierPreview" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="إلى" :error="supplierForm.errors.period_to"><DatePicker v-model="supplierForm.period_to" @change="loadSupplierPreview" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field :label="`الكمية (${lookups.bases[e.supplier_rate_basis] || ''})`" :error="supplierForm.errors.quantity" hint="فارغ = المحسوب أدناه"><input v-model.number="supplierForm.quantity" type="text" inputmode="decimal" data-num min="0" step="0.01" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="نسبة الضريبة %"><input v-model.number="supplierForm.tax_rate" @change="loadSupplierPreview" type="text" inputmode="decimal" data-num min="0" max="100" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="رقم فاتورة المورد" class="col-span-2"><input v-model="supplierForm.reference" class="w-full rounded-xl border-slate-200 text-xs" /></Field>

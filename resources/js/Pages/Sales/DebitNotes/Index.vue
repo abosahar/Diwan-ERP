@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import { taxRate } from '@/utils/tax';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { ref } from 'vue';
@@ -38,7 +39,7 @@ const save = () => form.post(route('sales.debit-notes.store'), { onSuccess: () =
         <Dialog :show="open" title="إشعار مدين" @close="open = false">
             <div class="grid grid-cols-2 gap-3">
                 <Field label="العميل" :error="form.errors.customer_id" class="col-span-2"><PartyPicker v-model="form.customer_id" /></Field>
-                <Field label="التاريخ"><input v-model="form.debit_note_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="form.debit_note_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="رقم الفاتورة المرتبطة (اختياري)" :error="form.errors.invoice_id"><input v-model.number="form.invoice_id" type="text" inputmode="decimal" data-num placeholder="معرّف الفاتورة" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المبلغ قبل الضريبة" :error="form.errors.subtotal"><input v-model.number="form.subtotal" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>
                 <Field label="نسبة الضريبة"><input v-model.number="form.tax_rate" type="text" inputmode="decimal" data-num step="0.01" class="w-full rounded-xl border-slate-200 text-xs font-mono" /></Field>

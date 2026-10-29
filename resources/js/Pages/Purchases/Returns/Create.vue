@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
@@ -35,7 +36,7 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.filter((i) => N
                         <option v-for="inv in recentInvoices" :key="inv.id" :value="inv.id">{{ inv.invoice_number }} — {{ inv.supplier?.name }} ({{ money(inv.total) }})</option>
                     </select>
                 </Field>
-                <Field label="التاريخ"><input v-model="form.return_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="التاريخ"><DatePicker v-model="form.return_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="التسوية">
                     <select v-model="form.settlement" class="w-full rounded-xl border-slate-200 text-xs"><option value="credit">تخفيض رصيد المورد</option><option value="cash">استرداد نقدي</option><option value="bank_transfer">استرداد بنكي</option></select>
                 </Field>

@@ -116,4 +116,20 @@ class QuickCreateTest extends TestCase
             }
         }
     }
+
+    /** Dates use the app's DatePicker and numbers a data-num text field (Western digits) — never the browser's own widgets. */
+    public function test_no_native_date_or_number_inputs(): void
+    {
+        $offenders = [];
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(resource_path('js')));
+        foreach ($files as $file) {
+            if ($file->getExtension() !== 'vue' || str_ends_with($file->getPathname(), 'UI/DatePicker.vue')) {
+                continue;
+            }
+            if (preg_match('/<input\b[^>]*\btype="(date|month|number)"/s', file_get_contents($file->getPathname()), $m)) {
+                $offenders[] = str_replace(resource_path('js').'/', '', $file->getPathname()).' ('.$m[1].')';
+            }
+        }
+        $this->assertSame([], $offenders, "Use <DatePicker> for dates and type=\"text\" inputmode=\"decimal\" data-num for numbers:\n".implode("\n", $offenders));
+    }
 }

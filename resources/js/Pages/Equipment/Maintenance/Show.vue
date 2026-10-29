@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, ref } from 'vue';
 import axios from 'axios';
@@ -82,7 +83,7 @@ const remove = () => confirm('حذف أمر الصيانة؟') && router.delete(
                     <div class="flex flex-wrap items-end gap-2">
                         <h4 class="font-black text-slate-700 flex-1">صرف من المستودع</h4>
                         <Field label="المستودع" :error="issueForm.errors.warehouse_id"><SelectCreate v-model="issueForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" :allow-empty="false" /></Field>
-                        <Field label="تاريخ الصرف"><input v-model="issueForm.date" type="date" class="rounded-xl border-slate-200 text-xs" /></Field>
+                        <Field label="تاريخ الصرف"><DatePicker v-model="issueForm.date" class="rounded-xl border-slate-200 text-xs" /></Field>
                     </div>
                     <div v-for="(l, i) in issueForm.lines" :key="i" class="grid grid-cols-12 gap-2 items-start">
                         <div class="col-span-7"><ProductPicker v-model="l.product_id" :initial="products[l.product_id] || null" @select="onPick(i, $event)" /></div>
@@ -118,7 +119,7 @@ const remove = () => confirm('حذف أمر الصيانة؟') && router.delete(
                 <div v-if="isOpen && $can('equipment.maintenance.complete')" class="border-t border-dashed border-slate-200 pt-3 grid grid-cols-2 gap-3">
                     <Field v-if="usesHours" label="عداد الساعات عند الإكمال" :error="completeForm.errors.hours_reading"><input v-model.number="completeForm.hours_reading" type="text" inputmode="decimal" data-num min="0" step="0.1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field v-if="usesKm" label="الكيلومترات عند الإكمال" :error="completeForm.errors.km_reading"><input v-model.number="completeForm.km_reading" type="text" inputmode="decimal" data-num min="0" step="0.1" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
-                    <Field label="تاريخ الإكمال"><input v-model="completeForm.date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                    <Field label="تاريخ الإكمال"><DatePicker v-model="completeForm.date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                     <Field label="ملاحظات الفني" class="col-span-2"><textarea v-model="completeForm.notes" rows="2" class="w-full rounded-xl border-slate-200 text-xs"></textarea></Field>
                     <p v-if="completeForm.errors.status" class="col-span-2 text-rose-600">{{ completeForm.errors.status }}</p>
                     <button type="button" @click="complete" :disabled="completeForm.processing" class="col-span-2 py-2 rounded-xl bg-emerald-600 text-white font-bold disabled:opacity-50">إكمال الصيانة ({{ checked.length }} بند)</button>

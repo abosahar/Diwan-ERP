@@ -1,4 +1,5 @@
 <script setup>
+import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import { computed, ref } from 'vue';
@@ -91,7 +92,7 @@ const act = (name, message) => { if (!message || confirm(message)) router.post(r
 
         <Dialog :show="showDeliver" title="إذن تسليم بضاعة" size="lg" @close="showDeliver = false">
             <div class="grid grid-cols-3 gap-3 mb-3">
-                <Field label="تاريخ التسليم"><input v-model="deliverForm.delivery_date" type="date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
+                <Field label="تاريخ التسليم"><DatePicker v-model="deliverForm.delivery_date" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
                 <Field label="المستودع"><SelectCreate v-model="deliverForm.warehouse_id" :options="warehouses" entity="warehouse" label="name_ar" placeholder="الافتراضي" /></Field>
                 <Field label="المستلم"><input v-model="deliverForm.receiver_name" class="w-full rounded-xl border-slate-200 text-xs" /></Field>
             </div>
