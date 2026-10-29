@@ -13,21 +13,33 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 /**
  * First run of a local install: one form creates the company and its owner,
  * then the page closes for good (it only exists while there is no company).
+ * The server answers the whole office network, so until then only the computer
+ * it runs on may open the page: another device must not become the owner first.
  */
 class LocalSetupController extends Controller
 {
+    private const ELSEWHERE = 'يُكمَل الإعداد الأول من الجهاز الذي ثُبّت عليه الديوان (اختصار «الديوان» على سطح مكتبه)، ثم تفتحه بقية الأجهزة.';
+
     public static function isOpen(): bool
     {
         return config('app.local_install') && ! Company::query()->exists();
     }
 
-    public function create(): Response
+    /** The connection itself, not a forwarded header: a local install has no proxy in front. */
+    protected static function fromThisComputer(Request $request): bool
+    {
+        return IpUtils::checkIp((string) $request->server('REMOTE_ADDR'), ['127.0.0.0/8', '::1', '::ffff:127.0.0.0/104']);
+    }
+
+    public function create(Request $request): Response
     {
         abort_unless(self::isOpen(), 404);
+        abort_unless(self::fromThisComputer($request), 403, self::ELSEWHERE);
 
         return Inertia::render('Auth/LocalSetup', [
             'countries' => collect(config('countries'))->map(fn ($c, $code) => ['code' => $code, 'name' => $c['name'], 'currency' => $c['currency'],
@@ -39,6 +51,7 @@ class LocalSetupController extends Controller
     public function store(Request $request): RedirectResponse
     {
         abort_unless(self::isOpen(), 404);
+        abort_unless(self::fromThisComputer($request), 403, self::ELSEWHERE);
 
         $data = $request->validate([
             'company_name' => 'required|string|max:255',
