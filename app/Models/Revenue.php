@@ -16,6 +16,7 @@ class Revenue extends Model
     protected $fillable = [
         'branch_id',
         'cost_center_id',
+        'project_id',
         'company_id',
         'account_id',
         'bank_account_id',

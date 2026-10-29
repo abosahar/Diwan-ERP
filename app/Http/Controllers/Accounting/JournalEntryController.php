@@ -7,8 +7,10 @@ use App\Models\Account;
 use App\Models\CostCenter;
 use App\Models\Customer;
 use App\Models\JournalEntry;
+use App\Models\Project;
 use App\Models\Supplier;
 use App\Services\Accounting\AccountMap;
+use App\Services\Accounting\DimensionPolicy;
 use App\Services\Accounting\PostingService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -70,6 +72,8 @@ class JournalEntryController extends Controller
         return Inertia::render('Accounting/Journals/Form', [
             'accounts' => Account::where('is_parent', false)->where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar', 'type', 'requires_cost_center']),
             'costCenters' => CostCenter::where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar']),
+            'projects' => Project::orderBy('name')->get(['id', 'name']),
+            'dimensionPolicy' => app(DimensionPolicy::class)->modes(),
             'customers' => Customer::orderBy('name')->get(['id', 'name']),
             'suppliers' => Supplier::orderBy('name')->get(['id', 'name']),
             'partyAccounts' => collect(self::PARTY_ROLES)->mapWithKeys(fn ($type, $role) => [(string) $this->map->find($role) => $type])->except(''),
@@ -87,6 +91,7 @@ class JournalEntryController extends Controller
             'lines' => 'required|array|min:2|max:500',
             'lines.*.account_id' => 'required|tenant_exists:accounts,id',
             'lines.*.cost_center_id' => 'nullable|tenant_exists:cost_centers,id',
+            'lines.*.project_id' => 'nullable|tenant_exists:projects,id',
             'lines.*.description' => 'nullable|string|max:500',
             'lines.*.debit' => 'required|numeric|min:0',
             'lines.*.credit' => 'required|numeric|min:0',
@@ -110,6 +115,9 @@ class JournalEntryController extends Controller
             'lines' => collect($validated['lines'])->map(fn ($line) => [
                 'account_id' => (int) $line['account_id'],
                 'cost_center_id' => $line['cost_center_id'] ?? null,
+                'project_id' => $line['project_id'] ?? null,
+                // Hand-made opening entries are exempt from the dimension policy.
+                'dimensions' => ($validated['entry_type'] ?? 'manual') !== 'opening',
                 'description' => $line['description'] ?? $validated['description'],
                 'debit' => (float) $line['debit'],
                 'credit' => (float) $line['credit'],

@@ -6,11 +6,14 @@ import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
+import { dimensionRequired } from '@/utils/dimensions';
 import { PlusIcon, TrashIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     accounts: Array,
     costCenters: Array,
+    projects: { type: Array, default: () => [] },
+    dimensionPolicy: { type: Object, default: () => ({}) },
     customers: { type: Array, default: () => [] },
     suppliers: { type: Array, default: () => [] },
     partyAccounts: { type: Object, default: () => ({}) },
@@ -26,7 +29,10 @@ const syncParty = (line) => {
     }
 };
 
-const blankLine = (i = 0) => ({ account_id: props.accounts?.[i]?.id || '', cost_center_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 });
+const accountOf = (line) => props.accounts?.find((a) => a.id === line.account_id);
+const needs = (line, dimension) => dimensionRequired(props.dimensionPolicy, dimension, accountOf(line));
+
+const blankLine = (i = 0) => ({ account_id: props.accounts?.[i]?.id || '', cost_center_id: '', project_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 });
 
 const form = useForm({
     date: new Date().toISOString().split('T')[0],
@@ -56,7 +62,7 @@ const submitEntry = (saveAs = 'posted') => {
 const formatCurrency = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const importLines = (lines, replace) => {
-    const rows = lines.map((l) => ({ account_id: l.account_id, cost_center_id: l.cost_center_id || '', party_type: '', party_id: '', description: l.description || '', debit: l.debit, credit: l.credit }));
+    const rows = lines.map((l) => ({ account_id: l.account_id, cost_center_id: l.cost_center_id || '', project_id: '', party_type: '', party_id: '', description: l.description || '', debit: l.debit, credit: l.credit }));
     form.lines = replace ? rows : [...form.lines.filter((l) => Number(l.debit) || Number(l.credit)), ...rows];
 };
 </script>
@@ -114,6 +120,7 @@ const importLines = (lines, replace) => {
                                     <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
                                         <th class="py-2.5 px-3 text-start">الحساب المحاسبي</th>
                                         <th class="py-2.5 px-3 text-start">مركز التكلفة</th>
+                                        <th class="py-2.5 px-3 text-start">المشروع</th>
                                         <th class="py-2.5 px-3 text-start">شرح البند</th>
                                         <th class="py-2.5 px-3 text-end w-28">مدين (Debit)</th>
                                         <th class="py-2.5 px-3 text-end w-28">دائن (Credit)</th>
@@ -127,7 +134,13 @@ const importLines = (lines, replace) => {
                                             <SelectCreate v-if="partyType(line)" v-model="line.party_id" :options="partyType(line) === 'customer' ? customers : suppliers" :entity="partyType(line)" label="name" :placeholder="partyType(line) === 'customer' ? '— اختر العميل —' : '— اختر المورد —'" :allow-empty="false" required class="mt-1" />
                                         </td>
                                         <td class="p-2">
-                                            <SelectCreate v-model="line.cost_center_id" :options="costCenters" entity="cost_center" :label="(cc) => `${cc.code} - ${cc.name_ar}`" placeholder="—" />
+                                            <SelectCreate v-model="line.cost_center_id" :options="costCenters" entity="cost_center" :label="(cc) => `${cc.code} - ${cc.name_ar}`" :placeholder="needs(line, 'cost_center') ? 'مطلوب *' : '—'" :allow-empty="!needs(line, 'cost_center')" />
+                                        </td>
+                                        <td class="p-2">
+                                            <select v-model="line.project_id" class="w-full py-1 px-2 bg-slate-50 border rounded-lg text-3xs" :class="needs(line, 'project') && !line.project_id ? 'border-rose-300' : 'border-slate-200'">
+                                                <option value="">{{ needs(line, 'project') ? 'مطلوب *' : '—' }}</option>
+                                                <option v-for="pr in projects" :key="pr.id" :value="pr.id">{{ pr.name }}</option>
+                                            </select>
                                         </td>
                                         <td class="p-2">
                                             <input 

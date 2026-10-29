@@ -1,4 +1,5 @@
 <script setup>
+import DimensionFields from '@/Components/Documents/DimensionFields.vue';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { taxRate } from '@/utils/tax';
@@ -6,12 +7,14 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 
-const props = defineProps({ expenseAccounts: Array, bankAccounts: Array });
+const props = defineProps({ expenseAccounts: Array, bankAccounts: Array, costCenters: Array, projects: Array, dimensionPolicy: Object });
 
 const form = useForm({
     title: '',
     category: 'مصروفات عامة',
     account_id: props.expenseAccounts?.[0]?.id || '',
+    cost_center_id: '',
+    project_id: '',
     bank_account_id: props.bankAccounts?.[0]?.id || '',
     amount: '',
     tax_amount: '',
@@ -118,6 +121,8 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                     <SelectCreate v-model="form.account_id" :options="expenseAccounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar}`" :allow-empty="false" />
                                 </div>
                             </div>
+                            <DimensionFields v-model:cost-center="form.cost_center_id" v-model:project="form.project_id" :account="{ type: 'expense', requires_cost_center: expenseAccounts.find((a) => a.id === form.account_id)?.requires_cost_center }" :policy="dimensionPolicy" :cost-centers="costCenters" :projects="projects" :errors="form.errors" />
+
             
                             <div class="grid grid-cols-2 gap-3">
                                 <div>

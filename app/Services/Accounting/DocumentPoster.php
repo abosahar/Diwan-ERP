@@ -251,8 +251,8 @@ class DocumentPoster
             'source' => $expense,
             'lines' => array_filter([
                 $expense->account_id
-                    ? ['account_id' => $expense->account_id, 'debit' => $amount, 'description' => $expense->title, 'cost_center_id' => $expense->cost_center_id]
-                    : ['role' => 'general_expense', 'debit' => $amount, 'description' => $expense->title, 'cost_center_id' => $expense->cost_center_id],
+                    ? ['account_id' => $expense->account_id, 'debit' => $amount, 'description' => $expense->title, 'cost_center_id' => $expense->cost_center_id, 'project_id' => $expense->project_id, 'dimensions' => true]
+                    : ['role' => 'general_expense', 'debit' => $amount, 'description' => $expense->title, 'cost_center_id' => $expense->cost_center_id, 'project_id' => $expense->project_id, 'dimensions' => true],
                 $tax > 0 ? ['role' => 'vat_input', 'debit' => $tax, 'description' => "ضريبة مدخلات - {$expense->expense_number}"] : null,
                 ['account_id' => $this->cashAccount($expense->bank_account_id, $expense->payment_method), 'credit' => $amount + $tax, 'description' => "صرف {$expense->expense_number}"],
             ]),
@@ -275,8 +275,8 @@ class DocumentPoster
             'lines' => array_filter([
                 ['account_id' => $this->cashAccount($revenue->bank_account_id, $revenue->payment_method), 'debit' => $amount + $tax, 'description' => "قبض {$revenue->revenue_number}"],
                 $revenue->account_id
-                    ? ['account_id' => $revenue->account_id, 'credit' => $amount, 'description' => $revenue->title, 'cost_center_id' => $revenue->cost_center_id]
-                    : ['role' => 'other_revenue', 'credit' => $amount, 'description' => $revenue->title, 'cost_center_id' => $revenue->cost_center_id],
+                    ? ['account_id' => $revenue->account_id, 'credit' => $amount, 'description' => $revenue->title, 'cost_center_id' => $revenue->cost_center_id, 'project_id' => $revenue->project_id, 'dimensions' => true]
+                    : ['role' => 'other_revenue', 'credit' => $amount, 'description' => $revenue->title, 'cost_center_id' => $revenue->cost_center_id, 'project_id' => $revenue->project_id, 'dimensions' => true],
                 $tax > 0 ? ['role' => 'vat_output', 'credit' => $tax, 'description' => "ضريبة مخرجات - {$revenue->revenue_number}"] : null,
             ]),
         ]);

@@ -548,6 +548,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         // Account mapping
         Route::get('/mappings', [A\AccountMappingController::class, 'index'])->name('mappings.index');
         Route::put('/mappings', [A\AccountMappingController::class, 'update'])->name('mappings.update');
+        Route::put('/mappings/dimensions', [A\AccountMappingController::class, 'dimensions'])->name('mappings.dimensions');
 
         // Fixed assets
         Route::get('/period-end', [A\PeriodEndController::class, 'index'])->name('period-end.index');

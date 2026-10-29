@@ -15,6 +15,7 @@ class JournalEntryLine extends Model
         'journal_entry_id',
         'account_id',
         'cost_center_id',
+        'project_id',
         'party_type',
         'party_id',
         'date',
@@ -31,6 +32,11 @@ class JournalEntryLine extends Model
         'date' => 'date',
         'reconciled_at' => 'datetime',
     ];
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
 
     public function costCenter(): BelongsTo
     {

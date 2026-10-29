@@ -480,6 +480,7 @@ return [
         'accounting.fiscal-years.reopen' => 'accounting.fiscal_years.approve',
         'accounting.mappings.index' => 'accounting.mappings.view',
         'accounting.mappings.update' => 'accounting.mappings.edit',
+        'accounting.mappings.dimensions' => 'accounting.mappings.edit',
         'accounting.period-end.index' => 'accounting.period_end.view',
         'accounting.period-end.revalue' => 'accounting.period_end.post',
         'accounting.period-end.zakat' => 'accounting.period_end.post',

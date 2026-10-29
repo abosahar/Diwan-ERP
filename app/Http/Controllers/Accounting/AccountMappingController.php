@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Services\Accounting\AccountMap;
+use App\Services\Accounting\DimensionPolicy;
 use App\Services\TenantManager;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,13 +18,29 @@ use Inertia\Response;
  */
 class AccountMappingController extends Controller
 {
-    public function index(AccountMap $map): Response
+    public function index(AccountMap $map, DimensionPolicy $policy): Response
     {
         return Inertia::render('Accounting/Mappings/Index', [
+            'dimensionPolicy' => $policy->modes(),
             'roles' => collect(AccountMap::ROLES)->map(fn ($r, $key) => ['key' => $key, 'label' => $r[0], 'type' => $r[1]])->values(),
             'mapping' => $map->all(),
             'accounts' => Account::where('is_parent', false)->where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar', 'type']),
         ]);
+    }
+
+    /** Cost-centre / project policy (optional, required, or only on profit-and-loss accounts). */
+    public function dimensions(Request $request, DimensionPolicy $policy)
+    {
+        $validated = $request->validate([
+            'cost_center' => ['required', Rule::in(DimensionPolicy::MODES)],
+            'project' => ['required', Rule::in(DimensionPolicy::MODES)],
+        ]);
+        $companyId = app(TenantManager::class)->getTenantId();
+        foreach (['cost_center', 'project'] as $dimension) {
+            $policy->set($dimension, $validated[$dimension], $companyId);
+        }
+
+        return back()->with('success', 'تم حفظ سياسة مراكز التكلفة والمشاريع');
     }
 
     public function update(Request $request, AccountMap $map)

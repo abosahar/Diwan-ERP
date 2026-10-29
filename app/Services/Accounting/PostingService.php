@@ -79,7 +79,8 @@ class PostingService
         $entryType = $data['entry_type'] ?? 'system';
         $lines = $this->normaliseLines($this->convert($data['lines'] ?? [], (float) ($data['rate'] ?? 1)), $companyId, $entryType !== 'manual');
 
-        $this->validateLines($lines, $companyId);
+        // Cost-centre / project policy applies when the entry is posted (a draft may stay incomplete).
+        $this->validateLines($lines, $companyId, $status === JournalEntry::STATUS_POSTED);
 
         return DB::transaction(function () use ($data, $companyId, $date, $status, $entryType, $lines) {
             $period = $status === JournalEntry::STATUS_POSTED
@@ -116,6 +117,7 @@ class PostingService
                     'journal_entry_id' => $entry->id,
                     'account_id' => $line['account_id'],
                     'cost_center_id' => $line['cost_center_id'] ?? null,
+                    'project_id' => $line['project_id'] ?? null,
                     'party_type' => $line['party_type'] ?? null,
                     'party_id' => $line['party_id'] ?? null,
                     'date' => $date->toDateString(),
@@ -147,6 +149,9 @@ class PostingService
             'debit' => (float) $l->debit,
             'credit' => (float) $l->credit,
             'cost_center_id' => $l->cost_center_id,
+            'project_id' => $l->project_id,
+            // Distribution lines of a hand-made entry follow the dimension policy when it is finally posted.
+            'dimensions' => in_array($entry->entry_type, ['manual', 'adjustment'], true),
         ])->all();
 
         $this->validateLines($lines, $entry->company_id);
@@ -202,6 +207,7 @@ class PostingService
                     'credit' => (float) $l->debit,
                     'description' => $l->description,
                     'cost_center_id' => $l->cost_center_id,
+                    'project_id' => $l->project_id,
                     'party_type' => $l->party_type,
                     'party_id' => $l->party_id,
                 ])->all(),
@@ -394,7 +400,7 @@ class PostingService
         return $normalised;
     }
 
-    protected function validateLines(array $lines, int $companyId): void
+    protected function validateLines(array $lines, int $companyId, bool $dimensionPolicy = true): void
     {
         if (count($lines) < 2) {
             throw new AccountingException('القيد يجب أن يحتوي على طرفين على الأقل (مدين ودائن).');
@@ -434,6 +440,14 @@ class PostingService
             }
             if ($account->requires_cost_center && empty($line['cost_center_id'])) {
                 throw new AccountingException("الحساب «{$account->code} - {$account->name_ar}» يتطلب تحديد مركز تكلفة.");
+            }
+            if ($dimensionPolicy && ! empty($line['dimensions'])) {
+                $policy = app(DimensionPolicy::class);
+                foreach (DimensionPolicy::DIMENSIONS as $dimension => $label) {
+                    if (empty($line["{$dimension}_id"]) && $policy->required($account, $dimension, $companyId)) {
+                        throw new AccountingException("الحساب «{$account->code} - {$account->name_ar}» يتطلب تحديد {$label} حسب سياسة المنشأة.");
+                    }
+                }
             }
         }
 
