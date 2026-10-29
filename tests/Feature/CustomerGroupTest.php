@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Account;
+use App\Models\BankAccount;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerGroup;
@@ -89,5 +90,31 @@ class CustomerGroupTest extends TestCase
 
         $this->put(route('sales.customer-groups.update', $group->id), ['code' => 'CG1', 'name' => 'جملة', 'account_id' => ''])->assertSessionHasErrors('account_id');
         $this->put(route('sales.customer-groups.update', $group->id), ['code' => 'CG1', 'name' => 'جملة 2', 'account_id' => $this->wholesale->id])->assertSessionHasNoErrors();
+    }
+
+    public function test_journal_lines_take_an_auxiliary_account(): void
+    {
+        $group = CustomerGroup::create(['code' => 'CG1', 'name' => 'جملة', 'account_id' => $this->wholesale->id]);
+        $customer = Customer::create(['name' => 'عميل', 'customer_type' => 'individual', 'status' => 'active', 'customer_group_id' => $group->id]);
+        $cash = Account::find(app(AccountMap::class)->id('default_cash'));
+        $box = BankAccount::create(['name' => 'الصندوق الرئيسي', 'type' => 'cash', 'currency' => 'SAR', 'opening_balance' => 0, 'current_balance' => 0, 'account_id' => $cash->id, 'is_active' => true]);
+        $other = BankAccount::create(['name' => 'بنك آخر', 'type' => 'bank', 'currency' => 'SAR', 'opening_balance' => 0, 'current_balance' => 0, 'account_id' => Account::find(app(AccountMap::class)->id('default_bank'))->id, 'is_active' => true]);
+
+        // The create page offers the group account as a customer control account and the cash account as a bank one.
+        $props = $this->get(route('accounting.journals.create'))->assertOk()->viewData('page')['props'];
+        $this->assertSame('customer', $props['partyAccounts'][(string) $this->wholesale->id]);
+        $this->assertSame('bank', $props['partyAccounts'][(string) $cash->id]);
+
+        $lines = fn (array $debit, array $credit) => ['date' => '2026-06-10', 'description' => 'قيد مساعد', 'save_as' => 'posted', 'lines' => [
+            ['account_id' => $this->wholesale->id, 'debit' => 50, 'credit' => 0] + $debit,
+            ['account_id' => $cash->id, 'debit' => 0, 'credit' => 50] + $credit,
+        ]];
+
+        // A group-account line needs its customer; a box of another account is refused.
+        $this->post(route('accounting.journals.store'), $lines([], []))->assertSessionHasErrors('lines.0.party_id');
+        $this->post(route('accounting.journals.store'), $lines(['party_type' => 'customer', 'party_id' => $customer->id], ['party_type' => 'bank', 'party_id' => $other->id]))->assertSessionHasErrors('lines.1.party_id');
+
+        $this->post(route('accounting.journals.store'), $lines(['party_type' => 'customer', 'party_id' => $customer->id], ['party_type' => 'bank', 'party_id' => $box->id]))->assertSessionHasNoErrors();
+        $this->assertSame($box->id, (int) JournalEntryLine::where('account_id', $cash->id)->where('party_type', 'bank')->value('party_id'));
     }
 }

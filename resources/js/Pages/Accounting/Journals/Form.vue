@@ -18,15 +18,28 @@ const props = defineProps({
     customers: { type: Array, default: () => [] },
     suppliers: { type: Array, default: () => [] },
     partyAccounts: { type: Object, default: () => ({}) },
+    bankAccounts: { type: Array, default: () => [] },
 });
 
 // Receivable / payable lines name their customer or supplier.
+const auxOptions = (line) => {
+    const type = partyType(line);
+    if (type === 'customer') return props.customers;
+    if (type === 'supplier') return props.suppliers;
+    return props.bankAccounts.filter((b) => b.account_id === line.account_id);
+};
+const auxLabel = (o) => (o.code ? `${o.name} (${o.code})` : o.name);
 const partyType = (line) => props.partyAccounts?.[String(line.account_id)] || null;
 const syncParty = (line) => {
     const type = partyType(line);
     if (line.party_type !== type) {
         line.party_type = type || '';
         line.party_id = '';
+        // A bank / cash box ledger account with a single box behind it picks that box.
+        if (type === 'bank') {
+            const boxes = auxOptions(line);
+            if (boxes.length === 1) line.party_id = boxes[0].id;
+        }
     }
 };
 
@@ -121,6 +134,7 @@ const importLines = (lines, replace) => {
                                 <thead>
                                     <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold">
                                         <th class="py-2.5 px-3 text-start">الحساب المحاسبي</th>
+                                        <th class="py-2.5 px-3 text-start">الحساب المساعد</th>
                                         <th class="py-2.5 px-3 text-start">مركز التكلفة</th>
                                         <th class="py-2.5 px-3 text-start">المشروع</th>
                                         <th class="py-2.5 px-3 text-start">شرح البند</th>
@@ -133,7 +147,10 @@ const importLines = (lines, replace) => {
                                     <tr v-for="(line, idx) in form.lines" :key="idx" class="bg-white">
                                         <td class="p-2">
                                             <SelectCreate v-model="line.account_id" :options="accounts" entity="account" :label="(acc) => `${acc.code} - ${acc.name_ar}`" placeholder="اختر الحساب" :allow-empty="false" required @update:modelValue="$nextTick(() => syncParty(line))" />
-                                            <SelectCreate v-if="partyType(line)" v-model="line.party_id" :options="partyType(line) === 'customer' ? customers : suppliers" :entity="partyType(line)" label="name" :placeholder="partyType(line) === 'customer' ? '— اختر العميل —' : '— اختر المورد —'" :allow-empty="false" required class="mt-1" />
+                                        </td>
+                                        <td class="p-2">
+                                            <SelectCreate v-if="partyType(line)" v-model="line.party_id" :options="auxOptions(line)" :entity="partyType(line) === 'bank' ? '' : partyType(line)" :label="auxLabel" :placeholder="partyType(line) === 'customer' ? 'اختر العميل' : partyType(line) === 'supplier' ? 'اختر المورد' : 'اختر الحساب المساعد'" :allow-empty="partyType(line) === 'bank'" :required="partyType(line) !== 'bank'" />
+                                            <span v-else class="text-slate-300 px-2">—</span>
                                         </td>
                                         <td class="p-2">
                                             <SelectCreate v-model="line.cost_center_id" :options="costCenters" entity="cost_center" :label="(cc) => `${cc.code} - ${cc.name_ar}`" :placeholder="needs(line, 'cost_center') ? 'مطلوب *' : '—'" :allow-empty="!needs(line, 'cost_center')" />
