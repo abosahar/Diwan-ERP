@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\CostCenter;
 use App\Models\Employee;
+use App\Models\TaxSettlement;
 use App\Services\Accounting\AccountingReports;
+use App\Services\Accounting\TaxSettlementService;
 use App\Services\HR\EmployeeFinanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -86,7 +88,23 @@ class FinancialReportController extends Controller
             // A user limited to some branches sees those branches' rows only.
             'byBranch' => array_values(array_filter($this->reports->taxByBranch($from, $to), fn ($row) => auth()->user()?->canUseBranch($row['branch_id']) ?? true)),
             'filters' => ['start_date' => $from->toDateString(), 'end_date' => $to->toDateString()],
+            'settlement' => app(TaxSettlementService::class)->preview($from, $to),
         ]);
+    }
+
+    public function settleVat(Request $request, TaxSettlementService $settlements)
+    {
+        $data = $request->validate(['start_date' => 'required|date', 'end_date' => 'required|date|after_or_equal:start_date']);
+        $settlements->settleVat(Carbon::parse($data['start_date']), Carbon::parse($data['end_date']));
+
+        return back()->with('success', 'تمت تسوية الإقرار وترحيل قيد التسوية');
+    }
+
+    public function cancelVatSettlement(TaxSettlement $settlement, TaxSettlementService $settlements)
+    {
+        $settlements->cancel($settlement);
+
+        return back()->with('success', 'أُلغيت التسوية وعُكس قيدها');
     }
 
     protected function range(Request $request): array

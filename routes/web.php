@@ -602,6 +602,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::get('/reports/cash-flow', [A\FinancialReportController::class, 'cashFlow'])->name('reports.cash-flow');
         Route::get('/reports/aging', [A\FinancialReportController::class, 'aging'])->name('reports.aging');
         Route::get('/reports/vat-return', [A\FinancialReportController::class, 'vatReturn'])->name('reports.vat-return');
+        Route::post('/reports/vat-return/settle', [A\FinancialReportController::class, 'settleVat'])->name('reports.vat-return.settle');
+        Route::delete('/reports/vat-settlements/{settlement}', [A\FinancialReportController::class, 'cancelVatSettlement'])->name('reports.vat-settlements.cancel');
 
         // General Ledger
         Route::get('/ledger', [GeneralLedgerController::class, 'index'])->name('ledger.index');

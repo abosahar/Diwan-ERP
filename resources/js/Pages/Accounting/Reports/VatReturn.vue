@@ -1,25 +1,42 @@
 <script setup>
 import { computed } from 'vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import DateRangeFilter from '@/Components/UI/DateRangeFilter.vue';
 import { money, amount } from '@/utils/format';
 
-const props = defineProps({ report: Object, filters: Object, byBranch: { type: Array, default: () => [] } });
+const props = defineProps({ report: Object, filters: Object, byBranch: { type: Array, default: () => [] }, settlement: Object });
 // The ZATCA form is Saudi; every company also gets the summary per branch / country.
 const saudi = computed(() => (usePage().props.tenant?.countries || ['SA']).includes('SA'));
 const multi = computed(() => props.byBranch.length > 1 || props.byBranch.some((b) => b.country !== 'SA'));
 const printPage = () => window.print();
+const settle = () => {
+    if (confirm('سيُرحَّل قيد يقفل ضريبة المخرجات والمدخلات للفترة في حساب الضريبة المستحقة، وتُمنع تسوية الفترة مرة أخرى. متابعة؟')) {
+        router.post(route('accounting.reports.vat-return.settle'), { start_date: props.filters.start_date, end_date: props.filters.end_date });
+    }
+};
+const cancelSettlement = () => {
+    if (confirm('إلغاء التسوية وعكس قيدها؟')) router.delete(route('accounting.reports.vat-settlements.cancel', props.settlement.settlement.id));
+};
 </script>
 
 <template>
     <AppLayout>
         <Head title="إقرار ضريبة القيمة المضافة" />
         <PageHeader title="إقرار ضريبة القيمة المضافة" :subtitle="`الفترة من ${filters.start_date} إلى ${filters.end_date}`" :crumbs="[{ label: 'المحاسبة' }, { label: 'إقرار الضريبة' }]">
-            <template #actions><button @click="printPage" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold">{{ $t('ui.print') }}</button></template>
+            <template #actions>
+                <button v-if="!settlement.settlement && $can('accounting.vat_return.settle')" @click="settle" data-settle class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">تسوية الإقرار</button>
+                <button @click="printPage" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold">{{ $t('ui.print') }}</button>
+            </template>
         </PageHeader>
         <DateRangeFilter route-name="accounting.reports.vat-return" :filters="filters" />
+
+        <div v-if="settlement.settlement" class="mb-4 border border-emerald-200 bg-emerald-50 text-emerald-800 rounded-xl px-4 py-3 text-xs flex flex-wrap items-center gap-3" data-settled>
+            <span class="font-bold">✓ تمت تسوية هذه الفترة ({{ String(settlement.settlement.start_date).substring(0, 10) }} → {{ String(settlement.settlement.end_date).substring(0, 10) }}) — صافي {{ amount(settlement.settlement.net_amount) }}</span>
+            <a v-if="settlement.settlement.journal_entry" :href="route('accounting.journals.show', settlement.settlement.journal_entry.id)" class="underline font-mono">{{ settlement.settlement.journal_entry.entry_number }}</a>
+            <button v-if="$can('accounting.vat_return.settle')" @click="cancelSettlement" class="ms-auto text-rose-600 font-bold">إلغاء التسوية</button>
+        </div>
 
         <div v-if="multi || !saudi" class="mb-6 space-y-3" data-tax-by-branch>
             <h3 class="font-black text-sm text-slate-800">ملخص الضريبة حسب الفرع والدولة</h3>
