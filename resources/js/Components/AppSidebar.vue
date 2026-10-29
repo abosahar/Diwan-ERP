@@ -174,7 +174,10 @@ const slim = computed(() => sidebarCollapsed.value);
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     {{ $page.props.brand?.local_install ? 'يعمل على هذا الجهاز' : 'الخادم: متصل' }}
                 </span>
-                <span class="text-[10px] text-slate-500 font-mono">v{{ $page.props.brand?.version }}</span>
+                <span class="text-[10px] text-slate-500 font-mono" data-version>
+                    v{{ $page.props.brand?.version }}
+                    <span v-if="$page.props.update?.available && $page.props.update?.latest" class="text-emerald-400" title="يتوفر إصدار أحدث: حدّثه من لوحة التحكم">· متوفر v{{ $page.props.update.latest.version }}</span>
+                </span>
             </div>
             <div :class="slim ? 'lg:flex' : 'hidden'" class="hidden justify-center">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="متصل"></span>

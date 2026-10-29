@@ -79,3 +79,21 @@ jobs:
           cp deploy/ubuntu/install.sh dist/install-server.sh
           gh release upload "$TAG" dist/diwan-erp.zip dist/diwan-erp.zip.sha256 \
             dist/Diwan-Setup.bat dist/install-windows.ps1 dist/install-mac.sh dist/install-linux.sh dist/install-server.sh --clobber
+
+      - name: Record the version in the repository
+        # Copies made from the source (not from this package) show the right release too.
+        # Not fatal: a protected branch may refuse the push.
+        continue-on-error: true
+        env:
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          git fetch origin "$BRANCH"
+          git checkout -B version-bump "origin/$BRANCH"
+          echo "${TAG#v}" > VERSION
+          if ! git diff --quiet VERSION; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Version ${TAG#v} [skip ci]" VERSION
+            git push origin "HEAD:$BRANCH"
+          fi
