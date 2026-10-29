@@ -177,6 +177,7 @@ export default [
             { label: 'nav.gosi_report', route: 'hr.reports.gosi', path: '/hr/reports/gosi', feature: 'gosi' },
             { label: 'nav.saudization_report', route: 'hr.reports.saudization', path: '/hr/reports/saudization', feature: 'saudization' },
             { label: 'nav.organization', route: 'hr.organization', path: '/hr/organization' },
+            { label: 'nav.nationalities', route: 'hr.nationalities.index', path: '/hr/nationalities' },
             { label: 'nav.hr_settings', route: 'hr.settings', path: '/hr/settings' },
             { label: 'nav.self_service', route: 'hr.me', path: '/hr/me' },
         ],

@@ -117,6 +117,7 @@
         "loans": "Loans",
         "settlements": "End of Service",
         "organization": "Organisation",
+        "nationalities": "Nationalities",
         "self_service": "My Services",
         "billing": "Subscription",
         "integrations": "API & Webhooks",

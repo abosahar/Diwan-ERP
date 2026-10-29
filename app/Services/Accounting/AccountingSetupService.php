@@ -5,6 +5,7 @@ namespace App\Services\Accounting;
 use App\Models\Account;
 use App\Models\BankAccount;
 use App\Models\Company;
+use App\Services\HR\NationalityCatalog;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -28,6 +29,7 @@ class AccountingSetupService
             $hasChart ? $this->completeExistingChart($company) : $this->createDefaultChart($company);
 
             $this->linkCashAndBankBoxes($company);
+            app(NationalityCatalog::class)->seed($company);
             $this->calendar->periodFor(now(), $company->id);
             $this->map->flush();
         });

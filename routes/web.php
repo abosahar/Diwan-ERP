@@ -37,6 +37,7 @@ use App\Http\Controllers\HR\EmployeeController;
 use App\Http\Controllers\HR\HrOperationsController;
 use App\Http\Controllers\HR\HrReportController;
 use App\Http\Controllers\HR\HrSettingsController;
+use App\Http\Controllers\HR\NationalityController;
 use App\Http\Controllers\HR\PayrollController;
 use App\Http\Controllers\HR\SelfServiceController;
 use App\Http\Controllers\IntegrationController;
@@ -649,6 +650,12 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::put('/leave-types/{leaveType}', [HrSettingsController::class, 'updateLeaveType'])->name('leave-types.update');
         Route::post('/holidays', [HrSettingsController::class, 'storeHoliday'])->name('holidays.store');
         Route::delete('/holidays/{holiday}', [HrSettingsController::class, 'destroyHoliday'])->name('holidays.destroy');
+
+        Route::get('/nationalities', [NationalityController::class, 'index'])->name('nationalities.index');
+        Route::get('/nationalities/create', [NationalityController::class, 'create'])->name('nationalities.create');
+        Route::post('/nationalities', [NationalityController::class, 'store'])->name('nationalities.store');
+        Route::get('/nationalities/{nationality}/edit', [NationalityController::class, 'edit'])->name('nationalities.edit');
+        Route::put('/nationalities/{nationality}', [NationalityController::class, 'update'])->name('nationalities.update');
 
         Route::get('/organization', [HrOperationsController::class, 'organization'])->name('organization');
         Route::post('/organization/departments', [HrOperationsController::class, 'storeDepartment'])->name('departments.store');

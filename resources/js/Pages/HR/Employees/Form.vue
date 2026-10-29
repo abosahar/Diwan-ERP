@@ -8,7 +8,7 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
 import { money } from '@/utils/format';
 
-const props = defineProps({ employee: Object, branches: Array, departments: Array, positions: Array, shifts: Array, costCenters: Array, managers: Array, users: Array });
+const props = defineProps({ employee: Object, branches: Array, departments: Array, positions: Array, shifts: Array, costCenters: Array, managers: Array, users: Array, nationalities: { type: Array, default: () => [] } });
 const e = props.employee || {};
 const d = (v) => (v ? String(v).substring(0, 10) : '');
 const form = useForm({
@@ -41,7 +41,7 @@ const input = 'w-full rounded-xl border-slate-200 text-xs';
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <Field label="الاسم الكامل" :error="form.errors.name" class="md:col-span-2"><input v-model="form.name" :class="input" /></Field>
                     <Field label="الرقم الوظيفي" :error="form.errors.employee_number" hint="يُولد تلقائياً إن تُرك فارغاً"><input v-model="form.employee_number" :class="input" /></Field>
-                    <Field label="الجنسية (رمز دولة)" :error="form.errors.nationality"><input v-model="form.nationality" maxlength="2" :class="input" class="uppercase font-mono" /></Field>
+                    <Field label="الجنسية *" :error="form.errors.nationality"><SelectCreate v-model="form.nationality" :options="nationalities" entity="nationality" value-key="code" label="name_ar" :allow-empty="false" required /></Field>
                     <Field label="نوع الهوية"><select v-model="form.id_type" :class="input"><option value="national_id">هوية وطنية</option><option value="iqama">إقامة</option><option value="border_number">رقم حدود</option></select></Field>
                     <Field label="رقم الهوية / الإقامة"><input v-model="form.national_id" :class="input" class="font-mono" /></Field>
                     <Field label="انتهاء الهوية / الإقامة"><DatePicker v-model="form.id_expiry" :class="input" /></Field>
