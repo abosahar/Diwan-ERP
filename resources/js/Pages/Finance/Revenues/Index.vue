@@ -56,7 +56,7 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Header Ribbon -->
-            <PageHeader title="الإيرادات" :crumbs="[{ label: 'المالية' }, { label: 'الإيرادات' }]">
+            <PageHeader year-scoped title="الإيرادات" :crumbs="[{ label: 'المالية' }, { label: 'الإيرادات' }]">
 <template #actions>
 <button 
                         @click="handleSearch"

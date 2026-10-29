@@ -69,7 +69,7 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5" @click="activeMenu = null">
             <!-- Header Ribbon -->
-            <PageHeader title="فواتير الشراء" :crumbs="[{ label: 'المشتريات' }, { label: 'فواتير الشراء' }]">
+            <PageHeader year-scoped title="فواتير الشراء" :crumbs="[{ label: 'المشتريات' }, { label: 'فواتير الشراء' }]">
 <template #actions>
 <button 
                         @click="router.reload()"

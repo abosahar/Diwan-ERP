@@ -29,7 +29,7 @@ const save = () => form.transform((d) => ({ ...d, items: d.items.map((i) => ({ p
 <template>
     <AppLayout>
         <Head title="طلبات الشراء" />
-        <PageHeader title="طلبات الشراء" subtitle="طلب داخلي ← اعتماد ← أمر شراء للمورد" :crumbs="[{ label: 'المشتريات' }, { label: 'طلبات الشراء' }]">
+        <PageHeader year-scoped title="طلبات الشراء" subtitle="طلب داخلي ← اعتماد ← أمر شراء للمورد" :crumbs="[{ label: 'المشتريات' }, { label: 'طلبات الشراء' }]">
             <template #actions><button v-if="$can('purchases.requests.create')" @click="open = true" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> طلب شراء</button></template>
         </PageHeader>
         <DocumentTable :paginator="requests" :columns="columns" :filters="filters" :statuses="statuses" search-route="purchases.requests.index" :link="(r) => route('purchases.requests.show', r.id)" />

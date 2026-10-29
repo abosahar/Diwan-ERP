@@ -45,6 +45,7 @@ class JournalEntryController extends Controller
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('reference', 'like', "%{$search}%"));
             })
+            ->inActiveYear('date', ! ($filters['from'] ?? null) && ! ($filters['to'] ?? null))
             ->orderByDesc('date')
             ->orderByDesc('id');
 

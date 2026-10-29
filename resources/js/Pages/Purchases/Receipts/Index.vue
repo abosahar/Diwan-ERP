@@ -20,7 +20,7 @@ const statuses = [{ value: 'received', label: 'غير مفوتر' }, { value: 'i
 <template>
     <AppLayout>
         <Head title="استلام البضاعة" />
-        <PageHeader title="استلام البضاعة (GRN)" subtitle="البضاعة المستلمة غير المفوترة تظهر في حساب «بضاعة مستلمة لم تصل فواتيرها»" :crumbs="[{ label: 'المشتريات' }, { label: 'الاستلامات' }]" />
+        <PageHeader year-scoped title="استلام البضاعة (GRN)" subtitle="البضاعة المستلمة غير المفوترة تظهر في حساب «بضاعة مستلمة لم تصل فواتيرها»" :crumbs="[{ label: 'المشتريات' }, { label: 'الاستلامات' }]" />
         <DocumentTable :paginator="receipts" :columns="columns" :filters="filters" :statuses="statuses" search-route="purchases.receipts.index" :link="(r) => route('purchases.receipts.show', r.id)" />
     </AppLayout>
 </template>

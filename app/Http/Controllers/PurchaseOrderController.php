@@ -46,7 +46,7 @@ class PurchaseOrderController extends Controller
             $query->where('status', $status);
         }
 
-        $orders = $query->orderBy('order_date', 'desc')
+        $orders = $query->inActiveYear('order_date')->orderBy('order_date', 'desc')
             ->orderBy('id', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();

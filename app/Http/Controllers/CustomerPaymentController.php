@@ -37,7 +37,7 @@ class CustomerPaymentController extends Controller
             });
         }
 
-        $payments = $query->orderBy('payment_date', 'desc')
+        $payments = $query->inActiveYear('payment_date')->orderBy('payment_date', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();
 

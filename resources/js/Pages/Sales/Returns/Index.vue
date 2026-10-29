@@ -32,7 +32,7 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Breadcrumbs Ribbon -->
-            <PageHeader title="المرتجعات والإشعارات الدائنة" :crumbs="[{ label: 'المبيعات' }, { label: 'المرتجعات والإشعارات الدائنة' }]">
+            <PageHeader year-scoped title="المرتجعات والإشعارات الدائنة" :crumbs="[{ label: 'المبيعات' }, { label: 'المرتجعات والإشعارات الدائنة' }]">
 <template #actions>
 <button 
                         @click="router.reload()" 

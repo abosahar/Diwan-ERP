@@ -42,7 +42,7 @@ class QuotationController extends Controller
             $query->where('status', $status);
         }
 
-        $quotations = $query->orderBy('quotation_date', 'desc')
+        $quotations = $query->inActiveYear('quotation_date')->orderBy('quotation_date', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();
 

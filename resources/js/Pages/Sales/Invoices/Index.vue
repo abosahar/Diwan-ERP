@@ -91,7 +91,7 @@ const formatDateArabic = (dateStr) => {
 
         <div class="space-y-5" @click="closeMenu">
             <!-- Top Breadcrumbs & Action Bar -->
-            <PageHeader title="الفواتير" :crumbs="[{ label: 'المبيعات' }, { label: 'الفواتير' }]">
+            <PageHeader year-scoped title="الفواتير" :crumbs="[{ label: 'المبيعات' }, { label: 'الفواتير' }]">
 <template #actions>
 <button 
                         @click="router.reload()" 

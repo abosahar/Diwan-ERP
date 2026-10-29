@@ -22,7 +22,7 @@ class DebitNoteController extends Controller
         $notes = DebitNote::with(['customer:id,name', 'invoice:id,invoice_number'])
             ->when($search, fn ($q, $s) => $q->where(fn ($q) => $q->where('debit_note_number', 'like', "%{$s}%")
                 ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$s}%"))))
-            ->orderByDesc('debit_note_date')->orderByDesc('id')
+            ->inActiveYear('debit_note_date')->orderByDesc('debit_note_date')->orderByDesc('id')
             ->paginate($this->perPage($request))->withQueryString();
 
         return Inertia::render('Sales/DebitNotes/Index', ['notes' => $notes, 'filters' => ['search' => $search]]);

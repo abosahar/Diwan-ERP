@@ -59,17 +59,18 @@ class InvoiceController extends Controller
             $query->whereDate('invoice_date', '<=', $dateTo);
         }
 
-        $invoices = $query->orderBy('invoice_date', 'desc')
+        $yearScoped = ! $dateFrom && ! $dateTo;
+        $invoices = $query->inActiveYear('invoice_date', $yearScoped)->orderBy('invoice_date', 'desc')
             ->orderBy('id', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();
 
         // Calculate summary KPI stats using aggregate queries (no full load)
         $stats = [
-            'total_count' => Invoice::count(),
-            'total_amount' => Invoice::query()->sumBase('total'),
-            'paid_amount' => Invoice::where('payment_status', 'paid')->sumBase('total'),
-            'unpaid_amount' => Invoice::whereIn('payment_status', ['unpaid', 'partially_paid'])->sumBase('remaining_amount'),
+            'total_count' => Invoice::inActiveYear('invoice_date')->count(),
+            'total_amount' => Invoice::inActiveYear('invoice_date')->sumBase('total'),
+            'paid_amount' => Invoice::inActiveYear('invoice_date')->where('payment_status', 'paid')->sumBase('total'),
+            'unpaid_amount' => Invoice::inActiveYear('invoice_date')->whereIn('payment_status', ['unpaid', 'partially_paid'])->sumBase('remaining_amount'),
         ];
 
         return Inertia::render('Sales/Invoices/Index', [

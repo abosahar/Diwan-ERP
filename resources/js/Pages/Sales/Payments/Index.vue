@@ -65,7 +65,7 @@ const formatCurrency = (val) => {
 
         <div class="space-y-5">
             <!-- Breadcrumbs Ribbon -->
-            <PageHeader title="المدفوعات" :crumbs="[{ label: 'المبيعات' }, { label: 'المدفوعات' }]">
+            <PageHeader year-scoped title="المدفوعات" :crumbs="[{ label: 'المبيعات' }, { label: 'المدفوعات' }]">
 <template #actions>
 <button
                         v-if="$canRoute('sales.payments.store')"

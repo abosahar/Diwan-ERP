@@ -20,7 +20,7 @@ class DeliveryNoteController extends Controller
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('delivery_number', 'like', "%{$s}%")
                 ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$s}%"))))
-            ->orderByDesc('delivery_date')->orderByDesc('id')
+            ->inActiveYear('delivery_date')->orderByDesc('delivery_date')->orderByDesc('id')
             ->paginate($this->perPage($request))->withQueryString();
 
         return Inertia::render('Sales/Deliveries/Index', ['notes' => $notes, 'filters' => $filters]);

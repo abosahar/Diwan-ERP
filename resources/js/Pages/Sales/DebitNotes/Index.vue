@@ -30,7 +30,7 @@ const save = () => form.post(route('sales.debit-notes.store'), { onSuccess: () =
 <template>
     <AppLayout>
         <Head title="الإشعارات المدينة" />
-        <PageHeader title="الإشعارات المدينة" subtitle="مبالغ إضافية على العميل (فرق سعر، رسوم...) تزيد مديونيته وضريبة المخرجات" :crumbs="[{ label: 'المبيعات' }, { label: 'الإشعارات المدينة' }]">
+        <PageHeader year-scoped title="الإشعارات المدينة" subtitle="مبالغ إضافية على العميل (فرق سعر، رسوم...) تزيد مديونيته وضريبة المخرجات" :crumbs="[{ label: 'المبيعات' }, { label: 'الإشعارات المدينة' }]">
             <template #actions><button v-if="$can('sales.debit_notes.create')" @click="open = true" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> إشعار مدين</button></template>
         </PageHeader>
         <DocumentTable :paginator="notes" :columns="columns" :filters="filters" search-route="sales.debit-notes.index">

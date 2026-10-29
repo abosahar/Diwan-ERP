@@ -24,7 +24,7 @@ const statuses = [
 <template>
     <AppLayout>
         <Head title="أوامر البيع" />
-        <PageHeader title="أوامر البيع" subtitle="أمر بيع ← إذن تسليم ← فاتورة" :crumbs="[{ label: 'المبيعات' }, { label: 'أوامر البيع' }]">
+        <PageHeader year-scoped title="أوامر البيع" subtitle="أمر بيع ← إذن تسليم ← فاتورة" :crumbs="[{ label: 'المبيعات' }, { label: 'أوامر البيع' }]">
             <template #actions>
                 <Link v-if="$can('sales.orders.create')" :href="route('sales.orders.create')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> أمر بيع</Link>
             </template>

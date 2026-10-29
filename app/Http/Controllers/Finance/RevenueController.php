@@ -33,7 +33,7 @@ class RevenueController extends Controller
             $query->where('category', $request->input('category'));
         }
 
-        $revenues = $query->paginate(15)->withQueryString();
+        $revenues = $query->inActiveYear('revenue_date')->paginate(15)->withQueryString();
 
         $stats = [
             'total_revenues' => Revenue::sum('total_amount'),

@@ -62,13 +62,14 @@ class PurchaseInvoiceController extends Controller
             $query->whereDate('invoice_date', '<=', $dateTo);
         }
 
-        $invoices = $query->orderBy('invoice_date', 'desc')
+        $yearScoped = ! $dateFrom && ! $dateTo;
+        $invoices = $query->inActiveYear('invoice_date', $yearScoped)->orderBy('invoice_date', 'desc')
             ->orderBy('id', 'desc')
             ->paginate($this->perPage($request))
             ->withQueryString();
 
         // One aggregate query instead of loading every invoice into memory.
-        $totals = PurchaseInvoice::query()
+        $totals = PurchaseInvoice::inActiveYear('invoice_date')
             ->selectRaw('COUNT(*) as cnt, COALESCE(SUM(total), 0) as total, COALESCE(SUM(paid_amount), 0) as paid, COALESCE(SUM(remaining_amount), 0) as due')
             ->first();
         $stats = [

@@ -25,7 +25,7 @@ class SalesOrderController extends Controller
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
             ->when($filters['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('order_number', 'like', "%{$s}%")
                 ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$s}%"))))
-            ->orderByDesc('order_date')->orderByDesc('id')
+            ->inActiveYear('order_date')->orderByDesc('order_date')->orderByDesc('id')
             ->paginate($this->perPage($request))->withQueryString();
 
         return Inertia::render('Sales/Orders/Index', ['orders' => $orders, 'filters' => $filters]);

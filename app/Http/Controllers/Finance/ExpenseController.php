@@ -34,7 +34,7 @@ class ExpenseController extends Controller
             $query->where('category', $request->input('category'));
         }
 
-        $expenses = $query->paginate(15)->withQueryString();
+        $expenses = $query->inActiveYear('expense_date')->paginate(15)->withQueryString();
 
         $stats = [
             'total_expenses' => Expense::sum('total_amount'),

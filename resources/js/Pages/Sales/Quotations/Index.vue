@@ -70,7 +70,7 @@ const formatDateArabic = (dateStr) => {
 
         <div class="space-y-5" @click="closeMenu">
             <!-- Breadcrumbs Ribbon -->
-            <PageHeader title="عروض الأسعار" :crumbs="[{ label: 'المبيعات' }, { label: 'عروض الأسعار' }]">
+            <PageHeader year-scoped title="عروض الأسعار" :crumbs="[{ label: 'المبيعات' }, { label: 'عروض الأسعار' }]">
 <template #actions>
 <button 
                         @click="router.reload()" 
