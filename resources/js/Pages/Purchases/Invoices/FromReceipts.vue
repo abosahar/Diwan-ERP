@@ -6,7 +6,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
 import PartyPicker from '@/Components/Documents/PartyPicker.vue';
-import { money, date, qty } from '@/utils/format';
+import { money, date, qty, today } from '@/utils/format';
 
 const props = defineProps({ supplier: Object, openItems: Array, bankAccounts: Array, suggestedNumber: String });
 const pickSupplier = (id) => id && router.get(route('purchases.invoices.from-receipts'), { supplier_id: id });
@@ -14,7 +14,7 @@ const pickSupplier = (id) => id && router.get(route('purchases.invoices.from-rec
 const form = useForm({
     supplier_id: props.supplier?.id ?? null,
     supplier_invoice_number: '',
-    invoice_date: new Date().toISOString().substring(0, 10),
+    invoice_date: today(),
     due_date: '',
     payment_method: 'credit',
     payment_status: 'unpaid',

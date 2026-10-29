@@ -9,7 +9,7 @@ import Pagination from '@/Components/UI/Pagination.vue';
 import StatCard from '@/Components/UI/StatCard.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
-import { money, date } from '@/utils/format';
+import { money, date, today, thisMonth, addMonths } from '@/utils/format';
 import { PlusIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({ assets: Object, categories: Array, accounts: Array, branches: Array, costCenters: Array, bankAccounts: Array, totals: Object, filters: Object });
@@ -18,12 +18,11 @@ const assetOpen = ref(false);
 const categoryOpen = ref(false);
 const depreciateOpen = ref(false);
 
-const today = new Date().toISOString().substring(0, 10);
-const assetForm = useForm({ asset_category_id: '', code: '', name_ar: '', serial_number: '', location: '', branch_id: '', cost_center_id: '', acquisition_date: today, cost: '', salvage_value: 0, useful_life_months: '', total_units: '', unit_label: 'ساعة', paid_from: 'bank_transfer', bank_account_id: '', supplier_id: '', taxable: false, opening_accumulated: 0, notes: '' });
+const assetForm = useForm({ asset_category_id: '', code: '', name_ar: '', serial_number: '', location: '', branch_id: '', cost_center_id: '', acquisition_date: today(), cost: '', salvage_value: 0, useful_life_months: '', total_units: '', unit_label: 'ساعة', paid_from: 'bank_transfer', bank_account_id: '', supplier_id: '', taxable: false, opening_accumulated: 0, notes: '' });
 const categoryForm = useForm({ name_ar: '', useful_life_months: 60, depreciation_method: 'straight_line', declining_rate: '', asset_account_id: '', accumulated_account_id: '', expense_account_id: '' });
 // Units-of-production categories need the asset's lifetime units.
 const unitsCategory = computed(() => props.categories.find((c) => c.id === assetForm.asset_category_id)?.depreciation_method === 'units_of_production');
-const depreciateForm = useForm({ month: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toISOString().substring(0, 7) });
+const depreciateForm = useForm({ month: addMonths(thisMonth(), -1) });
 
 const filters = reactive({ search: props.filters.search ?? '', status: props.filters.status ?? '' });
 const apply = () => router.get(route('accounting.fixed-assets.index'), filters, { preserveState: true });

@@ -2,14 +2,14 @@
 import { reactive } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { confirmAction } from '@/composables/useDialog';
-import { date } from '@/utils/format';
+import { date, today } from '@/utils/format';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({ groups: Object, leaveTypes: Array, bankFormats: Object, holidays: Array, errors: Object });
 const holiday = useForm({ name: '', start_date: '', end_date: '' });
-const year = new Date().getFullYear();
+const year = today().substring(0, 4);
 // Fixed-date holidays; the two Eids follow the Hijri calendar, so their dates are entered each year.
 const presets = [['اليوم الوطني', `${year}-09-23`, `${year}-09-23`], ['يوم التأسيس', `${year}-02-22`, `${year}-02-22`], ['عطلة عيد الفطر', '', ''], ['عطلة عيد الأضحى', '', '']];
 const usePreset = ([name, start, end]) => Object.assign(holiday, { name, start_date: start, end_date: end });

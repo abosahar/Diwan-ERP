@@ -23,6 +23,7 @@ import {
     DocumentCheckIcon,
     UserIcon,
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 const props = defineProps({
     boxes: { type: Array, default: () => [] },
@@ -612,7 +613,7 @@ onMounted(() => {
 
                     <div class="border-t border-slate-200 pt-2 text-3xs text-start space-y-0.5">
                         <p>رقم الفاتورة: <strong>{{ latestOrder.order_number }}</strong></p>
-                        <p>التاريخ: {{ new Date(latestOrder.created_at).toLocaleString('ar-SA') }}</p>
+                        <p>التاريخ: {{ new Date(latestOrder.created_at).toLocaleString('ar-SA', { timeZone: timeZone() }) }}</p>
                         <p>طريقة الدفع: {{ ({ cash: 'نقداً', card: 'بطاقة مدى', multiple: 'مجزأ (نقد + بطاقة)' })[latestOrder.payment_method] || latestOrder.payment_method }}</p>
                     </div>
 

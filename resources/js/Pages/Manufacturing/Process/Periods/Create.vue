@@ -3,13 +3,14 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
+import { thisMonth, monthEnd } from '@/utils/format';
 
 const props = defineProps({ stages: Array });
-const now = new Date();
+const month = thisMonth();
 const form = useForm({
     process_stage_id: props.stages?.[0]?.id || '',
-    date_from: new Date(now.getFullYear(), now.getMonth(), 1, 12).toISOString().slice(0, 10),
-    date_to: new Date(now.getFullYear(), now.getMonth() + 1, 0, 12).toISOString().slice(0, 10),
+    date_from: `${month}-01`,
+    date_to: monthEnd(month),
 });
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
 </script>

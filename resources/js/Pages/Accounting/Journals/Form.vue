@@ -6,6 +6,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { PlusIcon, TrashIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
+import { today } from '@/utils/format';
 
 const props = defineProps({
     accounts: Array,
@@ -28,7 +29,7 @@ const syncParty = (line) => {
 const blankLine = (i = 0) => ({ account_id: props.accounts?.[i]?.id || '', cost_center_id: '', party_type: '', party_id: '', description: '', debit: 0, credit: 0 });
 
 const form = useForm({
-    date: new Date().toISOString().split('T')[0],
+    date: today(),
     reference: '',
     description: '',
     entry_type: 'manual',

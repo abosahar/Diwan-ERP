@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
+import { today } from '@/utils/format';
 
 const props = defineProps({ suppliers: Array, unpaidInvoices: Array });
 
@@ -11,7 +12,7 @@ const form = useForm({
     supplier_id: props.suppliers?.[0]?.id || '',
     purchase_invoice_id: '',
     amount: '',
-    payment_date: new Date().toISOString().split('T')[0],
+    payment_date: today(),
     payment_method: 'bank_transfer',
     reference_number: '',
     notes: '',

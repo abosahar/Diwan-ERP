@@ -60,6 +60,45 @@ export function dateTime(value) {
     return value ? local(value).substring(0, 16).replace('T', ' ') : '—';
 }
 
+/** The business time zone for toLocaleString() and the like; undefined (the device's) if the browser lacks it. */
+export function timeZone() {
+    const zone = usePage().props?.timezone;
+    return zone && zoneFormatter(zone) ? zone : undefined;
+}
+
+// Date fields default to the business time zone's day: from midnight to 03:00
+// in Riyadh the UTC date (toISOString) is still yesterday, and on the 1st the
+// previous month.
+
+/** Today in the business time zone, 2026-10-29. */
+export function today() {
+    return local(new Date().toISOString()).substring(0, 10);
+}
+
+/** This month in the business time zone, 2026-10. */
+export function thisMonth() {
+    return today().substring(0, 7);
+}
+
+/** A YYYY-MM-DD date some days later (or earlier): addDays(today(), 30). */
+export function addDays(day, days) {
+    const d = new Date(`${day}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + days);
+    return d.toISOString().substring(0, 10);
+}
+
+/** A YYYY-MM month some months later (or earlier): addMonths(thisMonth(), -1) is last month. */
+export function addMonths(month, months) {
+    const d = new Date(`${month}-01T00:00:00Z`);
+    d.setUTCMonth(d.getUTCMonth() + months);
+    return d.toISOString().substring(0, 7);
+}
+
+/** Last day of a YYYY-MM month, 2026-10-31. */
+export function monthEnd(month) {
+    return addDays(`${addMonths(month, 1)}-01`, -1);
+}
+
 export function monthLabel(period) {
     const s = String(period);
     return `${s.substring(0, 4)}-${s.substring(4, 6)}`;

@@ -5,14 +5,14 @@ import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Field from '@/Components/UI/Field.vue';
-import { money, qty } from '@/utils/format';
+import { money, qty, today } from '@/utils/format';
 
 const props = defineProps({ invoice: Object, recentInvoices: Array, bankAccounts: Array, suggestedNumber: String });
 const pick = (e) => router.get(route('purchases.returns.create'), { invoice_id: e.target.value });
 
 const form = useForm({
     purchase_invoice_id: props.invoice?.id ?? null,
-    return_date: new Date().toISOString().substring(0, 10),
+    return_date: today(),
     reason: '',
     settlement: 'credit',
     bank_account_id: '',

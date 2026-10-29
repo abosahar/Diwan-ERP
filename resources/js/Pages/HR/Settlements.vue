@@ -8,14 +8,13 @@ import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
-import { money, date } from '@/utils/format';
+import { money, date, today } from '@/utils/format';
 
 defineProps({ settlements: Object, employees: Array, reasons: Object, bankAccounts: Array });
-const today = new Date().toISOString().substring(0, 10);
-const form = useForm({ employee_id: '', termination_date: today, reason: 'resignation', salary_days: 0, other_dues: 0, other_deductions: 0, notes: '' });
-const provision = useForm({ date: today });
+const form = useForm({ employee_id: '', termination_date: today(), reason: 'resignation', salary_days: 0, other_dues: 0, other_deductions: 0, notes: '' });
+const provision = useForm({ date: today() });
 const paying = ref(null);
-const payForm = useForm({ date: today, bank_account_id: '' });
+const payForm = useForm({ date: today(), bank_account_id: '' });
 const approve = (s) => { if (confirm('اعتماد المخالصة وإنهاء خدمة الموظف؟')) router.post(route('hr.settlements.approve', s.id), {}, { preserveScroll: true }); };
 </script>
 

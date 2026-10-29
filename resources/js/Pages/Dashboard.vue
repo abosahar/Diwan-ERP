@@ -21,6 +21,7 @@ import {
     ReceiptPercentIcon,
     ClockIcon
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 // Open while setup is under way; folded away once most steps are done.
 const checklistOpen = ref(true);
@@ -47,7 +48,8 @@ const currentDate = computed(() => {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: timeZone()
     });
 });
 

@@ -13,6 +13,7 @@ import {
     MagnifyingGlassIcon,
     ArrowTopRightOnSquareIcon
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 const props = defineProps({
     companies: Object,
@@ -182,7 +183,7 @@ const impersonate = async (companyId) => {
 
                             <!-- Created date -->
                             <td class="px-6 py-4 text-slate-500 font-mono text-[11px]" dir="ltr">
-                                {{ new Date(company.created_at).toLocaleDateString('en-CA') }}
+                                {{ new Date(company.created_at).toLocaleDateString('en-CA', { timeZone: timeZone() }) }}
                             </td>
 
                             <!-- Impersonate Action Button -->

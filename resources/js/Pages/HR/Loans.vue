@@ -7,10 +7,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
-import { money, date } from '@/utils/format';
+import { money, date, today } from '@/utils/format';
 
 defineProps({ loans: Object, employees: Array, bankAccounts: Array });
-const form = useForm({ employee_id: '', date: new Date().toISOString().substring(0, 10), amount: 0, monthly_installment: 0, first_deduction_month: '', reason: '' });
+const form = useForm({ employee_id: '', date: today(), amount: 0, monthly_installment: 0, first_deduction_month: '', reason: '' });
 const bank = ref('');
 const decide = async (loan, approve) => {
     let note = null;

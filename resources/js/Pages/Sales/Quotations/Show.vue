@@ -12,6 +12,7 @@ import {
     BuildingOffice2Icon,
     DocumentTextIcon,
 } from '@heroicons/vue/24/outline';
+import { timeZone } from '@/utils/format';
 
 const props = defineProps({
     quotation: Object,
@@ -42,7 +43,8 @@ const formatDateArabic = (dateStr) => {
         return d.toLocaleDateString('ar-SA', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
+            timeZone: timeZone()
         });
     } catch {
         return dateStr;

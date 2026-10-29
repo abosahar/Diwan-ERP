@@ -10,7 +10,7 @@ import Field from '@/Components/UI/Field.vue';
 import EquipmentForm from '@/Components/Equipment/EquipmentForm.vue';
 import MaintenanceStatus from '@/Components/Equipment/MaintenanceStatus.vue';
 import ProductPicker from '@/Components/Documents/ProductPicker.vue';
-import { money, date } from '@/utils/format';
+import { money, date, thisMonth, addMonths, monthEnd } from '@/utils/format';
 
 const props = defineProps({ equipment: Object, schedules: Array, readings: Array, rentals: Array, orders: Array, billings: Array, profit: Object, profitFrom: String, others: Array, statuses: Object, lookups: Object });
 const e = computed(() => props.equipment);
@@ -64,9 +64,9 @@ const supplierOpen = ref(false);
 const supplierForm = useForm({ period_from: '', period_to: '', quantity: '', tax_rate: taxRate(), reference: '' });
 const supplierPreview = ref(null);
 const openSupplier = () => {
-    const now = new Date();
-    supplierForm.period_from = new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleDateString('en-CA');
-    supplierForm.period_to = new Date(now.getFullYear(), now.getMonth(), 0).toLocaleDateString('en-CA');
+    const month = addMonths(thisMonth(), -1);
+    supplierForm.period_from = `${month}-01`;
+    supplierForm.period_to = monthEnd(month);
     supplierForm.clearErrors();
     supplierOpen.value = true;
     loadSupplierPreview();

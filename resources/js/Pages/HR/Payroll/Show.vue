@@ -8,7 +8,7 @@ import PageHeader from '@/Components/UI/PageHeader.vue';
 import Dialog from '@/Components/UI/Dialog.vue';
 import Field from '@/Components/UI/Field.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
-import { money } from '@/utils/format';
+import { money, today } from '@/utils/format';
 
 const props = defineProps({ payroll: Object, adjustments: Array, employees: Array, bankAccounts: Array, errors: { type: Object, default: () => ({}) } });
 const act = (name, message) => { if (!message || confirm(message)) router.post(route(name, props.payroll.id), {}, { preserveScroll: true }); };
@@ -19,7 +19,7 @@ const unapprove = async () => {
         router.post(route('hr.payroll.unapprove', props.payroll.id), {}, { preserveScroll: true });
     }
 };
-const payForm = useForm({ date: new Date().toISOString().substring(0, 10), bank_account_id: '' });
+const payForm = useForm({ date: today(), bank_account_id: '' });
 const typeLabel = { bonus: 'مكافأة', commission: 'عمولة', overtime_hours: 'ساعات إضافي', penalty: 'جزاء', deduction: 'استقطاع' };
 const sum = (key) => props.payroll.items.reduce((s, i) => s + Number(i[key] || 0), 0);
 const remove = async (url, message) => { if (await confirmAction(message, { danger: true, confirmText: 'حذف' })) router.delete(url, { preserveScroll: true }); };
