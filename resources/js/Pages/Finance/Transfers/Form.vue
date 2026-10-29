@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
@@ -16,6 +17,7 @@ const form = useForm({
     reference: '',
     notes: '',
 });
+useUnsavedGuard(form);
 
 const selectedFromAccount = computed(() => props.accounts?.find((a) => a.id === form.from_account_id));
 

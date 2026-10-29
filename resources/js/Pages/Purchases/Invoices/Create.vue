@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -81,6 +82,7 @@ const form = useForm({
         }
     ],
 });
+useUnsavedGuard(form);
 
 // Warehouses of the chosen branch (and shared ones without a branch); all of them if none match.
 const branchWarehouses = computed(() => {

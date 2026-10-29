@@ -132,4 +132,22 @@ class QuickCreateTest extends TestCase
         }
         $this->assertSame([], $offenders, "Use <DatePicker> for dates and type=\"text\" inputmode=\"decimal\" data-num for numbers:\n".implode("\n", $offenders));
     }
+
+    /** Create / edit pages ask before losing unsaved changes. */
+    public function test_form_pages_use_the_unsaved_changes_guard(): void
+    {
+        $missing = [];
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(resource_path('js/Pages')));
+        foreach ($files as $file) {
+            if (! preg_match('/(Create|Edit|Form)\.vue$/', $file->getFilename()) || str_contains($file->getPathname(), 'Profile/Partials')) {
+                continue;
+            }
+            $code = file_get_contents($file->getPathname());
+            // Pages built on useForm (not the axios-based customer pages) must call the guard.
+            if (preg_match('/const \w+ = useForm\(/', $code) && ! str_contains($code, 'useUnsavedGuard(')) {
+                $missing[] = str_replace(resource_path('js/Pages').'/', '', $file->getPathname());
+            }
+        }
+        $this->assertSame([], $missing, "Add useUnsavedGuard(form) to:\n".implode("\n", $missing));
+    }
 }

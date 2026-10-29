@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -11,6 +12,7 @@ import LineItemsEditor from '@/Components/Documents/LineItemsEditor.vue';
 const props = defineProps({ warehouses: Array, suggestedNumber: String, branches: Array, defaultBranchId: Number });
 const today = new Date().toISOString().substring(0, 10);
 const form = useForm({ customer_id: null, branch_id: props.defaultBranchId || props.branches?.[0]?.id || '', warehouse_id: '', order_date: today, delivery_date: '', notes: '', items: [] });
+useUnsavedGuard(form);
 const save = () => form.post(route('sales.orders.store'));
 </script>
 

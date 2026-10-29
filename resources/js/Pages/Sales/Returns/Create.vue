@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -45,6 +46,7 @@ const form = useForm({
         tax_rate: Number(i.tax_rate), quantity: 0, return_to_stock: true,
     })),
 });
+useUnsavedGuard(form);
 const itemMode = ref(form.items.length > 0);
 const itemsTotal = computed(() => form.items.reduce((s, i) => s + Number(i.quantity || 0) * i.unit_net * (1 + i.tax_rate / 100), 0));
 

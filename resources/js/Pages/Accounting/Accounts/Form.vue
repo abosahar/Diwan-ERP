@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -39,6 +40,7 @@ const editForm = useForm({
     balance: props.account?.balance ?? '0.00',
     is_active: props.account ? Boolean(props.account.is_active) : true,
 });
+useUnsavedGuard(editForm);
 
 const submitEditAccount = () => (editing
     ? editForm.put(route('accounting.accounts.update', props.account.id))

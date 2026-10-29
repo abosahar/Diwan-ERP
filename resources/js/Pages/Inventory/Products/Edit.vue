@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -14,6 +15,7 @@ const form = useForm({
     track_inventory: !!p.track_inventory, type: p.type, tracking: p.tracking || 'none', reorder_level: p.reorder_level, reorder_quantity: p.reorder_quantity,
     vat_category: p.vat_category || 'S', vat_exemption_code: p.vat_exemption_code || '',
 });
+useUnsavedGuard(form);
 const inp = 'w-full rounded-xl border-slate-200 text-xs';
 </script>
 

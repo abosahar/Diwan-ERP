@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -15,6 +16,7 @@ const form = useForm({
     output_quantity: b.output_quantity ?? 1, scrap_percent: b.scrap_percent ?? 0, routing_id: b.routing_id || '', notes: b.notes || '',
     items: b.items?.length ? b.items.map((i) => ({ component_id: i.component_id, quantity: i.quantity, scrap_percent: i.scrap_percent })) : [{ component_id: '', quantity: 1, scrap_percent: 0 }],
 });
+useUnsavedGuard(form);
 const cost = computed(() => {
     const byId = Object.fromEntries(props.products.map((p) => [p.id, Number(p.average_cost) || 0]));
     const sum = form.items.reduce((a, i) => a + (Number(i.quantity) || 0) * (1 + (Number(i.scrap_percent) || 0) / 100) * (byId[i.component_id] || 0), 0);

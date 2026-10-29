@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { taxRate } from '@/utils/tax';
@@ -40,6 +41,7 @@ const form = useForm({
     warehouse_id: props.warehouses?.[0]?.id || '',
     description: '',
 });
+useUnsavedGuard(form);
 
 const submit = () => {
     form.post(route('inventory.products.store'));

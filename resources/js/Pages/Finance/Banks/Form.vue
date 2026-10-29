@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
@@ -17,6 +18,7 @@ const form = useForm({
     opening_balance: '0.00',
     account_id: props.chartAccounts?.[0]?.id || '',
 });
+useUnsavedGuard(form);
 
 const submitAccount = () => form.post(route('finance.banks.store'));
 </script>

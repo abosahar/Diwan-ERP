@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, watch } from 'vue';
@@ -12,6 +13,7 @@ const form = useForm({
     product_id: props.preset?.product_id || '', quantity: props.preset?.quantity || 1, bom_id: '', routing_id: '', warehouse_id: props.warehouses?.[0]?.id || '', output_warehouse_id: '',
     planned_start: new Date().toISOString().slice(0, 10), planned_end: '', sales_order_id: props.preset?.sales_order_id || '', priority: 3, notes: '',
 });
+useUnsavedGuard(form);
 const productBoms = computed(() => props.boms.filter((b) => b.product_id === form.product_id));
 watch(() => form.product_id, () => { form.bom_id = productBoms.value.find((b) => b.is_default)?.id || productBoms.value[0]?.id || ''; });
 watch(() => form.bom_id, (id) => { const b = props.boms.find((x) => x.id === id); if (b?.routing_id && !form.routing_id) form.routing_id = b.routing_id; });

@@ -54,6 +54,25 @@ export function notify(message, options = {}) {
     return open({ message, alertOnly: true, title: options.title || 'تنبيه', ...options });
 }
 
+/** «لديك تغييرات غير محفوظة»: resolves 'save' | 'discard' | 'stay' (see useUnsavedGuard). */
+export const unsavedState = reactive({ open: false, resolve: null });
+
+export function confirmUnsaved() {
+    unsavedState.resolve?.('stay');
+
+    return new Promise((resolve) => {
+        unsavedState.open = true;
+        unsavedState.resolve = resolve;
+    });
+}
+
+export function settleUnsaved(choice) {
+    const resolve = unsavedState.resolve;
+    unsavedState.open = false;
+    unsavedState.resolve = null;
+    resolve?.(choice);
+}
+
 export function useDialog() {
     return { ask, confirmAction, notify };
 }

@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DimensionFields from '@/Components/Documents/DimensionFields.vue';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
@@ -26,6 +27,7 @@ const form = useForm({
     vendor_name: '',
     notes: '',
 });
+useUnsavedGuard(form);
 
 const onAmountChange = () => {
     if (form.amount && form.taxable) {

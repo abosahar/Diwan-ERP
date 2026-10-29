@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -8,6 +9,7 @@ import Field from '@/Components/UI/Field.vue';
 
 const props = defineProps({ products: Array, plans: Array });
 const form = useForm({ product_id: '', qc_plan_id: '', inspected_quantity: '', notes: '' });
+useUnsavedGuard(form);
 const plans = computed(() => props.plans.filter((p) => !p.product_id || p.product_id === form.product_id));
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
 </script>

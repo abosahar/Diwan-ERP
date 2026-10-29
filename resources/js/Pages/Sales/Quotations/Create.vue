@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -56,6 +57,7 @@ const form = useForm({
         }
     ]
 });
+useUnsavedGuard(form);
 
 // A new branch moves lines still on the old standard rate to the new one (reduced or zero rates stay).
 watch(() => form.branch_id, (id) => {

@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -21,6 +22,7 @@ const form = useForm({
     bank_name: e.bank_name || '', bank_code: e.bank_code || '', iban: e.iban || '', status: e.status || 'active', notes: e.notes || '',
     salary_effective_date: new Date().toISOString().slice(0, 10), salary_change_reason: '',
 });
+useUnsavedGuard(form);
 // A pay change on an existing employee is recorded with its effective date.
 const payFields = ['basic_salary', 'housing_allowance', 'transport_allowance', 'other_allowances'];
 const payChanged = () => props.employee && payFields.some((f) => Number(form[f] || 0) !== Number(e[f] || 0));

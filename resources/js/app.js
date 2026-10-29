@@ -10,6 +10,7 @@ import i18n from './i18n';
 import VueApexCharts from 'vue3-apexcharts';
 import { PermissionsPlugin } from './permissions';
 import PromptDialog from './Components/UI/PromptDialog.vue';
+import UnsavedDialog from './Components/UI/UnsavedDialog.vue';
 import { installLatinDigits } from './utils/latinDigits';
 
 installLatinDigits();
@@ -28,7 +29,7 @@ createInertiaApp({
         appName = props.initialPage?.props?.brand?.name || appName;
 
         // PromptDialog is the single host for ask() / confirmAction() / notify().
-        const app = createApp({ render: () => [h(App, props), h(PromptDialog)] });
+        const app = createApp({ render: () => [h(App, props), h(PromptDialog), h(UnsavedDialog)] });
         
         // Tax of the user's branch in templates: {{ $taxLabel() }}, {{ $taxRate() }}%.
         app.config.globalProperties.$taxRate = taxRate;

@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { ref } from 'vue';
@@ -19,6 +20,7 @@ const form = useForm({
     currency_code: '',
     exchange_rate: '',
 });
+useUnsavedGuard(form);
 
 const filteredInvoices = ref([]);
 

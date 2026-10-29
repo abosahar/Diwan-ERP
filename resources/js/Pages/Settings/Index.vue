@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
@@ -125,6 +126,7 @@ const form = useForm({
     acc_default_cash_id: findDefaultAccountId('default_cash'),
     acc_default_bank_id: findDefaultAccountId('default_bank'),
 });
+useUnsavedGuard(form);
 
 const onboardForm = useForm({
     otp: '',

@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -13,6 +14,7 @@ const adjustForm = useForm({
     quantity: 1,
     reason: '',
 });
+useUnsavedGuard(adjustForm);
 
 const submitAdjust = () => adjustForm.post(route('inventory.operations.adjust'));
 </script>

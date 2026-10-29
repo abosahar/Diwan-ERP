@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -13,6 +14,7 @@ const form = useForm({
     capacity_hours_per_day: c.capacity_hours_per_day ?? 8, efficiency: c.efficiency ?? 100, labour_rate_per_hour: c.labour_rate_per_hour ?? 0, overhead_rate_per_hour: c.overhead_rate_per_hour ?? 0,
     is_active: c.is_active ?? true, notes: c.notes || '',
 });
+useUnsavedGuard(form);
 const submit = () => (editing ? form.put(route('manufacturing.work-centers.update', c.id)) : form.post(route('manufacturing.work-centers.store')));
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
 </script>

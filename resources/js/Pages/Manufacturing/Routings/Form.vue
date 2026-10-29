@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -14,6 +15,7 @@ const form = useForm({
     code: r.code || '', name: r.name || '', product_id: r.product_id || '', is_active: r.is_active ?? true, notes: r.notes || '',
     operations: r.operations?.length ? r.operations.map((o) => ({ seq: o.seq, name: o.name, work_center_id: o.work_center_id, setup_minutes: o.setup_minutes, run_minutes: o.run_minutes })) : [blank(10)],
 });
+useUnsavedGuard(form);
 const add = () => form.operations.push(blank((Math.max(0, ...form.operations.map((o) => Number(o.seq) || 0)) || 0) + 10));
 const submit = () => (editing ? form.put(route('manufacturing.routings.update', r.id)) : form.post(route('manufacturing.routings.store')));
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';

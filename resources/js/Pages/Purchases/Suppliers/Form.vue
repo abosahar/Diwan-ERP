@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -20,6 +21,7 @@ const form = useForm({
     opening_balance: props.supplier?.opening_balance ?? 0,
     status: props.supplier?.status || 'active',
 });
+useUnsavedGuard(form);
 
 const submitSupplier = () => (editingSupplier
     ? form.put(route('purchases.suppliers.update', editingSupplier.id))

@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import ImportLines from '@/Components/Documents/ImportLines.vue';
@@ -42,6 +43,7 @@ const form = useForm({
     save_as: 'posted',
     lines: [blankLine(0), blankLine(1)],
 });
+useUnsavedGuard(form);
 
 const addLine = () => form.lines.push(blankLine(0));
 const removeLine = (index) => {

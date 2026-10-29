@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -13,6 +14,7 @@ const transferForm = useForm({
     quantity: 1,
     notes: '',
 });
+useUnsavedGuard(transferForm);
 
 const submitTransfer = () => transferForm.post(route('inventory.operations.transfer'));
 </script>

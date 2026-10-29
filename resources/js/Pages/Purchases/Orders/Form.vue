@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -20,6 +21,7 @@ const form = useForm({
     terms: o?.terms ?? '',
     items: (o?.items ?? []).map((i) => ({ product_id: i.product_id, item_name: i.item_name, quantity: Number(i.quantity), unit_price: Number(i.unit_price), discount: Number(i.discount), tax_rate: Number(i.tax_rate) })),
 });
+useUnsavedGuard(form);
 // "submit" is sent through transform(): as a form field it would shadow
 // Inertia's own form.submit() and post()/put() would silently do nothing.
 const save = (submit) => {

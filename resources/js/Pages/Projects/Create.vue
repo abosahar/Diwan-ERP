@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -10,6 +11,7 @@ import BoqEditor from '@/Components/Projects/BoqEditor.vue';
 
 const props = defineProps({ managers: Array, warehouses: Array, suggestedCode: String, branches: Array, defaultBranchId: Number });
 const form = useForm({ customer_id: null, branch_id: props.defaultBranchId || props.branches?.[0]?.id || '', name: '', contract_number: '', manager_id: '', warehouse_id: '', start_date: '', end_date: '', contract_value: 0, advance_percent: 0, retention_percent: 5, location: '', description: '', boq: [] });
+useUnsavedGuard(form);
 const save = () => {
     form.clearErrors();
     if (!form.name) form.setError('name', 'أدخل اسم المشروع.');

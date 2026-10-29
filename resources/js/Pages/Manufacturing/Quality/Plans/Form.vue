@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -13,6 +14,7 @@ const form = useForm({
     name: p.name || '', product_id: p.product_id || '', applies_to: p.applies_to || 'production', is_active: p.is_active ?? true,
     checks: p.checks?.length ? p.checks.map((c) => ({ name: c.name, type: c.type, min: c.min ?? '', max: c.max ?? '' })) : [{ name: '', type: 'passfail', min: '', max: '' }],
 });
+useUnsavedGuard(form);
 const submit = () => (editing ? form.put(route('manufacturing.plans.update', p.id)) : form.post(route('manufacturing.plans.store')));
 const input = 'w-full text-xs rounded-xl border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
 </script>

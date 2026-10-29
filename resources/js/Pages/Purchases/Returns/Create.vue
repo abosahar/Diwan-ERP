@@ -1,4 +1,5 @@
 <script setup>
+import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed } from 'vue';
@@ -19,6 +20,7 @@ const form = useForm({
     bank_account_id: '',
     items: (props.invoice?.items ?? []).map((i) => ({ purchase_invoice_item_id: i.id, name: i.item_name, returnable: i.returnable_quantity, unit_net: Number(i.quantity) ? (Number(i.quantity) * Number(i.unit_price) - Number(i.discount)) / Number(i.quantity) : 0, tax_rate: Number(i.tax_rate), quantity: 0 })),
 });
+useUnsavedGuard(form);
 const total = computed(() => form.items.reduce((s, i) => s + Number(i.quantity) * i.unit_net * (1 + i.tax_rate / 100), 0));
 const save = () => form.transform((d) => ({ ...d, items: d.items.filter((i) => Number(i.quantity) > 0).map(({ purchase_invoice_item_id, quantity }) => ({ purchase_invoice_item_id, quantity })) }))
     .post(route('purchases.returns.store'));
