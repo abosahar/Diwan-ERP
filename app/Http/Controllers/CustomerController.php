@@ -94,6 +94,7 @@ class CustomerController extends Controller
         $this->normalizeNationalAddress($request);
         $validated = $request->validate([
             'customer_type' => 'nullable|in:individual,commercial',
+            'customer_group_id' => 'nullable|tenant_exists:customer_groups,id',
             'code' => 'nullable|string|max:50',
             'name' => 'required|string|max:255',
             'company_name' => 'nullable|string|max:255',
@@ -258,6 +259,7 @@ class CustomerController extends Controller
         $this->normalizeNationalAddress($request);
         $validated = $request->validate([
             'customer_type' => 'nullable|in:individual,commercial',
+            'customer_group_id' => 'nullable|tenant_exists:customer_groups,id',
             'code' => 'nullable|string|max:50',
             'name' => 'required|string|max:255',
             'company_name' => 'nullable|string|max:255',

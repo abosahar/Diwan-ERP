@@ -377,6 +377,10 @@ class PostingService
             $accountId = $line['account_id'] ?? null;
             if (! $accountId && ! empty($line['role'])) {
                 $accountId = $this->accounts->id($line['role'], $companyId);
+                // A customer of a group with its own receivable account posts there.
+                if ($line['role'] === 'receivables' && ($line['party_type'] ?? null) === 'customer' && ! empty($line['party_id'])) {
+                    $accountId = app(PartyAccounts::class)->receivableFor((int) $line['party_id'], $companyId) ?: $accountId;
+                }
             }
 
             $normalised[] = array_merge($line, [

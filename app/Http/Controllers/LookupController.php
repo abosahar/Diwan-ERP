@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Category;
 use App\Models\CostCenter;
 use App\Models\Customer;
+use App\Models\CustomerGroup;
 use App\Models\Department;
 use App\Models\JobPosition;
 use App\Models\Product;
@@ -99,6 +100,7 @@ class LookupController extends Controller
             'shifts' => [WorkShift::class, 'name', fn ($m) => $m->name],
             'asset_categories' => [AssetCategory::class, 'name_ar', fn ($m) => $m->name_ar],
             'work_centers' => [WorkCenter::class, 'name', fn ($m) => $m->name],
+            'customer_groups' => [CustomerGroup::class, 'code', fn ($m) => $m->name],
             'accounts' => [Account::class, 'code', fn ($m) => $m->code.' - '.$m->name_ar],
         ];
         abort_unless(isset($lists[$name]), 404);

@@ -118,6 +118,7 @@
         "settlements": "End of Service",
         "organization": "Organisation",
         "nationalities": "Nationalities",
+        "customer_groups": "Customer groups",
         "self_service": "My Services",
         "billing": "Subscription",
         "integrations": "API & Webhooks",

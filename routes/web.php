@@ -62,6 +62,7 @@ use App\Http\Controllers\Reports\InsightsController;
 use App\Http\Controllers\Reports\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Sales as S;
+use App\Http\Controllers\Sales\CustomerGroupController;
 use App\Http\Controllers\Sales\RecurringInvoiceController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SelfUpdateController;
@@ -236,6 +237,11 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convertToInvoice'])->name('quotations.convert');
 
         // Clients (Customers)
+        Route::get('/customer-groups', [CustomerGroupController::class, 'index'])->name('customer-groups.index');
+        Route::get('/customer-groups/create', [CustomerGroupController::class, 'create'])->name('customer-groups.create');
+        Route::post('/customer-groups', [CustomerGroupController::class, 'store'])->name('customer-groups.store');
+        Route::get('/customer-groups/{group}/edit', [CustomerGroupController::class, 'edit'])->name('customer-groups.edit');
+        Route::put('/customer-groups/{group}', [CustomerGroupController::class, 'update'])->name('customer-groups.update');
         Route::get('/clients', [CustomerController::class, 'index'])->name('clients.index');
         Route::get('/clients/create', [CustomerController::class, 'create'])->name('clients.create');
         Route::post('/clients', [CustomerController::class, 'store'])->name('clients.store');
