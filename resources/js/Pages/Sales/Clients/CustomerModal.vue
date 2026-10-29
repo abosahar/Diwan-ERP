@@ -382,7 +382,7 @@ const saveCustomer = async () => {
                                 v-model="form.name"
                                 type="text"
                                 required
-                                placeholder="مثال: شركة مدن الراقية المحدودة"
+                                placeholder="مثال: شركة شبوة سوفت"
                                 class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 :class="{ 'border-rose-400': formErrors.name }"
                             />
@@ -399,7 +399,7 @@ const saveCustomer = async () => {
                                 <input
                                     v-model="form.commercial_registration"
                                     type="text"
-                                    placeholder="مثال: 4030502848"
+                                    placeholder="مثال: ××××××××××"
                                     class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 font-mono transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 />
                             </div>
@@ -411,7 +411,7 @@ const saveCustomer = async () => {
                                     v-model="form.tax_number"
                                     type="text"
                                     maxlength="15"
-                                    placeholder="مثال: 311576763100003"
+                                    placeholder="مثال: ××××××××××××××××"
                                     class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 font-mono transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                 />
                             </div>
@@ -594,7 +594,7 @@ const saveCustomer = async () => {
                                             type="text"
                                             inputmode="numeric"
                                             maxlength="4"
-                                            placeholder="4002"
+                                            placeholder="××××"
                                             data-field="building_number"
                                             class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 font-mono transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         />
@@ -605,7 +605,7 @@ const saveCustomer = async () => {
                                         <input
                                             v-model="form.street_name"
                                             type="text"
-                                            placeholder="مثال: طريق الملك فهد"
+                                            placeholder="مثال: ××××"
                                             class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         />
                                     </div>
@@ -618,7 +618,7 @@ const saveCustomer = async () => {
                                         type="text"
                                         inputmode="numeric"
                                         maxlength="4"
-                                        placeholder="7007"
+                                        placeholder="××××"
                                         class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 font-mono transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                     />
                                     <p v-if="formErrors.additional_details" class="text-3xs text-rose-600 mt-1">{{ formErrors.additional_details[0] }}</p>
@@ -631,7 +631,7 @@ const saveCustomer = async () => {
                                         <input
                                             v-model="form.district"
                                             type="text"
-                                            placeholder="مثال: جامعة الملك عبدالعزيز"
+                                            placeholder="مثال: ××××"
                                             class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         />
                                     </div>
@@ -640,7 +640,7 @@ const saveCustomer = async () => {
                                         <input
                                             v-model="form.city"
                                             type="text"
-                                            placeholder="مثال: جدة"
+                                            placeholder="مثال: ××××"
                                             class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         />
                                     </div>
@@ -653,7 +653,7 @@ const saveCustomer = async () => {
                                         <input
                                             v-model="form.postal_code"
                                             type="text"
-                                            placeholder="مثال: 22254"
+                                            placeholder="مثال: ×××××"
                                             class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 font-mono transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         />
                                         <p v-if="formErrors.postal_code" class="text-3xs text-rose-600 mt-1">{{ formErrors.postal_code[0] }}</p>
@@ -663,7 +663,7 @@ const saveCustomer = async () => {
                                         <input
                                             v-model="form.province"
                                             type="text"
-                                            placeholder="مثال: جدة"
+                                            placeholder="مثال: ××××"
                                             class="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                                         />
                                     </div>
