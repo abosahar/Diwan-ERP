@@ -475,6 +475,8 @@ return [
         'accounting.cost-centers.destroy' => 'accounting.cost_centers.delete',
         'accounting.fiscal-years.index' => 'accounting.fiscal_years.view',
         'accounting.fiscal-years.store' => 'accounting.fiscal_years.create',
+        'accounting.fiscal-years.create' => 'accounting.fiscal_years.create',
+        'accounting.fiscal-years.preview' => 'accounting.fiscal_years.create',
         'accounting.fiscal-periods.update' => 'accounting.fiscal_years.manage',
         'accounting.fiscal-years.close' => 'accounting.fiscal_years.approve',
         'accounting.fiscal-years.reopen' => 'accounting.fiscal_years.approve',

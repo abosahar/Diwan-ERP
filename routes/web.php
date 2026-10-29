@@ -540,6 +540,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
 
         // Fiscal years & periods
         Route::get('/fiscal-years', [A\FiscalYearController::class, 'index'])->name('fiscal-years.index');
+        Route::get('/fiscal-years/create', [A\FiscalYearController::class, 'create'])->name('fiscal-years.create');
+        Route::get('/fiscal-years/preview', [A\FiscalYearController::class, 'preview'])->name('fiscal-years.preview');
         Route::post('/fiscal-years', [A\FiscalYearController::class, 'store'])->name('fiscal-years.store');
         Route::put('/fiscal-periods/{period}', [A\FiscalYearController::class, 'updatePeriod'])->name('fiscal-periods.update');
         Route::post('/fiscal-years/{year}/close', [A\FiscalYearController::class, 'close'])->name('fiscal-years.close');

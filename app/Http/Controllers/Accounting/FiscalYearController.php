@@ -11,6 +11,7 @@ use App\Services\TenantManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,26 +25,71 @@ class FiscalYearController extends Controller
         ]);
     }
 
+    public function create(): Response
+    {
+        $start = now()->addYear()->startOfYear();
+
+        return Inertia::render('Accounting/FiscalYears/Create', [
+            'periodTypes' => FiscalYear::PERIOD_TYPES,
+            'defaults' => [
+                'name' => 'السنة المالية '.$start->year,
+                'start_date' => $start->toDateString(),
+                'end_date' => $start->copy()->addYear()->subDay()->toDateString(),
+                'period_type' => 'monthly',
+            ],
+        ]);
+    }
+
+    /** Live preview of the periods a year would get, and the existing year it would clash with. */
+    public function preview(Request $request, FiscalCalendar $calendar)
+    {
+        [$start, $end, $type] = $this->bounds($request);
+
+        $periods = collect($calendar->periodRanges($start, $type, $calendar->defaultName($start, $end), $end))
+            ->map(fn ($p, $i) => ['n' => $i + 1, 'label' => $p[3], 'code' => $p[0], 'from' => $p[1]->toDateString(), 'to' => $p[2]->toDateString()])->values();
+        $clash = $this->overlapping($start, $end);
+
+        return response()->json([
+            'periods' => $periods,
+            'overlap' => $clash ? ['name' => $clash->name, 'from' => $clash->start_date->toDateString(), 'to' => $clash->end_date->toDateString()] : null,
+            'months' => (int) $start->diffInMonths($end->copy()->addDay()),
+        ]);
+    }
+
     public function store(Request $request, FiscalCalendar $calendar)
+    {
+        [$start, $end, $type] = $this->bounds($request);
+        $request->validate(['name' => 'nullable|string|max:100']);
+
+        if ($this->overlapping($start, $end)) {
+            return back()->withErrors(['start_date' => 'تتداخل هذه السنة المالية مع سنة مالية أخرى موجودة بالفعل لهذه المنشأة — لا يمكن أن تمتلك المنشأة سنتين ماليتين متداخلتين.']);
+        }
+
+        $calendar->createYear($start, app(TenantManager::class)->getTenantId(), $type, $end, $request->input('name') ?: null);
+
+        return redirect()->route('accounting.fiscal-years.index')->with('success', 'تم إنشاء السنة المالية وفتراتها: '.FiscalYear::PERIOD_TYPES[$type]);
+    }
+
+    /** @return array{0: Carbon, 1: Carbon, 2: string} start (month start), end (month end), period type */
+    protected function bounds(Request $request): array
     {
         $validated = $request->validate([
             'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after:start_date',
             'period_type' => ['nullable', Rule::in(array_keys(FiscalYear::PERIOD_TYPES))],
         ]);
-
         $start = Carbon::parse($validated['start_date'])->startOfMonth();
-        $overlap = FiscalYear::where('start_date', '<=', $start->copy()->addYear()->subDay()->toDateString())
-            ->where('end_date', '>=', $start->toDateString())
-            ->exists();
-
-        if ($overlap) {
-            return back()->withErrors(['start_date' => 'السنة المالية تتداخل مع سنة موجودة.']);
+        $end = isset($validated['end_date']) ? Carbon::parse($validated['end_date'])->endOfMonth()->startOfDay() : $start->copy()->addYear()->subDay();
+        if ($start->diffInMonths($end->copy()->addDay()) > 18) {
+            throw ValidationException::withMessages(['end_date' => 'لا يمكن أن تزيد السنة المالية عن 18 شهرًا.']);
         }
 
-        $type = $validated['period_type'] ?? 'monthly';
-        $calendar->createYear($start, app(TenantManager::class)->getTenantId(), $type);
+        return [$start, $end, $validated['period_type'] ?? 'monthly'];
+    }
 
-        return back()->with('success', 'تم إنشاء السنة المالية وفتراتها: '.FiscalYear::PERIOD_TYPES[$type]);
+    protected function overlapping(Carbon $start, Carbon $end): ?FiscalYear
+    {
+        return FiscalYear::whereDate('start_date', '<=', $end->toDateString())->whereDate('end_date', '>=', $start->toDateString())->first();
     }
 
     /**

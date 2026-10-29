@@ -1,7 +1,6 @@
 <script setup>
-import DatePicker from '@/Components/UI/DatePicker.vue';
 import { ref } from 'vue';
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { date } from '@/utils/format';
@@ -9,8 +8,6 @@ import { ChevronDownIcon } from '@heroicons/vue/24/outline';
 
 defineProps({ years: Array, periodTypes: Object });
 
-const form = useForm({ start_date: new Date().getFullYear() + 1 + '-01-01', period_type: 'monthly' });
-const create = () => form.post(route('accounting.fiscal-years.store'), { preserveScroll: true });
 const setStatus = (period, status) => router.put(route('accounting.fiscal-periods.update', period.id), { status }, { preserveScroll: true });
 const closeYear = (year) => confirm(`إقفال السنة المالية ${year.name}؟ سيتم ترحيل صافي الربح/الخسارة إلى الأرباح المحتجزة وإغلاق جميع الفترات.`) && router.post(route('accounting.fiscal-years.close', year.id), {}, { preserveScroll: true });
 const reopenYear = (year) => confirm(`إعادة فتح السنة ${year.name}؟ سيتم عكس قيد الإقفال.`) && router.post(route('accounting.fiscal-years.reopen', year.id), {}, { preserveScroll: true });
@@ -25,17 +22,10 @@ const expanded = ref(null);
         <Head title="السنوات المالية" />
         <PageHeader title="السنوات والفترات المالية" subtitle="إغلاق الفترات يمنع الترحيل بتواريخها، والإقفال السنوي يرحل نتيجة السنة للأرباح المحتجزة" :crumbs="[{ label: 'المحاسبة' }, { label: 'السنوات المالية' }]">
             <template #actions>
-                <form v-if="$can('accounting.fiscal_years.create')" @submit.prevent="create" class="flex items-center gap-2 text-xs">
-                    <DatePicker v-model="form.start_date" class="rounded-xl border-slate-200 text-xs" />
-                    <select v-model="form.period_type" class="rounded-xl border-slate-200 text-xs" title="نوع الفترات">
-                        <option v-for="(label, key) in periodTypes" :key="key" :value="key">{{ label }}</option>
-                    </select>
-                    <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">إنشاء سنة مالية</button>
-                </form>
+                <Link v-if="$can('accounting.fiscal_years.create')" :href="route('accounting.fiscal-years.create')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">إنشاء سنة مالية</Link>
             </template>
         </PageHeader>
-        <p v-if="form.errors.start_date" class="text-xs text-rose-600 mb-3">{{ form.errors.start_date }}</p>
-
+        
         <div class="space-y-3">
             <div v-for="year in years" :key="year.id" class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                 <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">

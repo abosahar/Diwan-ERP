@@ -102,4 +102,29 @@ class FiscalPeriodTypesTest extends TestCase
             ->assertInertia(fn ($page) => $page->has('periodTypes', 4));
         $this->post(route('accounting.fiscal-years.store'), ['start_date' => '2037-01-01', 'period_type' => 'weekly'])->assertSessionHasErrors('period_type');
     }
+
+    public function test_custom_end_date_cap_overlap_and_preview(): void
+    {
+        // A 6-month year split in quarters.
+        $this->post(route('accounting.fiscal-years.store'), ['name' => 'سنة قصيرة', 'start_date' => '2040-01-01', 'end_date' => '2040-06-30', 'period_type' => 'quarterly'])->assertSessionHasNoErrors();
+        $year = FiscalYear::whereDate('start_date', '2040-01-01')->firstOrFail();
+        $this->assertSame('سنة قصيرة', $year->name);
+        $this->assertSame('2040-06-30', $year->end_date->toDateString());
+        $this->assertCount(2, $year->periods);
+        $this->assertSame('2040-06-30', $year->periods->last()->end_date->toDateString());
+
+        // More than 18 months is refused; so is a clash with the year above.
+        $this->post(route('accounting.fiscal-years.store'), ['start_date' => '2041-01-01', 'end_date' => '2043-01-31'])->assertSessionHasErrors('end_date');
+        $this->post(route('accounting.fiscal-years.store'), ['start_date' => '2040-03-01', 'end_date' => '2041-02-28'])->assertSessionHasErrors('start_date');
+
+        $preview = $this->getJson(route('accounting.fiscal-years.preview', ['start_date' => '2042-01-01', 'end_date' => '2042-12-31', 'period_type' => 'semimonthly']))->assertOk();
+        $this->assertCount(24, $preview->json('periods'));
+        $this->assertSame('يناير (1-15)', $preview->json('periods.0.label'));
+        $this->assertSame('يناير (16-31)', $preview->json('periods.1.label'));
+        $this->assertNull($preview->json('overlap'));
+
+        $clash = $this->getJson(route('accounting.fiscal-years.preview', ['start_date' => '2040-02-01', 'end_date' => '2040-12-31']))->json();
+        $this->assertSame('سنة قصيرة', $clash['overlap']['name']);
+        $this->get(route('accounting.fiscal-years.create'))->assertOk()->assertInertia(fn ($p) => $p->component('Accounting/FiscalYears/Create'));
+    }
 }
