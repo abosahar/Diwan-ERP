@@ -3,6 +3,7 @@ import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 
 import { ChevronUpDownIcon, PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { quickCreate } from '@/quickCreate';
 import { canRoute } from '@/permissions';
+import { useFixedDropdown } from '@/composables/useFixedDropdown';
 
 const CustomerModal = defineAsyncComponent(() => import('@/Pages/Sales/Clients/CustomerModal.vue'));
 const QuickCreateDialog = defineAsyncComponent(() => import('@/Components/UI/QuickCreateDialog.vue'));
@@ -49,6 +50,10 @@ const exact = computed(() => all.value.some((o) => labelOf(o).trim().toLowerCase
 const showCreate = computed(() => canCreate.value && term.value !== '' && !exact.value);
 
 const shown = computed(() => (open.value ? query.value : (selected.value ? labelOf(selected.value) : '')));
+// The list is fixed under the field: in a line table that scrolls sideways or in a
+// dialog body, an absolute one would be cut off by the scroll box. At least 12rem wide.
+const { style: listStyle, anchor } = useFixedDropdown(() => open.value, { minWidth: 192 });
+const openList = (el) => { open.value = true; anchor(el); };
 const choose = (value) => { emit('update:modelValue', value); open.value = false; query.value = ''; };
 const startCreate = () => { open.value = false; creating.value = true; };
 const created = (record) => {
@@ -68,14 +73,14 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', outside));
     <div ref="root" class="relative" data-select-create>
         <input
             type="text" :value="shown" :placeholder="placeholder" :disabled="disabled" autocomplete="off"
-            @focus="open = true" @input="query = $event.target.value; open = true"
+            @focus="openList($event.target)" @input="query = $event.target.value; openList($event.target)"
             @keydown.enter.prevent="showCreate ? startCreate() : (filtered[0] && choose(filtered[0][valueKey]))"
             @keydown.esc="open = false; query = ''"
             class="w-full rounded-xl border-slate-200 text-xs ps-3 pe-8 py-2 focus:border-indigo-600 focus:ring-indigo-600 disabled:bg-slate-50"
         />
         <input v-if="required" type="text" tabindex="-1" aria-hidden="true" :value="modelValue" required class="absolute inset-0 opacity-0 pointer-events-none" />
         <span class="absolute inset-y-0 end-2 flex items-center text-slate-400 pointer-events-none"><ChevronUpDownIcon class="w-4 h-4" /></span>
-        <div v-if="open" class="absolute z-40 mt-1 w-full min-w-[12rem] bg-white border border-slate-200 rounded-xl shadow-lg max-h-64 overflow-y-auto p-1 text-xs">
+        <div v-if="open" :style="listStyle" data-select-list class="fixed z-40 bg-white border border-slate-200 rounded-xl shadow-lg max-h-64 overflow-y-auto p-1 text-xs">
             <button v-if="showCreate" type="button" @click="startCreate" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-start" data-create-option>
                 <PlusIcon class="w-4 h-4 stroke-2" /> <span>إنشاء "{{ term }}"</span>
             </button>

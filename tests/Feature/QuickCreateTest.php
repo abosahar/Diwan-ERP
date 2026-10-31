@@ -150,4 +150,43 @@ class QuickCreateTest extends TestCase
         }
         $this->assertSame([], $missing, "Add useUnsavedGuard(form) to:\n".implode("\n", $missing));
     }
+
+    /** Native selects keep room for their arrow on the end side: app.css gives it unless the select's own padding classes take it away. */
+    public function test_selects_leave_room_for_the_arrow(): void
+    {
+        $offenders = [];
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(resource_path('js')));
+        foreach ($files as $file) {
+            if ($file->getExtension() !== 'vue') {
+                continue;
+            }
+            $code = file_get_contents($file->getPathname());
+            preg_match_all("/const (\w+) = '([^']*)'/", $code, $consts);
+            $consts = array_combine($consts[1], $consts[2]);
+            // Quote-aware, so a "=>" inside an attribute does not end the tag.
+            preg_match_all('/<select\b(?:[^>"\']|"[^"]*"|\'[^\']*\')*>/', $code, $tags, PREG_OFFSET_CAPTURE);
+            foreach ($tags[0] as [$tag, $offset]) {
+                // Its classes: class="...", plus the quoted strings and the `const` names used in :class="...".
+                preg_match('/(?:^|\s)class="([^"]*)"/', $tag, $static);
+                preg_match('/:class="([^"]*)"/', $tag, $bound);
+                preg_match_all("/'([^']*)'/", $bound[1] ?? '', $quoted);
+                preg_match_all('/\b[A-Za-z_]\w*\b/', preg_replace("/'[^']*'/", '', $bound[1] ?? ''), $names);
+                $classes = implode(' ', [$static[1] ?? '', ...$quoted[1], ...array_map(fn ($n) => $consts[$n] ?? '', $names[0])]);
+                if (str_contains($classes, 'bg-none')) {
+                    continue;
+                }
+                // The end side: pe-* beats px-*, which beats p-* (Tailwind's order). pl-/pr- cannot follow the direction.
+                $end = null;
+                foreach (['p', 'px', 'pe'] as $prefix) {
+                    if (preg_match('/(?:^|[\s:])'.$prefix.'-([\d.]+)(?=\s|$)/', $classes, $m)) {
+                        $end = (float) $m[1];
+                    }
+                }
+                if (($end !== null && $end < 6) || preg_match('/(?:^|[\s:])p[lr]-/', $classes)) {
+                    $offenders[] = str_replace(resource_path('js').'/', '', $file->getPathname()).':'.(substr_count(substr($code, 0, $offset), "\n") + 1);
+                }
+            }
+        }
+        $this->assertSame([], $offenders, "Leave a select's horizontal padding to app.css (2.5rem for the arrow), or give the end side pe-6 or more (ps-/pe-, not pl-/pr-):\n".implode("\n", $offenders));
+    }
 }

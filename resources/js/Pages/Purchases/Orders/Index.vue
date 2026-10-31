@@ -118,7 +118,7 @@ const formatCurrency = (val) => {
                             <select 
                                 v-model="status" 
                                 @change="handleSearch"
-                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
+                                class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition"
                             >
                                 <option value="">كل الحالات</option>
                                 <option value="pending">قيد الانتظار</option>

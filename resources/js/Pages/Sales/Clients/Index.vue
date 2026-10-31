@@ -175,7 +175,7 @@ const formatCurrency = (val) => {
                             <label class="block text-xs font-semibold text-slate-600 mb-1.5">نوع العميل</label>
                             <select 
                                 v-model="customerType" 
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                class="w-full text-xs rounded-xl border border-slate-200 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             >
                                 <option value="">الكل (فردي وتجاري)</option>
                                 <option value="commercial">تجاري</option>
@@ -188,7 +188,7 @@ const formatCurrency = (val) => {
                             <label class="block text-xs font-semibold text-slate-600 mb-1.5">الحالة</label>
                             <select 
                                 v-model="status" 
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                class="w-full text-xs rounded-xl border border-slate-200 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             >
                                 <option value="">الكل</option>
                                 <option value="active">نشط</option>

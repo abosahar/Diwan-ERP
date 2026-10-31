@@ -51,7 +51,7 @@ const submit = () => {
                     <select 
                         v-model="form.pos_register_id" 
                         required
-                        class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-4 py-3 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-center font-medium bg-slate-50/50"
+                        class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-10 py-3 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-center font-medium bg-slate-50/50"
                     >
                         <option v-for="reg in registers" :key="reg.id" :value="reg.id">
                             {{ reg.name }}
