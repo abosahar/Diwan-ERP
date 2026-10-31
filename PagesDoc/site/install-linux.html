@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تثبيت «الديوان» على لينكس (Ubuntu / Mint / Debian) · الديوان</title>
+<meta name="description" content="تثبيت بسطر واحد على Ubuntu أو Mint أو Debian، مع أوامر التشغيل اليومي وأماكن الملفات.">
+<meta name="generator" content="PagesDoc">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%221%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%230f766e%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%230d9488%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2334d399%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22url%28%23g%29%22%2F%3E%3Cg%20transform%3D%22translate%286.4%206.4%29%20scale%28.8%29%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%202L2%207l10%205%2010-5-10-5z%22%2F%3E%3Cpath%20d%3D%22M2%2017l10%205%2010-5%22%2F%3E%3Cpath%20d%3D%22M2%2012l10%205%2010-5%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script>try{var t=localStorage.getItem('pagesdoc-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body class="page-doc" id="top">
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<header class="topbar">
+  <div class="topbar-in">
+    <button type="button" class="icon-btn nav-toggle" data-open-nav aria-label="فهرس الأدلة"><svg class="i i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <a class="brand" href="index.html" aria-label="الديوان: الصفحة الرئيسية للتوثيق">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
+      <span class="brand-text"><b>الديوان</b><small>مركز التوثيق</small></span>
+    </a>
+    <a class="ver" href="https://github.com/turkialawlqy/Diwan-ERP/tags" target="_blank" rel="noopener" title="كل الإصدارات (Tags) على GitHub">v1.5.0</a>
+    <button type="button" class="searchbox" data-open-search aria-label="بحث في التوثيق">
+      <svg class="i i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span>ابحث في التوثيق...</span><kbd>Ctrl K</kbd>
+    </button>
+    <div class="top-actions">
+      <button type="button" class="icon-btn" data-theme-toggle aria-label="تبديل الوضع الليلي"><svg class="i i-moon only-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg><svg class="i i-sun only-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg></button>
+      <a class="icon-btn" href="https://github.com/turkialawlqy/Diwan-ERP" target="_blank" rel="noopener" aria-label="المستودع على GitHub" title="المستودع على GitHub"><svg class="i i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 8l-4.5 4 4.5 4M15.5 8l4.5 4-4.5 4M13.5 5l-3 14"/></svg></a>
+    </div>
+  </div>
+</header>
+<section class="hero hero-doc">
+  <svg class="watermark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="مسار التنقل"><a href="index.html">الرئيسية</a><span aria-hidden="true">‹</span><span>التثبيت والبدء</span></nav>
+    <div class="hero-row">
+      <div class="hero-icon"><svg class="i i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9.5l3 2.5-3 2.5M12.5 15H17"/></svg></div>
+      <div class="hero-text">
+        <h1>تثبيت «الديوان» على لينكس (Ubuntu / Mint / Debian)</h1>
+        <p class="lede">دليل خطوة بخطوة لتثبيت النظام على جهاز لينكس مكتبي للاستخدام في المكتب. لا تحتاج خبرة تقنية. يستغرق 5-15 دقيقة.</p>
+      </div>
+    </div>
+    <div class="meta"><span class="chip"><svg class="i i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5.2a3.5 3.5 0 0 1 0 6.6M18.5 14.2A6.5 6.5 0 0 1 21.5 20"/></svg>لـ أصحاب المنشآت</span><span class="chip"><svg class="i i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></svg>3 دقائق قراءة</span><span class="chip"><svg class="i i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>8 أقسام</span><span class="chip"><svg class="i i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>آخر تحديث 26 أكتوبر 2026</span></div>
+  </div>
+</section>
+<div class="layout wrap">
+  <aside class="sidenav" aria-label="فهرس الأدلة"><div class="sidenav-in"><div class="sidenav-head"><span>كل الأدلة</span><button type="button" class="icon-btn" data-close-nav aria-label="إغلاق"><svg class="i i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><a class="side-home" href="index.html"><svg class="i i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11L12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/></svg><span>الرئيسية: نظرة عامة على النظام</span></a><div class="side-group"><div class="side-title">التثبيت والبدء</div><a href="install.html"><svg class="i i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>من أين أبدأ؟</span></a><a href="install-windows.html"><svg class="i i-desktop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4M3 10h18M12 4v6"/></svg><span>ويندوز</span></a><a href="install-mac.html"><svg class="i i-laptop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="5" width="15" height="10.5" rx="1.5"/><path d="M2.5 19h19"/></svg><span>ماك</span></a><a href="install-linux.html" class="active" aria-current="page"><svg class="i i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9.5l3 2.5-3 2.5M12.5 15H17"/></svg><span>لينكس</span></a><a href="windows-local.html"><svg class="i i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5v4h4M12 7.5V12l3 2"/></svg><span>ويندوز القديم (MAMP)</span></a></div><div class="side-group"><div class="side-title">الخوادم والتشغيل</div><a href="server-setup.html"><svg class="i i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01M11 7.5h6M11 16.5h6"/></svg><span>إعداد خادم من الصفر</span></a><a href="deployment.html"><svg class="i i-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18.5a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 11a3.75 3.75 0 0 1-.5 7.5"/><path d="M12 13v7M9 15.5l3-3 3 3"/></svg><span>النشر والتشغيل</span></a><a href="data-retention.html"><svg class="i i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.4-7.5 9.5-4.3-1.1-7.5-4.9-7.5-9.5V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg><span>الاحتفاظ بالبيانات</span></a></div><div class="side-group"><div class="side-title">الوحدات والميزات</div><a href="zatca.html"><svg class="i i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-2.5-1.6L13 21l-2.5-1.6L8 21l-2-1.4z"/><path d="M9 8h6M9 11.5h6M9 15h3.5"/></svg><span>الفوترة الإلكترونية</span></a><a href="manufacturing.html"><svg class="i i-factory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20.5V10l5 3v-3l5 3v-3l5 3V4h3v16.5z"/><path d="M7 17h2M12 17h2"/></svg><span>التصنيع والمصانع</span></a></div><div class="side-group"><div class="side-title">للمطوّرين</div><a href="api.html"><svg class="i i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 8l-4.5 4 4.5 4M15.5 8l4.5 4-4.5 4M13.5 5l-3 14"/></svg><span>الواجهة البرمجية API</span></a><a href="architecture.html"><svg class="i i-blocks" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>المعمارية</span></a></div><div class="side-group"><div class="side-title">المساعدة والتواصل</div><a href="feature-requests.html"><svg class="i i-bulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 18h5M10.5 21h3"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg><span>الاقتراحات والملاحظات</span></a></div></div></aside>
+  <main class="content" id="main">
+    <details class="toc-mobile"><summary><svg class="i i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>في هذه الصفحة<svg class="i i-chevron chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><ul class="toc-list"><li class="l2"><a href="#قبل-البدء"><span>قبل البدء</span></a></li><li class="l2"><a href="#الخطوة-1-افتح-الطرفية-terminal"><span class="toc-num">1</span><span>افتح الطرفية (Terminal)</span></a></li><li class="l2"><a href="#الخطوة-2-الصق-أمر-التثبيت"><span class="toc-num">2</span><span>الصق أمر التثبيت</span></a></li><li class="l2"><a href="#الخطوة-3-انتظر-حتى-ينتهي"><span class="toc-num">3</span><span>انتظر حتى ينتهي</span></a></li><li class="l2"><a href="#الخطوة-4-الإعداد-الأول"><span class="toc-num">4</span><span>الإعداد الأول</span></a></li><li class="l2"><a href="#الاستخدام-اليومي"><span>الاستخدام اليومي</span></a></li><li class="l2"><a href="#أماكن-الملفات"><span>أماكن الملفات</span></a></li><li class="l2"><a href="#حل-المشكلات"><span>حل المشكلات</span></a></li></ul></details>
+    <article class="prose">
+
+
+<blockquote class="callout note">
+<p><strong>لخادم على الإنترنت</strong> (مثل DigitalOcean)، مع نطاق وشهادة SSL لعدة منشآت، استخدم <a href="server-setup.html">دليل إعداد خادم «الديوان» من الصفر</a> بدلاً من هذا الدليل.</p>
+</blockquote>
+<h2 id="قبل-البدء">قبل البدء<a class="anchor" href="#%D9%82%D8%A8%D9%84-%D8%A7%D9%84%D8%A8%D8%AF%D8%A1" aria-label="رابط مباشر لهذا القسم">#</a></h2>
+<ul>
+<li><strong>النظام:</strong> Ubuntu 22.04 أو أحدث، أو Linux Mint 21 أو أحدث، أو Debian 12.</li>
+<li><strong>المساحة:</strong> 3 جيجابايت فارغة على الأقل.</li>
+<li><strong>الإنترنت:</strong> اتصال أثناء التثبيت.</li>
+<li><strong>كلمة مرور حسابك:</strong> التي تدخل بها إلى الجهاز، ويجب أن يملك حسابك صلاحية <code>sudo</code>. الحساب الأول على الجهاز يملكها عادة.</li>
+</ul>
+<h2 id="الخطوة-1-افتح-الطرفية-terminal" class="numbered"><span class="h-num" data-label="الخطوة">1</span>افتح الطرفية (Terminal)<a class="anchor" href="#%D8%A7%D9%84%D8%AE%D8%B7%D9%88%D8%A9-1-%D8%A7%D9%81%D8%AA%D8%AD-%D8%A7%D9%84%D8%B7%D8%B1%D9%81%D9%8A%D8%A9-terminal" aria-label="رابط مباشر لهذا القسم">#</a></h2>
+<p>اضغط <strong>Ctrl + Alt + T</strong>، أو ابحث عن <strong>Terminal</strong> في قائمة البرامج.</p>
+<h2 id="الخطوة-2-الصق-أمر-التثبيت" class="numbered"><span class="h-num" data-label="الخطوة">2</span>الصق أمر التثبيت<a class="anchor" href="#%D8%A7%D9%84%D8%AE%D8%B7%D9%88%D8%A9-2-%D8%A7%D9%84%D8%B5%D9%82-%D8%A3%D9%85%D8%B1-%D8%A7%D9%84%D8%AA%D8%AB%D8%A8%D9%8A%D8%AA" aria-label="رابط مباشر لهذا القسم">#</a></h2>
+<p>انسخ السطر كاملاً، والصقه في الطرفية بـ <strong>Ctrl + Shift + V</strong>، ثم اضغط <strong>Enter</strong>:</p>
+<div class="code"><div class="code-bar"><span class="code-lang">Bash</span><button type="button" class="copy" data-copy="" aria-label="نسخ"><svg class="i i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/></svg><svg class="i i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>نسخ</span></button></div><pre dir="ltr"><code class="language-bash" data-hl="bash">sudo bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/latest/download/install-linux.sh)"
+</code></pre></div>
+<ul>
+<li><strong>إن ظهر <code>curl: command not found</code>:</strong> نفّذ أولاً <code>sudo apt install -y curl</code>، ثم الصق الأمر مرة أخرى.</li>
+<li><strong>عند <code>[sudo] password</code>:</strong> اكتب كلمة مرور حسابك، واضغط Enter. لن تظهر الحروف أثناء الكتابة، وهذا طبيعي.</li>
+</ul>
+<h2 id="الخطوة-3-انتظر-حتى-ينتهي" class="numbered"><span class="h-num" data-label="الخطوة">3</span>انتظر حتى ينتهي<a class="anchor" href="#%D8%A7%D9%84%D8%AE%D8%B7%D9%88%D8%A9-3-%D8%A7%D9%86%D8%AA%D8%B8%D8%B1-%D8%AD%D8%AA%D9%89-%D9%8A%D9%86%D8%AA%D9%87%D9%8A" aria-label="رابط مباشر لهذا القسم">#</a></h2>
+<p>الرسائل تظهر بالإنجليزية، لأن الطرفية لا تعرض العربية جيداً:</p>
+<div class="tablebox"><table>
+<thead>
+<tr>
+<th>ما يظهر</th>
+<th>معناه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1/6 Installing PHP and the database</code></td>
+<td>تثبيت PHP وقاعدة البيانات MySQL.</td>
+</tr>
+<tr>
+<td><code>2/6 Downloading the latest Diwan release</code></td>
+<td>تنزيل النظام.</td>
+</tr>
+<tr>
+<td><code>3/6 Database and settings</code></td>
+<td>تجهيز البيانات والإعدادات.</td>
+</tr>
+<tr>
+<td><code>4/6 Starting Diwan automatically with the computer</code></td>
+<td>التشغيل التلقائي مع الجهاز.</td>
+</tr>
+<tr>
+<td><code>5/6 Allowing the office devices to connect</code></td>
+<td>السماح لأجهزة المكتب بالوصول.</td>
+</tr>
+<tr>
+<td><code>6/6 Applications menu shortcut</code></td>
+<td>اختصار في قائمة البرامج.</td>
+</tr>
+<tr>
+<td><code>Installed successfully!</code></td>
+<td><strong>تم التثبيت بنجاح.</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="الخطوة-4-الإعداد-الأول" class="numbered"><span class="h-num" data-label="الخطوة">4</span>الإعداد الأول<a class="anchor" href="#%D8%A7%D9%84%D8%AE%D8%B7%D9%88%D8%A9-4-%D8%A7%D9%84%D8%A5%D8%B9%D8%AF%D8%A7%D8%AF-%D8%A7%D9%84%D8%A3%D9%88%D9%84" aria-label="رابط مباشر لهذا القسم">#</a></h2>
+<p>افتح المتصفح على <code>http://localhost:8000</code>، أو ابحث عن <strong>الديوان</strong> في قائمة البرامج. ستظهر صفحة <strong>«تم تثبيت النظام بنجاح»</strong>:</p>
+<ol>
+<li>اكتب اسم المنشأة، والدولة، والعملة. العملة لا تتغير بعد البدء.</li>
+<li>اكتب حساب المدير: الاسم، والبريد (اسم الدخول)، وكلمة المرور.</li>
+<li>اضغط <strong>«ابدأ استخدام النظام»</strong>.</li>
+</ol>
+<h2 id="الاستخدام-اليومي">الاستخدام اليومي<a class="anchor" href="#%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AE%D8%AF%D8%A7%D9%85-%D8%A7%D9%84%D9%8A%D9%88%D9%85%D9%8A" aria-label="رابط مباشر لهذا القسم">#</a></h2>
+<ul>
+<li><strong>تشغيل النظام:</strong> يعمل تلقائياً مع تشغيل الجهاز، حتى قبل تسجيل الدخول.</li>
+<li><strong>أجهزة المكتب والجوالات:</strong> العنوان ورمز QR في <strong>الإعدادات</strong> داخل النظام، في مربع «الوصول من أجهزة المكتب».</li>
+<li><strong>التحديث:</strong> يتحدّث تلقائياً كل ليلة الساعة 3:30. يأخذ نسخة احتياطية قبل تغيير قاعدة البيانات، ويرجع للإصدار السابق تلقائياً إن حدثت مشكلة.</li>
+</ul>
+<div class="tablebox"><table>
+<thead>
+<tr>
+<th>المطلوب</th>
+<th>الأمر</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>تحديث الآن</td>
+<td><code>sudo bash /opt/diwan/current/deploy/linux/update.sh</code></td>
+</tr>
+<tr>
+<td>نسخة احتياطية الآن</td>
+<td><code>cd /opt/diwan/current &amp;&amp; sudo -u diwan php artisan erp:backup</code></td>
+</tr>
+<tr>
+<td>إعادة تشغيل النظام</td>
+<td><code>sudo systemctl restart diwan-web diwan-queue diwan-scheduler</code></td>
+</tr>
+<tr>
+<td>حالة النظام</td>
+<td><code>systemctl status diwan-web</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="أماكن-الملفات">أماكن الملفات<a class="anchor" href="#%D8%A3%D9%85%D8%A7%D9%83%D9%86-%D8%A7%D9%84%D9%85%D9%84%D9%81%D8%A7%D8%AA" aria-label="رابط مباشر لهذا القسم">#</a></h2>
+<div class="tablebox"><table>
+<thead>
+<tr>
+<th>المجلد أو الملف</th>
+<th>المحتوى</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/opt/diwan/secrets.txt</code></td>
+<td><strong>كلمات المرور.</strong> انسخه إلى مكان آمن (<code>sudo cat /opt/diwan/secrets.txt</code>).</td>
+</tr>
+<tr>
+<td><code>/opt/diwan/shared/storage/app/backups/</code></td>
+<td><strong>النسخ الاحتياطية الليلية.</strong> انسخها أسبوعياً إلى فلاش أو تخزين سحابي.</td>
+</tr>
+<tr>
+<td><code>/opt/diwan/shared/.env</code></td>
+<td>الإعدادات، مثل البريد. للتعديل: <code>sudo nano /opt/diwan/shared/.env</code>، ثم «إعادة تشغيل النظام» من الجدول أعلاه.</td>
+</tr>
+</tbody>
+</table></div>
+<p>لإعداد البريد، انظر أسطر <code>MAIL_</code> في <a href="install-windows.html#%D8%A5%D8%B1%D8%B3%D8%A7%D9%84-%D8%A7%D9%84%D9%81%D9%88%D8%A7%D8%AA%D9%8A%D8%B1-%D8%A8%D8%A7%D9%84%D8%A8%D8%B1%D9%8A%D8%AF-%D8%A7%D8%AE%D8%AA%D9%8A%D8%A7%D8%B1%D9%8A">دليل ويندوز</a>. بعد تعديلها نفّذ:</p>
+<div class="code"><div class="code-bar"><span class="code-lang">Bash</span><button type="button" class="copy" data-copy="" aria-label="نسخ"><svg class="i i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/></svg><svg class="i i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>نسخ</span></button></div><pre dir="ltr"><code class="language-bash" data-hl="bash">cd /opt/diwan/current &amp;&amp; sudo -u diwan php artisan optimize &amp;&amp; sudo systemctl restart diwan-web diwan-queue diwan-scheduler
+</code></pre></div>
+<h2 id="حل-المشكلات">حل المشكلات<a class="anchor" href="#%D8%AD%D9%84-%D8%A7%D9%84%D9%85%D8%B4%D9%83%D9%84%D8%A7%D8%AA" aria-label="رابط مباشر لهذا القسم">#</a></h2>
+<div class="tablebox"><table>
+<thead>
+<tr>
+<th>المشكلة</th>
+<th>الحل</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>This installer is for Ubuntu, Debian and Mint</code></td>
+<td>نظامك يستخدم مدير حزم آخر. استخدم <a href="server-setup.html">دليل الخادم</a> كمرجع للحزم المطلوبة.</td>
+</tr>
+<tr>
+<td><code>Could not download Diwan</code></td>
+<td>تحقق من الإنترنت، ثم أعد لصق الأمر. إعادة التشغيل آمنة.</td>
+</tr>
+<tr>
+<td>أجهزة المكتب لا تفتح العنوان</td>
+<td>تأكد أنها على نفس الراوتر. إن كان لديك جدار حماية غير <code>ufw</code>، اسمح بالمنفذ 8000.</td>
+</tr>
+<tr>
+<td>النظام لا يفتح</td>
+<td><code>sudo systemctl restart diwan-web</code>، ثم راجع: <code>journalctl -u diwan-web -n 50</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<p>لأي مشكلة أخرى: صوّر الطرفية وافتح طلباً في <a href="https://github.com/turkialawlqy/Diwan-ERP/issues" target="_blank" rel="noopener" class="ext">صفحة المشروع</a>.</p>
+
+    </article>
+    <div class="source-row"><span><svg class="i i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg> المصدر: <code>docs/INSTALL-LINUX.md</code></span><span class="source-actions"><a class="ext" href="https://github.com/turkialawlqy/Diwan-ERP/blob/main/docs/INSTALL-LINUX.md" target="_blank" rel="noopener">عرض على GitHub</a><button type="button" class="link-btn" data-print><svg class="i i-printer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V3.5h10V8"/><rect x="3.5" y="8" width="17" height="8.5" rx="1.5"/><path d="M7 14h10v6.5H7z"/></svg> طباعة / PDF</button></span></div>
+    <nav class="pager" aria-label="التنقل بين الصفحات"><a class="pager-card prev" href="install-mac.html"><span class="pager-dir"><svg class="i i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg> السابق</span><b>تثبيت «الديوان» على ماك</b></a><a class="pager-card next" href="windows-local.html"><span class="pager-dir">التالي <svg class="i i-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></span><b>تشغيل النظام وتحديثه على ويندوز (MAMP)</b></a></nav>
+  </main>
+  <aside class="toc" aria-label="في هذه الصفحة"><div class="toc-in"><div class="toc-title">في هذه الصفحة</div><ul class="toc-list"><li class="l2"><a href="#قبل-البدء"><span>قبل البدء</span></a></li><li class="l2"><a href="#الخطوة-1-افتح-الطرفية-terminal"><span class="toc-num">1</span><span>افتح الطرفية (Terminal)</span></a></li><li class="l2"><a href="#الخطوة-2-الصق-أمر-التثبيت"><span class="toc-num">2</span><span>الصق أمر التثبيت</span></a></li><li class="l2"><a href="#الخطوة-3-انتظر-حتى-ينتهي"><span class="toc-num">3</span><span>انتظر حتى ينتهي</span></a></li><li class="l2"><a href="#الخطوة-4-الإعداد-الأول"><span class="toc-num">4</span><span>الإعداد الأول</span></a></li><li class="l2"><a href="#الاستخدام-اليومي"><span>الاستخدام اليومي</span></a></li><li class="l2"><a href="#أماكن-الملفات"><span>أماكن الملفات</span></a></li><li class="l2"><a href="#حل-المشكلات"><span>حل المشكلات</span></a></li></ul><a class="toc-top" href="#top"><svg class="i i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg> العودة للأعلى</a></div></aside>
+</div>
+<footer class="footer">
+  <div class="wrap footer-in">
+    <div class="footer-brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span><div><b>الديوان</b><span>نظام إدارة الأعمال المتكامل · مركز التوثيق</span></div></div>
+    <div class="footer-links">
+      <a href="index.html">الرئيسية</a>
+      <a href="feature-requests.html">اقترح ميزة</a>
+      <a href="https://github.com/turkialawlqy/Diwan-ERP/releases" target="_blank" rel="noopener">الإصدارات</a>
+      <a href="https://github.com/turkialawlqy/Diwan-ERP/tags" target="_blank" rel="noopener">الوسوم (Tags)</a>
+      <a href="https://github.com/turkialawlqy/Diwan-ERP/issues" target="_blank" rel="noopener">طلب مساعدة</a>
+    </div>
+    <div class="footer-note">مولّد من <code>README.md</code> و<code>docs/*.md</code> بواسطة PagesDoc · 2026</div>
+  </div>
+</footer>
+<div class="search" data-search hidden>
+  <div class="search-backdrop" data-close-search></div>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="بحث في التوثيق">
+    <div class="search-head">
+      <svg class="i i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+      <input type="search" placeholder="ابحث في كل الأدلة..." aria-label="عبارة البحث" autocomplete="off" spellcheck="false" data-search-input>
+      <button type="button" class="esc" data-close-search>Esc</button>
+    </div>
+    <div class="search-results" data-search-results></div>
+    <div class="search-foot"><span><kbd>↑</kbd><kbd>↓</kbd> للتنقل</span><span><kbd>Enter</kbd> للفتح</span><span><kbd>Esc</kbd> للإغلاق</span></div>
+  </div>
+</div>
+<div class="nav-backdrop" data-close-nav></div>
+<script src="assets/search-index.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

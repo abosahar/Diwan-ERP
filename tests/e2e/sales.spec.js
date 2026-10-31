@@ -34,7 +34,7 @@ test('sales invoice: pick customer and product, issue, open print with QR', asyn
 
 test('validation messages are in Arabic', async ({ page }) => {
     await page.goto('/sales/clients/create');
-    await page.getByPlaceholder('مثال: شركة مدن الراقية المحدودة').fill('عميل ببريد خاطئ');
+    await page.getByPlaceholder('مثال: شركة شبوة سوفت').fill('عميل ببريد خاطئ');
     await page.getByPlaceholder('client@company.com').fill('ليس-بريداً');
     await page.getByRole('button', { name: 'حفظ', exact: true }).click();
     await expect(page.locator('body')).toContainText('يجب أن يكون البريد الإلكتروني بريداً إلكترونياً صحيحاً.');
