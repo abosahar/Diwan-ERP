@@ -14,17 +14,19 @@ const WIDTHS = [375, 768, 1024, 1440];
 
 const sidewaysOverflow = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
+// One test per width, so each stays well inside the per-test timeout on a slow CI runner.
+// The collapsed rail exists from lg (1024px) up; below that the sidebar is a drawer either way.
 for (const collapsed of [false, true]) {
-    test(`no sideways scrolling, sidebar ${collapsed ? 'collapsed' : 'expanded'}`, async ({ page }) => {
-        await page.addInitScript((value) => localStorage.setItem('diwan.sidebar.collapsed', value), collapsed ? '1' : '0');
-        for (const width of WIDTHS) {
+    for (const width of WIDTHS.filter((w) => !collapsed || w >= 1024)) {
+        test(`no sideways scrolling at ${width}px, sidebar ${collapsed ? 'collapsed' : 'expanded'}`, async ({ page }) => {
+            await page.addInitScript((value) => localStorage.setItem('diwan.sidebar.collapsed', value), collapsed ? '1' : '0');
             await page.setViewportSize({ width, height: 900 });
             for (const path of PAGES) {
                 await page.goto(path, { waitUntil: 'networkidle' });
                 expect.soft(await sidewaysOverflow(page), `${path} at ${width}px`).toBe(0);
             }
-        }
-    });
+        });
+    }
 }
 
 test('phones: list tables scroll inside their card', async ({ page }) => {
