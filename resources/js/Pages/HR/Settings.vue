@@ -58,7 +58,7 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
                 <h4 class="font-bold mt-4 mb-2">تدرّج نسبة المعاش للمشتركين الجدد (لكل طرف)</h4>
                 <div v-for="(row, i) in forms['hr.gosi'].new_entrant_annuity" :key="i" class="flex gap-2 mb-1.5 items-center">
                     <span>من</span><DatePicker v-model="row.from" class="rounded-xl border-slate-200 text-xs" />
-                    <input v-model.number="row.rate" type="text" inputmode="decimal" data-num step="0.01" class="w-24 rounded-xl border-slate-200 text-xs font-mono" /><span>%</span>
+                    <input v-model.number="row.rate" type="text" inputmode="decimal" data-num step="0.01" class="w-24 min-w-0 rounded-xl border-slate-200 text-xs font-mono" /><span>%</span>
                     <button @click="forms['hr.gosi'].new_entrant_annuity.splice(i, 1)" class="text-rose-600">✕</button>
                 </div>
                 <button @click="forms['hr.gosi'].new_entrant_annuity.push({ from: '', rate: 0 })" class="text-indigo-600 font-bold">+ مرحلة</button>
@@ -101,8 +101,8 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
                 <h3 class="font-black text-slate-700 mb-3">شرائح الإجازة المرضية (خلال السنة)</h3>
                 <div v-for="(t, i) in forms['hr.sick_tiers'].tiers" :key="i" class="flex gap-2 mb-1.5 items-center">
                     <span class="w-16">شريحة {{ i + 1 }}</span>
-                    <input v-model.number="t.days" type="text" inputmode="decimal" data-num class="w-20 rounded-xl border-slate-200 text-xs font-mono" /><span>يوماً بأجر</span>
-                    <input v-model.number="t.pay" type="text" inputmode="decimal" data-num class="w-20 rounded-xl border-slate-200 text-xs font-mono" /><span>%</span>
+                    <input v-model.number="t.days" type="text" inputmode="decimal" data-num class="w-20 min-w-0 rounded-xl border-slate-200 text-xs font-mono" /><span>يوماً بأجر</span>
+                    <input v-model.number="t.pay" type="text" inputmode="decimal" data-num class="w-20 min-w-0 rounded-xl border-slate-200 text-xs font-mono" /><span>%</span>
                     <button @click="forms['hr.sick_tiers'].tiers.splice(i, 1)" class="text-rose-600">✕</button>
                 </div>
                 <button @click="forms['hr.sick_tiers'].tiers.push({ days: 30, pay: 0 })" class="text-indigo-600 font-bold">+ شريحة</button>
@@ -120,8 +120,8 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
                 </div>
                 <h4 class="font-bold mt-3 mb-1">الاستقالة (م 85): نسبة المستحق حسب مدة الخدمة</h4>
                 <div v-for="(r, i) in forms['hr.end_of_service'].resignation" :key="i" class="flex gap-2 mb-1.5 items-center">
-                    <span>أقل من</span><input v-model.number="r.below" type="text" inputmode="decimal" data-num class="w-20 rounded-xl border-slate-200 text-xs font-mono" /><span>سنة:</span>
-                    <input v-model.number="r.share" type="text" inputmode="decimal" data-num step="0.01" class="w-24 rounded-xl border-slate-200 text-xs font-mono" /><span>%</span>
+                    <span>أقل من</span><input v-model.number="r.below" type="text" inputmode="decimal" data-num class="w-20 min-w-0 rounded-xl border-slate-200 text-xs font-mono" /><span>سنة:</span>
+                    <input v-model.number="r.share" type="text" inputmode="decimal" data-num step="0.01" class="w-24 min-w-0 rounded-xl border-slate-200 text-xs font-mono" /><span>%</span>
                     <button @click="forms['hr.end_of_service'].resignation.splice(i, 1)" class="text-rose-600">✕</button>
                 </div>
                 <button @click="forms['hr.end_of_service'].resignation.push({ below: 0, share: 0 })" class="text-indigo-600 font-bold">+ شريحة</button>
@@ -134,10 +134,11 @@ const inp = 'w-full rounded-xl border-slate-200 text-xs font-mono';
                 <h3 class="font-black text-slate-700 mb-1">العطل الرسمية (م 112)</h3>
                 <p class="text-slate-400 mb-3">لا تُخصم أيامها من الإجازة السنوية، ولا يُسجَّل فيها غياب. أدخل تواريخ العيدين ميلادياً لكل سنة.</p>
                 <div class="flex flex-wrap gap-1.5 mb-2"><button v-for="p in presets" :key="p[0]" @click="usePreset(p)" class="px-2 py-1 rounded-lg border border-slate-200">{{ p[0] }}</button></div>
-                <div v-if="$can('hr.settings.manage')" class="grid grid-cols-2 sm:grid-cols-4 gap-2 items-end">
-                    <input v-model="holiday.name" placeholder="الاسم" class="col-span-2 sm:col-span-1 rounded-xl border-slate-200 text-xs" />
-                    <DatePicker v-model="holiday.start_date" class="rounded-xl border-slate-200 text-xs" />
-                    <DatePicker v-model="holiday.end_date" class="rounded-xl border-slate-200 text-xs" />
+                <!-- From lg this card is half the page: back to two columns so whole dates fit. -->
+                <div v-if="$can('hr.settings.manage')" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2 items-end">
+                    <input v-model="holiday.name" placeholder="الاسم" class="col-span-2 sm:col-span-1 lg:col-span-2 rounded-xl border-slate-200 text-xs" />
+                    <DatePicker v-model="holiday.start_date" class="w-full rounded-xl border-slate-200 text-xs" />
+                    <DatePicker v-model="holiday.end_date" class="w-full rounded-xl border-slate-200 text-xs" />
                     <button @click="holiday.post(route('hr.holidays.store'), { preserveScroll: true, onSuccess: () => holiday.reset() })" :disabled="holiday.processing" class="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold">إضافة</button>
                 </div>
                 <p v-for="k in ['name', 'start_date', 'end_date']" :key="k" class="text-rose-600">{{ holiday.errors[k] }}</p>

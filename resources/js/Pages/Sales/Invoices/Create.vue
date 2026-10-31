@@ -1,5 +1,6 @@
 <script setup>
 import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import { useFixedDropdown } from '@/composables/useFixedDropdown';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -415,6 +416,14 @@ const handleGlobalClick = (event) => {
     }
 };
 
+// The lines table scrolls sideways inside its card on narrow screens, so the
+// product list is fixed under its field instead of hanging from the row.
+const { style: productListStyle, anchor: anchorProductList } = useFixedDropdown(() => form.items.some(it => it.isDropdownOpen));
+const openProductList = (item, event) => {
+    form.items.forEach(it => { it.isDropdownOpen = it === item; }); // one list at a time: they share the position
+    anchorProductList(event.target);
+};
+
 onMounted(() => {
     document.addEventListener('click', handleGlobalClick);
 });
@@ -618,7 +627,7 @@ const importLines = (lines, replace) => {
                                 <select 
                                     v-model="form.payment_method" 
                                     @change="syncSelectedFinancialAccount"
-                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-semibold"
+                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-semibold"
                                 >
                                     <option value="bank_transfer">تحويل بنكي (Bank Transfer)</option>
                                     <option value="cash">نقداً (Cash)</option>
@@ -633,7 +642,7 @@ const importLines = (lines, replace) => {
                                 <select 
                                     v-model="form.payment_status" 
                                     @change="syncSelectedFinancialAccount"
-                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-semibold"
+                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-semibold"
                                 >
                                     <option value="paid">مدفوعة بالكامل</option>
                                     <option value="partially_paid">مدفوعة جزئياً</option>
@@ -656,7 +665,7 @@ const importLines = (lines, replace) => {
                                 </div>
                                 <select 
                                     v-model="form.bank_account_id"
-                                    class="w-full text-xs sm:text-sm rounded-xl border border-indigo-200 bg-white px-3 py-2.5 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-bold text-slate-800 shadow-2xs"
+                                    class="w-full text-xs sm:text-sm rounded-xl border border-indigo-200 bg-white py-2.5 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-bold text-slate-800 shadow-2xs"
                                     required
                                 >
                                     <option value="" disabled>-- اختر الحساب المالي أو الخزينة المودع بها --</option>
@@ -706,7 +715,7 @@ const importLines = (lines, replace) => {
 
                     <!-- Invoice Line Items Card -->
                     <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-2xs space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                             <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
                                 <span>بنود الفاتورة والأصناف</span>
                                 <span class="px-2 py-0.5 rounded-full text-2xs bg-indigo-50 text-indigo-700 font-bold">
@@ -724,8 +733,8 @@ const importLines = (lines, replace) => {
                             </button>
                         </div>
 
-                        <!-- Items Table -->
-                        <div class="overflow-visible">
+                        <!-- Items Table: wide lines scroll inside the card; `relative` keeps absolutely placed children inside the scroll box. -->
+                        <div class="relative overflow-x-auto">
                             <table class="w-full text-right border-collapse text-xs">
                                 <thead>
                                     <tr class="border-b border-slate-100 bg-slate-50/50 text-slate-500 font-bold">
@@ -752,8 +761,8 @@ const importLines = (lines, replace) => {
                                                 <input 
                                                     v-model="item.item_name"
                                                     type="text" 
-                                                    @focus="item.isDropdownOpen = true"
-                                                    @input="item.isDropdownOpen = true"
+                                                    @focus="openProductList(item, $event)"
+                                                    @input="openProductList(item, $event)"
                                                     placeholder="اختر أو انشئ منتج..."
                                                     class="w-full text-xs rounded-xl border border-slate-200 ps-2.5 pe-8 py-2 focus:border-indigo-500 font-bold text-slate-800 transition"
                                                     required
@@ -766,7 +775,9 @@ const importLines = (lines, replace) => {
                                             <!-- Dropdown for Product Matching & Fast-Creation -->
                                             <div 
                                                 v-if="item.isDropdownOpen"
-                                                class="absolute start-3 end-3 top-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl z-40 max-h-64 overflow-y-auto p-1.5 divide-y divide-slate-100"
+                                                :style="productListStyle"
+                                                data-product-list
+                                                class="fixed bg-white border border-slate-200 rounded-2xl shadow-xl z-40 max-h-64 overflow-y-auto p-1.5 divide-y divide-slate-100"
                                             >
                                                 <!-- Create Product Button (Matches Screenshot) -->
                                                 <div 

@@ -274,7 +274,7 @@ onMounted(() => {
             <div class="flex items-center gap-2 max-w-xs w-full">
                 <select 
                     v-model="selectedCustomerId" 
-                    class="w-full text-xs rounded-xl bg-indigo-800/80 border-indigo-600 text-white py-1.5 px-3 focus:ring-1 focus:ring-white"
+                    class="w-full text-xs rounded-xl bg-indigo-800/80 border-indigo-600 text-white py-1.5 focus:ring-1 focus:ring-white"
                 >
                     <option :value="null">عميل نقدي (عام)</option>
                     <option v-for="c in customers" :key="c.id" :value="c.id">
@@ -722,7 +722,7 @@ onMounted(() => {
 
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">توريد النقدية إلى (اختياري)</label>
-                        <select v-model="closeSessionForm.deposit_bank_account_id" class="w-full rounded-xl border border-slate-200 p-2 text-xs">
+                        <select v-model="closeSessionForm.deposit_bank_account_id" class="w-full rounded-xl border border-slate-200 py-2 ps-2 pe-8 text-xs">
                             <option value="">تبقى في درج نقطة البيع</option>
                             <option v-for="b in boxes" :key="b.id" :value="b.id">{{ b.name }}</option>
                         </select>

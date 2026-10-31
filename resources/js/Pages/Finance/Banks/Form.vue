@@ -46,7 +46,7 @@ const submitAccount = () => form.post(route('finance.banks.store'));
                                     <label class="block font-medium text-slate-700 mb-1">النوع <span class="text-rose-500">*</span></label>
                                     <select 
                                         v-model="form.type" 
-                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
+                                        class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
                                     >
                                         <option value="bank">حساب بنكي</option>
                                         <option value="cash">خزينة نقدية (درج كاش)</option>

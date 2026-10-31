@@ -11,9 +11,12 @@
 .form-grid > :has(> textarea, > table) { grid-column: 1 / -1; }
 
 /* Native selects: inherit the app font (Arabic glyphs fall back to a tall system font otherwise) and keep the
-   arrow on the end side so it never covers the text. @tailwindcss/forms only handles left-to-right.
-   Low specificity on purpose: padding utilities (ps-8, px-3...) on a select still win. */
+   arrow on the end side so it never covers the text. @tailwindcss/forms puts the arrow and its 2.5rem gap on the
+   right only; each direction rule below sets both with physical sides, so they stay together even in a box whose
+   dir differs from the page's. One element of specificity on purpose: it beats the plugin's `select` (same weight,
+   later) but not padding utilities on a select (ps-3 pe-10, px-3...), which still win. List boxes (multiple,
+   size > 1) have no arrow and keep the plugin's padding. */
 :where(select, option) { font-family: inherit; }
-:where(select) { line-height: 1.4; padding-inline-start: 0.75rem; padding-inline-end: 2rem; }
-:where([dir="rtl"]) select { background-position: left 0.6rem center; }
-:where([dir="ltr"]) select { background-position: right 0.6rem center; }
+:where(select) { line-height: 1.4; }
+:where([dir="rtl"]) select:where(:not([multiple], [size]:not([size="1"]))) { background-position: left 0.6rem center; padding-left: 2.5rem; padding-right: 0.75rem; }
+:where([dir="ltr"]) select:where(:not([multiple], [size]:not([size="1"]))) { background-position: right 0.6rem center; padding-left: 0.75rem; padding-right: 2.5rem; }

@@ -28,7 +28,7 @@ watch(() => form.country_code, () => { if (selectedCountry.value) form.currency 
 const submit = () => form.post(route('setup'), { onFinish: () => form.reset('password', 'password_confirmation') });
 
 const input = 'w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl ps-10 pe-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition';
-const select = 'w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl ps-10 pe-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
+const select = 'w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl ps-10 pe-10 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
 </script>
 
 <template>

@@ -255,10 +255,11 @@ const costOptions = computed(() => ({
             <div><div class="text-slate-500">ذمم عملاء متأخرة</div><div class="text-base font-black font-mono mt-1">{{ Number(cashOutlook.overdue).toLocaleString('en-US', { maximumFractionDigits: 0 }) }}</div></div>
         </Link>
 
-        <!-- 4. Bottom Grid: Recent Invoices & Top Products -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 4. Bottom Grid: Recent Invoices & Top Products. Side by side only from xl: at lg the
+             expanded sidebar leaves the products column about 200px, too narrow for a name and an amount. -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <!-- Recent Invoices (2 Cols) -->
-            <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
+            <div class="xl:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
                         <h2 class="text-sm font-bold text-slate-900">أحدث فواتير المبيعات</h2>
@@ -324,17 +325,17 @@ const costOptions = computed(() => ({
                         :key="idx"
                         class="p-3 rounded-2xl bg-slate-50/70 hover:bg-slate-50 border border-slate-100 flex items-center justify-between gap-3 transition"
                     >
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-xs text-indigo-600 shadow-xs">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-8 h-8 shrink-0 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-xs text-indigo-600 shadow-xs">
                                 {{ idx + 1 }}
                             </div>
-                            <div>
-                                <p class="text-xs font-bold text-slate-800 truncate max-w-[150px]">{{ product.name }}</p>
-                                <span class="text-[10px] text-slate-400">{{ product.category }}</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-slate-800 truncate" :title="product.name">{{ product.name }}</p>
+                                <span class="block text-[10px] text-slate-400 truncate">{{ product.category }}</span>
                             </div>
                         </div>
 
-                        <div class="text-end">
+                        <div class="text-end shrink-0 whitespace-nowrap">
                             <p class="text-xs font-bold text-emerald-700 font-sans">{{ product.revenue }} {{ $cur() }}</p>
                             <span class="text-[10px] text-slate-500">{{ product.sold_units }} قطعة</span>
                         </div>

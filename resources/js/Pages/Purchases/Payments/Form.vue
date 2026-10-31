@@ -53,7 +53,7 @@ const submitPayment = () => form.post(route('purchases.payments.store'));
                                 <select 
                                     v-model="form.purchase_invoice_id"
                                     @change="() => { const inv = filteredInvoices.find((i) => i.id === form.purchase_invoice_id); form.currency_code = inv?.currency_code || ''; form.exchange_rate = ''; }" 
-                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 font-medium"
+                                    class="w-full rounded-xl border border-slate-200 py-2 font-medium"
                                 >
                                     <option value="">سداد عام على رصيد الحساب</option>
                                     <option v-for="inv in filteredInvoices" :key="inv.id" :value="inv.id">
@@ -91,7 +91,7 @@ const submitPayment = () => form.post(route('purchases.payments.store'));
                                     <label class="block font-bold text-slate-700 mb-1">طريقة الصرف</label>
                                     <select 
                                         v-model="form.payment_method" 
-                                        class="w-full rounded-xl border border-slate-200 px-3 py-2 font-medium"
+                                        class="w-full rounded-xl border border-slate-200 py-2 font-medium"
                                     >
                                         <option value="bank_transfer">تحويل بنكي</option>
                                         <option value="cash">نقداً</option>

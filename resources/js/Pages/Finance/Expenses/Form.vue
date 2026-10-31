@@ -146,7 +146,7 @@ const submitExpense = () => form.post(route('finance.expenses.store'));
                                     <label class="block font-medium text-slate-700 mb-1">طريقة الدفع</label>
                                     <select 
                                         v-model="form.payment_method" 
-                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500"
+                                        class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-rose-500 focus:border-rose-500"
                                     >
                                         <option value="bank_transfer">تحويل بنكي</option>
                                         <option value="cash">نقداً</option>
