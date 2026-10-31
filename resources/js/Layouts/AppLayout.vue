@@ -21,14 +21,16 @@ const dismissFlash = () => {
     showFlash.value = false;
 };
 
-// Business-rule errors (e.g. accounting: closed period, unbalanced entry)
-// are shown here even on pages whose forms do not render that field.
-const generalError = computed(() => page.props.errors?.accounting || page.props.errors?.plan || null);
+// Business-rule errors (e.g. accounting: closed period, unbalanced entry; context:
+// a branch or fiscal year that cannot be chosen) are shown here even on pages
+// whose forms do not render that field.
+const GENERAL_ERRORS = ['accounting', 'plan', 'context'];
+const generalError = computed(() => GENERAL_ERRORS.map((key) => page.props.errors?.[key]).find(Boolean) || null);
 
 // Every other validation error, so a rejected save is never silent on a form
 // that has no slot for that field (nested lines, hidden fields...).
 const fieldErrors = computed(() => props.ownErrors ? [] : Object.entries(page.props.errors || {})
-    .filter(([key]) => !['accounting', 'plan'].includes(key))
+    .filter(([key]) => !GENERAL_ERRORS.includes(key))
     .flatMap(([, message]) => String(message).split('\n'))
     .filter((message, i, all) => message && all.indexOf(message) === i));
 const showAllErrors = ref(false);

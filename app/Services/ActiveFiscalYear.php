@@ -34,9 +34,15 @@ class ActiveFiscalYear
             ?? $years->first();
     }
 
+    /** Is $id one of the company's fiscal years? */
+    public function allows(int $id): bool
+    {
+        return $this->years()->contains('id', $id);
+    }
+
     public function switchTo(int $id): bool
     {
-        if (! $this->years()->contains('id', $id)) {
+        if (! $this->allows($id)) {
             return false;
         }
         request()->session()->put(self::SESSION_KEY, $id);

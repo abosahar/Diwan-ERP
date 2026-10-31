@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import BrandLogo from './BrandLogo.vue';
+import WorkspaceContext from './WorkspaceContext.vue';
 import { ChevronDownIcon, ChevronRightIcon, ChevronLeftIcon, XMarkIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline';
 import navigation from '@/navigation';
 import { canRoute } from '@/permissions';
@@ -98,8 +99,13 @@ const slim = computed(() => sidebarCollapsed.value);
             </button>
         </div>
 
-        <!-- Navigation (scrollable, permission aware) -->
-        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1 text-sm select-none custom-scrollbar">
+        <!-- Working context: company, branch and fiscal year (fixed, above the menu) -->
+        <div v-if="page.props.tenant" :class="slim ? 'lg:px-0' : ''" class="px-3 py-3 border-b border-slate-800/80 flex-shrink-0">
+            <WorkspaceContext :slim="slim" />
+        </div>
+
+        <!-- Navigation (the only part that scrolls, permission aware) -->
+        <nav class="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-1 text-sm select-none custom-scrollbar">
             <template v-for="item in visibleItems" :key="item.key">
                 <!-- Single link -->
                 <Link

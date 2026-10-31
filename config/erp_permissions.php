@@ -295,6 +295,7 @@ return [
         'dashboard' => 'dashboard.main.view',
         // Each result group re-checks its own view permission in SearchController.
         'search' => '@authenticated',
+        'context.update' => '@authenticated',
         'context.branch' => '@authenticated',
         'system.update.status' => '@authenticated',
         'system.update.apply' => '@authenticated',

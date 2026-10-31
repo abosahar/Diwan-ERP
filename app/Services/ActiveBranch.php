@@ -159,15 +159,21 @@ class ActiveBranch
     }
 
     /**
+     * May the user work in $value (a branch id or 'all')?
+     */
+    public function allows(int|string $value): bool
+    {
+        return $value === self::ALL
+            ? $this->canViewAll()
+            : $this->branches()->contains('id', (int) $value);
+    }
+
+    /**
      * Switch the working branch. $value is a branch id or 'all'.
      */
     public function switchTo(int|string $value): bool
     {
-        if ($value === self::ALL) {
-            if (! $this->canViewAll()) {
-                return false;
-            }
-        } elseif (! $this->branches()->contains('id', (int) $value)) {
+        if (! $this->allows($value)) {
             return false;
         }
 
