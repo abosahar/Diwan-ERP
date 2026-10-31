@@ -63,3 +63,39 @@ test('phones: invoice lines scroll in their card and the product list is not cut
         expect(shown, `${path}: the whole product list is visible`).toBe(true);
     }
 });
+
+test('line tables: the SelectCreate list is not cut off by the table box', async ({ page }) => {
+    for (const [width, height] of [[375, 812], [1440, 900]]) {
+        await page.setViewportSize({ width, height });
+        for (const path of ['/sales/quotations/create', '/manufacturing/boms/create', '/manufacturing/routings/create']) {
+            await page.goto(path, { waitUntil: 'networkidle' });
+            const field = page.locator('table [data-select-create] > input').first();
+            await field.click();
+            const list = page.locator('[data-select-list]');
+            await expect(list).toBeVisible();
+            const { shown, attached } = await list.evaluate((el, input) => {
+                const r = el.getBoundingClientRect();
+                const f = input.getBoundingClientRect();
+                const x = r.left + r.width / 2;
+                const near = (a, b) => Math.abs(a - b) < 1.5;
+                return {
+                    // The table's scroll box would clip an absolute list; its far edge must still be on top.
+                    shown: r.left >= 0 && r.right <= innerWidth && [r.top + 4, r.bottom - 4].every((y) => el.contains(document.elementFromPoint(x, y))),
+                    // 4px under (or above) the field, over the field's start edge (the right one in Arabic).
+                    attached: (near(r.top, f.bottom + 4) || near(r.bottom, f.top - 4)) && r.left < f.right && r.right >= f.right - 0.5,
+                };
+            }, await field.elementHandle());
+            expect.soft(shown, `${path} at ${width}px: the whole list is visible`).toBe(true);
+            expect.soft(attached, `${path} at ${width}px: the list sits at its field`).toBe(true);
+        }
+    }
+
+    // Typing a new name still offers «إنشاء "…"», and Enter opens the create dialog.
+    await page.goto('/sales/quotations/create', { waitUntil: 'networkidle' });
+    const field = page.locator('table [data-select-create] > input').first();
+    await field.click();
+    await field.pressSequentially('صنف لم يُسجَّل بعد', { delay: 20 });
+    await expect(page.locator('[data-select-list] [data-create-option]')).toBeVisible();
+    await field.press('Enter');
+    await expect(page.locator('[data-quick-create]')).toBeVisible();
+});
