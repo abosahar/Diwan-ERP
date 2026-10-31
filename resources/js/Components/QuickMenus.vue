@@ -1,11 +1,11 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import { ChevronDownIcon, EyeIcon, PlusIcon } from '@heroicons/vue/24/outline';
+import { ArrowsPointingInIcon, ArrowsPointingOutIcon, ChevronDownIcon, EyeIcon, PlusIcon } from '@heroicons/vue/24/outline';
 import { addMenu, viewMenu } from '@/quickMenus';
 import { canRoute } from '@/permissions';
 
-/** «إضافة» (grouped create shortcuts) and «عرض» (shortcuts to the main lists) in the top bar. */
+/** «إضافة» (grouped create shortcuts) and «عرض» (shortcuts to the main lists, and full screen) in the top bar. */
 const open = ref(null); // 'add' | 'view' | null
 const root = ref(null);
 
@@ -14,17 +14,26 @@ const groups = computed(() => addMenu
     .filter((g) => g.items.length));
 const views = computed(() => viewMenu.filter((i) => canRoute(i.route)));
 
+// Full screen, where the browser allows it (not on iPhone).
+const canFullscreen = !!document.fullscreenEnabled;
+const isFullscreen = ref(!!document.fullscreenElement);
+const syncFullscreen = () => { isFullscreen.value = !!document.fullscreenElement; };
+const toggleFullscreen = () => {
+    open.value = null;
+    (document.fullscreenElement ? document.exitFullscreen?.() : document.documentElement.requestFullscreen?.())?.catch(() => {});
+};
+
 const toggle = (name) => { open.value = open.value === name ? null : name; };
 const outside = (e) => { if (open.value && root.value && !root.value.contains(e.target)) open.value = null; };
 const esc = (e) => { if (e.key === 'Escape') open.value = null; };
-onMounted(() => { document.addEventListener('mousedown', outside); document.addEventListener('keydown', esc); });
-onBeforeUnmount(() => { document.removeEventListener('mousedown', outside); document.removeEventListener('keydown', esc); });
+onMounted(() => { document.addEventListener('mousedown', outside); document.addEventListener('keydown', esc); document.addEventListener('fullscreenchange', syncFullscreen); });
+onBeforeUnmount(() => { document.removeEventListener('mousedown', outside); document.removeEventListener('keydown', esc); document.removeEventListener('fullscreenchange', syncFullscreen); });
 </script>
 
 <template>
-    <div ref="root" class="flex items-center gap-1.5 shrink-0" data-quick-menus>
+    <div ref="root" class="flex items-center gap-1 sm:gap-1.5 shrink-0" data-quick-menus>
         <div v-if="groups.length" class="sm:relative">
-            <button type="button" @click="toggle('add')" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold" :aria-expanded="open === 'add'" data-quick-add>
+            <button type="button" @click="toggle('add')" class="h-9 inline-flex items-center gap-1.5 px-2.5 sm:px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold" :aria-expanded="open === 'add'" aria-label="إضافة" data-quick-add>
                 <PlusIcon class="w-4 h-4 stroke-2" /> <span class="hidden sm:inline">إضافة</span> <ChevronDownIcon class="w-3 h-3 hidden sm:block" />
             </button>
             <div v-if="open === 'add'" class="fixed sm:absolute inset-x-3 sm:inset-x-auto top-[4.25rem] sm:top-full sm:end-0 sm:mt-2 sm:w-64 max-h-[75vh] overflow-y-auto bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5" data-quick-add-panel>
@@ -38,8 +47,8 @@ onBeforeUnmount(() => { document.removeEventListener('mousedown', outside); docu
             </div>
         </div>
 
-        <div v-if="views.length" class="sm:relative">
-            <button type="button" @click="toggle('view')" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:border-indigo-300 text-indigo-700 text-xs font-bold" :aria-expanded="open === 'view'" data-quick-view>
+        <div v-if="views.length || canFullscreen" class="sm:relative">
+            <button type="button" @click="toggle('view')" class="h-9 inline-flex items-center gap-1.5 px-2.5 sm:px-3 rounded-lg border border-slate-200 bg-white hover:border-indigo-300 text-indigo-700 text-xs font-bold" :aria-expanded="open === 'view'" aria-label="عرض" data-quick-view>
                 <EyeIcon class="w-4 h-4" /> <span class="hidden sm:inline">عرض</span> <ChevronDownIcon class="w-3 h-3 hidden sm:block" />
             </button>
             <div v-if="open === 'view'" class="fixed sm:absolute inset-x-3 sm:inset-x-auto top-[4.25rem] sm:top-full sm:end-0 sm:mt-2 sm:w-60 max-h-[75vh] overflow-y-auto bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5" data-quick-view-panel>
@@ -47,6 +56,12 @@ onBeforeUnmount(() => { document.removeEventListener('mousedown', outside); docu
                     <span class="font-semibold">{{ item.label }}</span>
                     <component :is="item.icon" class="w-4 h-4 text-indigo-400" />
                 </Link>
+                <div v-if="canFullscreen" :class="views.length ? 'border-t border-slate-100 mt-1.5 pt-1.5' : ''">
+                    <button type="button" @click="toggleFullscreen" class="w-full flex items-center justify-between gap-3 px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 text-start" data-fullscreen-toggle>
+                        <span class="font-semibold">{{ isFullscreen ? 'الخروج من ملء الشاشة' : 'ملء الشاشة' }}</span>
+                        <component :is="isFullscreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon" class="w-4 h-4 text-indigo-400" />
+                    </button>
+                </div>
             </div>
         </div>
     </div>

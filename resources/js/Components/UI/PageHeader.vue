@@ -8,7 +8,7 @@ defineProps({
     subtitle: { type: String, default: '' },
     // [{ label, href? }]
     crumbs: { type: Array, default: () => [] },
-    // The list below shows only the fiscal year chosen in the top bar: say so.
+    // The list below shows only the fiscal year chosen in the «سياق العمل» card: say so.
     yearScoped: { type: Boolean, default: false },
 });
 
@@ -33,7 +33,7 @@ const activeYear = computed(() => {
             <h1 class="text-lg font-black text-slate-800">{{ title }}</h1>
             <p v-if="subtitle" class="text-xs text-slate-500 mt-0.5">{{ subtitle }}</p>
             <p v-if="yearScoped && activeYear" class="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-[11px] font-bold" data-year-chip>
-                السنة المالية {{ activeYear.name }} فقط · غيّرها من الشريط العلوي أو بفلتر التاريخ
+                السنة المالية {{ activeYear.name }} فقط · غيّرها من «سياق العمل» في القائمة الجانبية أو بفلتر التاريخ
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2 print:hidden">

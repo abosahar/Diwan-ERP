@@ -1,22 +1,10 @@
 <script setup>
-import { usePage, router } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { GlobeAltIcon } from '@heroicons/vue/24/outline';
-import { useI18n } from 'vue-i18n';
+import { useLanguage } from '@/composables/useLanguage';
 
 const page = usePage();
-const { locale } = useI18n();
-
-const toggleLanguage = () => {
-    const nextLocale = page.props.locale === 'ar' ? 'en' : 'ar';
-    router.post(route('locale.switch'), { locale: nextLocale }, {
-        preserveScroll: true,
-        onSuccess: () => {
-            locale.value = nextLocale;
-            document.documentElement.lang = nextLocale;
-            document.documentElement.dir = nextLocale === 'ar' ? 'rtl' : 'ltr';
-        }
-    });
-};
+const { toggleLanguage } = useLanguage();
 </script>
 
 <template>

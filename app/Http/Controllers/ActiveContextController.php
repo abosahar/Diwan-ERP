@@ -8,10 +8,52 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 /**
- * The top bar selects: working branch and fiscal year.
+ * Working branch and fiscal year: chosen in the sidebar's «سياق العمل» card
+ * (update), or one at a time (branch, fiscalYear).
  */
 class ActiveContextController extends Controller
 {
+    /**
+     * Applies the branch and fiscal year sent (either may be left out) together:
+     * nothing changes unless every value sent is allowed.
+     */
+    public function update(Request $request, ActiveBranch $branches, ActiveFiscalYear $years): RedirectResponse
+    {
+        $request->validate([
+            'branch_id' => ['nullable', 'regex:/^(all|\d+)$/'],
+            'fiscal_year_id' => ['nullable', 'integer'],
+        ]);
+        $branch = $request->input('branch_id');
+        $branch = $branch === null || $branch === ActiveBranch::ALL ? $branch : (int) $branch;
+        $year = $request->filled('fiscal_year_id') ? (int) $request->input('fiscal_year_id') : null;
+
+        if ($branch !== null && ! $branches->allows($branch)) {
+            return back()->withErrors(['context' => 'لا تملك صلاحية العمل على هذا الفرع.']);
+        }
+        if ($year !== null && ! $years->allows($year)) {
+            return back()->withErrors(['context' => 'السنة المالية غير موجودة.']);
+        }
+        if ($branch === null && $year === null) {
+            return back();
+        }
+
+        if ($year !== null) {
+            $years->switchTo($year);
+        }
+        if ($branch !== null) {
+            $branches->switchTo($branch);
+        }
+
+        $chosen = $branches->branches()->firstWhere('id', $branches->id());
+        $summary = array_filter([
+            $branches->isAll() ? 'كل الفروع' : ($chosen?->name_ar ?: $chosen?->name_en),
+            ($current = $years->current()) ? 'السنة المالية '.$current->name : null,
+        ]);
+
+        return ($branch !== null ? $this->backToSafePage($request) : back())
+            ->with('success', 'تم تغيير سياق العمل: '.implode(' • ', $summary));
+    }
+
     public function branch(Request $request, ActiveBranch $active): RedirectResponse
     {
         $request->validate(['branch_id' => ['required']]);
