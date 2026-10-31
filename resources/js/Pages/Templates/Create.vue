@@ -49,7 +49,7 @@ const submitCreate = () => createForm.post(route('templates.store'));
             
                             <div v-if="createForm.mode === 'freeform'">
                                 <label class="block font-medium text-slate-700 mb-1" for="ff-kind">المستند</label>
-                                <select id="ff-kind" v-model="createForm.template_type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800">
+                                <select id="ff-kind" v-model="createForm.template_type" class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800">
                                     <option v-for="(l, k) in kinds" :key="k" :value="k">{{ l }}</option>
                                 </select>
                                 <p v-if="createForm.errors.template_type" class="text-rose-600 mt-1">{{ createForm.errors.template_type }}</p>
@@ -60,7 +60,7 @@ const submitCreate = () => createForm.post(route('templates.store'));
                                 <label class="block font-medium text-slate-700 mb-1">نوع المستند</label>
                                 <select 
                                     v-model="createForm.template_type" 
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
+                                    class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
                                 >
                                     <option value="invoice_a4">فاتورة ضريبية قياسية (A4 ZATCA)</option>
                                     <option value="invoice_thermal_80mm">إيصال حراري كاشير (80mm POS)</option>

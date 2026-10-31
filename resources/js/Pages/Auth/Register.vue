@@ -122,7 +122,7 @@ const submit = () => {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="country_code" class="block text-xs font-bold text-slate-700 mb-1">دولة المنشأة *</label>
-                    <select id="country_code" v-model="form.country_code" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl px-3 py-2.5 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-bold" data-register-country>
+                    <select id="country_code" v-model="form.country_code" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl py-2.5 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-bold" data-register-country>
                         <option v-for="c in countries" :key="c.code" :value="c.code">{{ c.name }}</option>
                     </select>
                     <p v-if="selectedCountry" class="mt-1 text-[11px] text-slate-500">{{ selectedCountry.tax }}</p>
@@ -134,7 +134,7 @@ const submit = () => {
                         <div class="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none text-slate-400">
                             <BanknotesIcon class="w-4 h-4" />
                         </div>
-                        <select id="currency" v-model="form.currency" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl ps-9 pe-4 py-2.5 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-sans font-bold">
+                        <select id="currency" v-model="form.currency" required class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl ps-9 pe-10 py-2.5 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-sans font-bold">
                             <option v-for="c in currencies" :key="c.code" :value="c.code">{{ c.name }} ({{ c.code }} - {{ c.symbol }})</option>
                         </select>
                     </div>

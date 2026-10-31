@@ -112,7 +112,7 @@ const formatCurrency = (val) => {
                             <select 
                                 v-model="selectedCategory"
                                 @change="handleSearch"
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                class="w-full text-xs rounded-xl border border-slate-200 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             >
                                 <option value="">جميع التصنيفات</option>
                                 <option v-for="cat in stats?.categories || []" :key="cat" :value="cat">{{ cat }}</option>

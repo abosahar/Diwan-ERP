@@ -111,7 +111,7 @@ const importLines = (lines, replace) => {
             
                         <div>
                             <label class="block font-medium text-slate-700 mb-1">نوع القيد</label>
-                            <select v-model="form.entry_type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+                            <select v-model="form.entry_type" class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl">
                                 <option value="manual">قيد يومية عادي</option>
                                 <option value="opening">قيد أرصدة افتتاحية</option>
                                 <option value="adjustment">قيد تسوية</option>
@@ -157,7 +157,7 @@ const importLines = (lines, replace) => {
                                             <SelectCreate v-model="line.cost_center_id" :options="costCenters" entity="cost_center" :label="(cc) => `${cc.code} - ${cc.name_ar}`" :placeholder="needs(line, 'cost_center') ? 'مطلوب *' : '—'" :allow-empty="!needs(line, 'cost_center')" />
                                         </td>
                                         <td class="p-2">
-                                            <select v-model="line.project_id" class="w-full py-1 px-2 bg-slate-50 border rounded-lg text-3xs" :class="needs(line, 'project') && !line.project_id ? 'border-rose-300' : 'border-slate-200'">
+                                            <select v-model="line.project_id" class="w-full py-1 ps-2 pe-8 bg-slate-50 border rounded-lg text-3xs" :class="needs(line, 'project') && !line.project_id ? 'border-rose-300' : 'border-slate-200'">
                                                 <option value="">{{ needs(line, 'project') ? 'مطلوب *' : '—' }}</option>
                                                 <option v-for="pr in projects" :key="pr.id" :value="pr.id">{{ pr.name }}</option>
                                             </select>

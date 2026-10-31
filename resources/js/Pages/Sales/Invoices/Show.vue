@@ -452,7 +452,7 @@ const resolveTag = (tag) => {
                         <select 
                             :value="currentTemplate.id"
                             @change="switchTemplate($event.target.value)"
-                            class="bg-transparent text-xs font-semibold text-slate-800 border-none p-0 focus:ring-0 cursor-pointer"
+                            class="bg-transparent text-xs font-semibold text-slate-800 border-none py-0 ps-0 pe-7 focus:ring-0 cursor-pointer"
                         >
                             <option v-for="t in invoiceTemplates" :key="t.id" :value="t.id">
                                 {{ t.name }} {{ t.is_default ? '★ (الافتراضي)' : '' }}

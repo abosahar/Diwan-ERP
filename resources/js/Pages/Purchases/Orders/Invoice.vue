@@ -57,7 +57,7 @@ const input = 'rounded-lg border border-slate-200 px-2 py-1.5 text-xs';
                     <button type="button" @click="addPayment" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold">+ دفعة</button>
                 </div>
                 <div v-for="(p, i) in form.payments" :key="i" class="grid grid-cols-12 gap-2 items-center">
-                    <select v-model="p.method" :class="input" class="col-span-3"><option value="cash">نقداً</option><option value="bank_transfer">تحويل بنكي</option><option value="card">بطاقة / مدى</option></select>
+                    <select v-model="p.method" :class="input" class="col-span-3 pe-8"><option value="cash">نقداً</option><option value="bank_transfer">تحويل بنكي</option><option value="card">بطاقة / مدى</option></select>
                     <div class="col-span-5"><SelectCreate v-model="p.bank_account_id" :options="bankAccounts" entity="bank" label="name" placeholder="الصندوق / البنك" /></div>
                     <input v-model="p.amount" type="text" inputmode="decimal" data-num :class="input" class="col-span-3 font-mono" />
                     <button type="button" @click="form.payments.splice(i, 1)" class="col-span-1 text-rose-500 font-bold">×</button>

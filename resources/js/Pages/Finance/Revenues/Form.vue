@@ -140,7 +140,7 @@ const submitRevenue = () => form.post(route('finance.revenues.store'));
                                     <label class="block font-medium text-slate-700 mb-1">طريقة التحصيل</label>
                                     <select 
                                         v-model="form.payment_method" 
-                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
+                                        class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-emerald-500 focus:border-emerald-500"
                                     >
                                         <option value="bank_transfer">تحويل بنكي</option>
                                         <option value="cash">نقداً</option>

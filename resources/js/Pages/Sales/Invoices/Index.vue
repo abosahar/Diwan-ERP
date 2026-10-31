@@ -164,8 +164,8 @@ const formatDateArabic = (dateStr) => {
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1.5">حالة الدفع</label>
                             <select 
-                                v-model="status" 
-                                class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                v-model="status"
+                                class="w-full text-xs rounded-xl border border-slate-200 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             >
                                 <option value="">جميع الحالات</option>
                                 <option value="paid">مدفوعة</option>
@@ -230,7 +230,9 @@ const formatDateArabic = (dateStr) => {
 
             <!-- Invoices Table Container (Matching live design) -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
-                <div class="overflow-x-auto">
+                <!-- relative: the sr-only header label is positioned against this box, so on phones the
+                     table scrolls here instead of widening the page -->
+                <div class="relative overflow-x-auto">
                     <table class="w-full text-right border-collapse">
                         <thead>
                             <tr class="border-b border-slate-100 bg-slate-50/50 text-slate-600 text-xs font-bold uppercase tracking-wider">

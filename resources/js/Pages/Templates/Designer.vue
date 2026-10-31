@@ -516,7 +516,7 @@ const setAsDefault = () => {
                     <select 
                         :value="template.id"
                         @change="router.get(route('templates.designer', $event.target.value))"
-                        class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-700 font-medium focus:ring-indigo-500"
+                        class="text-xs bg-slate-50 border border-slate-200 rounded-xl py-2 text-slate-700 font-medium focus:ring-indigo-500"
                     >
                         <option v-for="t in templates" :key="t.id" :value="t.id">
                             {{ t.name }} {{ t.is_default ? '(افتراضي)' : '' }}
@@ -583,7 +583,7 @@ const setAsDefault = () => {
                     <div class="bg-white border border-slate-200/80 rounded-2xl p-3 shadow-2xs flex flex-wrap items-center justify-between gap-3">
                         <div class="flex items-center gap-2">
                             <!-- Document Scope -->
-                            <select v-model="selectedScope" class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-medium text-slate-700">
+                            <select v-model="selectedScope" class="text-xs bg-slate-50 border border-slate-200 rounded-xl ps-2.5 pe-8 py-1.5 font-medium text-slate-700">
                                 <option value="مبيعات">مبيعات</option>
                                 <option value="مشتريات">مشتريات</option>
                                 <option value="عروض أسعار">عروض أسعار</option>
@@ -591,7 +591,7 @@ const setAsDefault = () => {
                             </select>
 
                             <!-- Document Type -->
-                            <select v-model="selectedDocType" class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-medium text-slate-700">
+                            <select v-model="selectedDocType" class="text-xs bg-slate-50 border border-slate-200 rounded-xl ps-2.5 pe-8 py-1.5 font-medium text-slate-700">
                                 <option value="فاتورة">فاتورة</option>
                                 <option value="إشعار دائن">إشعار دائن</option>
                                 <option value="إشعار مدين">إشعار مدين</option>
@@ -601,7 +601,7 @@ const setAsDefault = () => {
                             <select 
                                 v-model="selectedInvoiceId" 
                                 @change="changePreviewInvoice"
-                                class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 font-mono text-slate-700"
+                                class="text-xs bg-slate-50 border border-slate-200 rounded-xl ps-2.5 pe-8 py-1.5 font-mono text-slate-700"
                             >
                                 <option v-for="inv in sampleInvoices" :key="inv.id" :value="inv.id">
                                     {{ inv.invoice_number }} ({{ formatCurrency(inv.total) }} {{ $cur() }})
@@ -1236,7 +1236,7 @@ const setAsDefault = () => {
                                 <label class="block font-bold text-slate-800 mb-1.5">الترتيب التفصيلي لمقدمة الفاتورة</label>
                                 <select 
                                     v-model="layout.header.layout_order"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
+                                    class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
                                 >
                                     <option value="logo_meta_qr">الشعار يمين، معلومات الفاتورة، QR كود يسار</option>
                                     <option value="meta_logo_qr">معلومات الفاتورة يمين، الشعار بالمنتصف، QR كود يسار</option>
@@ -1341,7 +1341,7 @@ const setAsDefault = () => {
                                             <!-- Tag Selector helper -->
                                             <select 
                                                 @change="insertTagToField(field, $event.target.value)"
-                                                class="h-7 text-3xs px-2 border border-slate-200 rounded-md bg-white text-indigo-600 font-mono"
+                                                class="h-7 text-3xs ps-2 pe-8 border border-slate-200 rounded-md bg-white text-indigo-600 font-mono"
                                                 title="إدراج متغير ذكي"
                                             >
                                                 <option value="" disabled selected>&#123;&#123;-&#125;&#125;</option>
@@ -1469,7 +1469,7 @@ const setAsDefault = () => {
                                 <label class="block font-bold text-slate-800 mb-1.5">نوع الخط المستخدم</label>
                                 <select 
                                     v-model="layout.design.font_family"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
+                                    class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
                                 >
                                     <option value="Cairo">Cairo (خط كلاسيكي رسمي)</option>
                                     <option value="Tajawal">Tajawal (خط عصري ناعم)</option>
@@ -1496,7 +1496,7 @@ const setAsDefault = () => {
                                 <label class="block font-bold text-slate-800 mb-1.5">حجم ونوع الورق</label>
                                 <select 
                                     v-model="layout.page.paper_size"
-                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
+                                    class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800"
                                 >
                                     <option value="A4">A4 (ورق قياسي رسمي)</option>
                                     <option value="A5">A5 (نصف حجم A4)</option>
@@ -1942,7 +1942,7 @@ const setAsDefault = () => {
                                         />
                                         <select 
                                             v-model="col.align" 
-                                            class="px-2 py-1 bg-white border border-slate-200 rounded-lg text-3xs"
+                                            class="ps-2 pe-8 py-1 bg-white border border-slate-200 rounded-lg text-3xs"
                                         >
                                             <option value="right">يمين</option>
                                             <option value="center">وسط</option>

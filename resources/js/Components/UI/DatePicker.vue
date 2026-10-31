@@ -9,6 +9,8 @@ import { toLatinDigits } from '@/utils/latinDigits';
  * (weeks start on Saturday, Western digits, month and year pickers, today /
  * clear, Hijri date of the selection). v-model is always 'YYYY-MM-DD' or ''.
  * Use it instead of <input type="date">; type "month" picks YYYY-MM.
+ * The box is never wider than the space it is given: in a narrow grid cell or a
+ * crowded row it shrinks instead of pushing the page sideways.
  */
 defineOptions({ inheritAttrs: false });
 const props = defineProps({
@@ -126,11 +128,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div ref="root" class="relative" data-date-picker>
+    <div ref="root" class="relative min-w-0" data-date-picker>
         <input
             ref="input" v-bind="$attrs" :value="text" type="text" inputmode="numeric" autocomplete="off" dir="ltr"
             :placeholder="isMonth ? 'YYYY-MM' : 'YYYY-MM-DD'" :required="required" :disabled="disabled" :maxlength="isMonth ? 7 : 10"
-            class="ps-9 text-start font-mono"
+            class="ps-9 text-start font-mono max-w-full"
             @focus="show" @click="show" @input="onInput" @blur="onBlurFix" @keydown.esc="close" @keydown.enter="open = false"
         />
         <span class="absolute inset-y-0 start-2 flex items-center text-slate-400 pointer-events-none"><CalendarDaysIcon class="w-4 h-4" /></span>

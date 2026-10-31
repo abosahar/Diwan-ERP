@@ -115,7 +115,7 @@ const impersonate = async (companyId) => {
                 <select
                     v-model="status"
                     @change="handleFilter"
-                    class="bg-slate-50 border border-slate-200 text-xs rounded-xl px-3 py-2.5 focus:ring-purple-500 focus:border-purple-500 font-medium text-slate-700"
+                    class="bg-slate-50 border border-slate-200 text-xs rounded-xl py-2.5 focus:ring-purple-500 focus:border-purple-500 font-medium text-slate-700"
                 >
                     <option value="">جميع الحالات</option>
                     <option value="active">نشطة</option>

@@ -1,5 +1,6 @@
 <script setup>
 import { useUnsavedGuard } from '@/composables/useUnsavedGuard';
+import { useFixedDropdown } from '@/composables/useFixedDropdown';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -446,6 +447,14 @@ const handleGlobalClick = (event) => {
     }
 };
 
+// The lines table scrolls sideways inside its card on narrow screens, so the
+// product list is fixed under its field instead of hanging from the row.
+const { style: productListStyle, anchor: anchorProductList } = useFixedDropdown(() => form.items.some(it => it.isDropdownOpen));
+const openProductList = (item, event) => {
+    form.items.forEach(it => { it.isDropdownOpen = it === item; }); // one list at a time: they share the position
+    anchorProductList(event.target);
+};
+
 onMounted(() => {
     document.addEventListener('click', handleGlobalClick);
 });
@@ -669,7 +678,8 @@ const importLines = (lines, replace) => {
                             </button>
                         </div>
 
-                        <div class="overflow-visible">
+                        <!-- Wide lines scroll inside the card; `relative` keeps absolutely placed children inside the scroll box. -->
+                        <div class="relative overflow-x-auto">
                             <table class="w-full text-right text-xs">
                                 <thead>
                                     <tr class="text-slate-400 font-bold border-b border-slate-100 pb-2">
@@ -694,8 +704,8 @@ const importLines = (lines, replace) => {
                                                 <input 
                                                     v-model="item.item_name"
                                                     type="text" 
-                                                    @focus="item.isDropdownOpen = true"
-                                                    @input="item.isDropdownOpen = true"
+                                                    @focus="openProductList(item, $event)"
+                                                    @input="openProductList(item, $event)"
                                                     placeholder="اختر أو اكتب اسم منتج للإنشاء..."
                                                     class="w-full text-xs rounded-xl border border-slate-200 ps-2.5 pe-8 py-2 focus:border-indigo-500 font-bold text-slate-800 transition"
                                                     required
@@ -708,7 +718,9 @@ const importLines = (lines, replace) => {
                                             <!-- Dropdown for Product Matching & Fast-Creation On Typing -->
                                             <div 
                                                 v-if="item.isDropdownOpen"
-                                                class="absolute start-3 end-3 top-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 max-h-64 overflow-y-auto p-1.5 divide-y divide-slate-100"
+                                                :style="productListStyle"
+                                                data-product-list
+                                                class="fixed bg-white border border-slate-200 rounded-2xl shadow-xl z-50 max-h-64 overflow-y-auto p-1.5 divide-y divide-slate-100"
                                             >
                                                 <!-- Create Product Action ONLY on Typing Non-existent product -->
                                                 <div 
@@ -849,7 +861,7 @@ const importLines = (lines, replace) => {
                             </div>
                             <p v-if="!form.payments.length" class="text-slate-500">الفاتورة آجلة بالكامل. أضف دفعة (أو أكثر: نقد وتحويل مثلًا) لتسجيل ما دُفع الآن.</p>
                             <div v-for="(p, i) in form.payments" :key="i" class="grid grid-cols-12 gap-2 items-end p-2 rounded-xl bg-slate-50 border border-slate-100" data-payment-row>
-                                <select v-model="p.method" class="col-span-4 rounded-lg border border-slate-200 px-2 py-1.5 font-medium">
+                                <select v-model="p.method" class="col-span-4 rounded-lg border border-slate-200 ps-2 pe-8 py-1.5 font-medium">
                                     <option value="cash">نقداً</option>
                                     <option value="bank_transfer">تحويل بنكي</option>
                                     <option value="card">بطاقة / مدى</option>
