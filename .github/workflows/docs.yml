@@ -1,0 +1,49 @@
+name: Deploy Documentation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - 'docs/**'
+      - 'PagesDoc/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Install dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Build documentation
+        run: php PagesDoc/build.php
+      - name: Upload documentation
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: PagesDoc/site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
