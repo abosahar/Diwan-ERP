@@ -10,5 +10,6 @@
 *.php diff=php
 
 /.github export-ignore
+/PagesDoc export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
