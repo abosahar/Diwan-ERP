@@ -30,7 +30,7 @@ const logout = () => {
 
 <template>
     <header class="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-3 sm:px-4 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
-        <!-- Start: sidebar toggle, search, «إضافة» and «عرض» -->
+        <!-- Start: sidebar toggle, «إضافة» and «عرض», search -->
         <div class="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
             <button
                 @click="$emit('toggleSidebar')"
@@ -41,9 +41,9 @@ const logout = () => {
                 <Bars3Icon class="w-6 h-6" />
             </button>
 
+            <QuickMenus />
             <!-- Global search palette (Ctrl+K) -->
             <GlobalSearch />
-            <QuickMenus />
         </div>
 
         <!-- End: POS, notifications, user menu -->
