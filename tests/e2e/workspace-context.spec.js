@@ -25,8 +25,13 @@ const card = (page) => page.locator('[data-context-card]');
 const panel = (page) => page.locator('[data-context-panel]');
 const summary = (page) => page.locator('[data-context-summary]');
 
+// Opens the popover unless it is open already: dismissing the unsaved-changes dialog by its
+// backdrop leaves it open (Headless UI counts the dialog, teleported to <body>, as another root).
 async function switchBranch(page, label) {
-    await card(page).click();
+    if ((await card(page).getAttribute('aria-expanded')) !== 'true') {
+        await expect(panel(page)).toHaveCount(0); // a popover that was closing is gone
+        await card(page).click();
+    }
     await panel(page).locator('[data-context-branch]').selectOption({ label });
     await panel(page).locator('[data-context-apply]').click();
 }
@@ -138,6 +143,8 @@ test('collapsed sidebar: an icon with a tooltip opens the popover beside the rai
     await signIn(page);
     await page.goto('/dashboard');
     await page.locator('[data-sidebar-toggle]').click();
+    // Hover only once the rail has stopped narrowing, or the icon slides out from under the mouse.
+    await expect(page.locator('aside')).toHaveCSS('width', '80px');
 
     await expect(summary(page)).toBeHidden();
     await card(page).hover();
@@ -170,6 +177,7 @@ test('phones: no sideways scrolling, and the card works in the drawer', async ({
     }
 
     await page.getByRole('button', { name: 'القائمة', exact: true }).click();
+    await expect(page.locator('aside')).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)'); // the drawer has slid in
     await card(page).click();
     await expect(panel(page)).toBeVisible();
     const box = await panel(page).boundingBox();
