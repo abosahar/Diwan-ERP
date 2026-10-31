@@ -12,6 +12,7 @@ import { PermissionsPlugin } from './permissions';
 import PromptDialog from './Components/UI/PromptDialog.vue';
 import UnsavedDialog from './Components/UI/UnsavedDialog.vue';
 import { installLatinDigits } from './utils/latinDigits';
+import { installContextHistoryGuard } from './utils/contextHistory';
 
 installLatinDigits();
 
@@ -27,6 +28,7 @@ createInertiaApp({
         ),
     setup({ el, App, props, plugin }) {
         appName = props.initialPage?.props?.brand?.name || appName;
+        installContextHistoryGuard(props.initialPage);
 
         // PromptDialog is the single host for ask() / confirmAction() / notify().
         const app = createApp({ render: () => [h(App, props), h(PromptDialog), h(UnsavedDialog)] });

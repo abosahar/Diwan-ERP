@@ -78,7 +78,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
 </script>
 
 <template>
-    <button type="button" @click="show" class="flex-1 min-w-[2.5rem] lg:min-w-[10rem] max-w-xs flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-400 text-xs sm:text-sm rounded-lg px-3 py-2 hover:bg-white hover:border-indigo-300 transition" data-search-open>
+    <button type="button" @click="show" class="h-9 flex-1 min-w-[2.25rem] sm:min-w-[10rem] lg:min-w-[14rem] max-w-md flex items-center justify-center sm:justify-start gap-2 bg-slate-50 border border-slate-200 text-slate-400 text-xs sm:text-sm rounded-lg px-2.5 sm:px-3 hover:bg-white hover:border-indigo-300 transition" :aria-label="$t('common.search')" data-search-open>
         <MagnifyingGlassIcon class="w-4 h-4 shrink-0" />
         <span class="flex-1 text-start truncate hidden sm:inline">{{ $t('common.search') }}</span>
         <kbd class="hidden md:inline text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-200 bg-white text-slate-400">Ctrl K</kbd>

@@ -190,7 +190,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/search', SearchController::class)->name('search');
 
-    // Top bar: working branch and fiscal year.
+    // Working branch and fiscal year (sidebar «سياق العمل» card).
+    Route::post('/context', [ActiveContextController::class, 'update'])->name('context.update');
     Route::post('/context/branch', [ActiveContextController::class, 'branch'])->name('context.branch');
     Route::post('/context/fiscal-year', [ActiveContextController::class, 'fiscalYear'])->name('context.fiscal-year');
     Route::get('/system/update', [SelfUpdateController::class, 'status'])->name('system.update.status');

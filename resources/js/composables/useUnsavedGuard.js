@@ -10,10 +10,29 @@ import { useSaveAndNew } from '@/composables/useSaveAndNew';
  * form's own post/put and same-page reloads (filters) are not.
  */
 let leaving = false;
+// Dirty checks of the forms on the current page.
+const guarded = new Set();
+
+const submitPageForm = () => (document.querySelector('main form') || document.querySelector('form'))?.requestSubmit();
+
+/**
+ * Before an action that reloads the page in place (switching the branch or fiscal
+ * year): resolves true to go ahead. With unsaved changes it asks first, and «حفظ»
+ * submits the form instead of going ahead.
+ */
+export async function confirmLeaving() {
+    if (![...guarded].some((dirty) => dirty())) return true;
+
+    const choice = await confirmUnsaved();
+    if (choice === 'save') submitPageForm();
+
+    return choice === 'discard';
+}
 
 export function useUnsavedGuard(form) {
     useSaveAndNew(form);
     const dirty = () => !!form.isDirty && !form.processing;
+    guarded.add(dirty);
 
     const stop = router.on('before', (event) => {
         const visit = event.detail.visit;
@@ -21,7 +40,7 @@ export function useUnsavedGuard(form) {
 
         confirmUnsaved().then((choice) => {
             if (choice === 'save') {
-                (document.querySelector('main form') || document.querySelector('form'))?.requestSubmit();
+                submitPageForm();
             } else if (choice === 'discard') {
                 leaving = true;
                 router.visit(visit.url.href, { method: visit.method, data: visit.data, replace: visit.replace, preserveScroll: visit.preserveScroll, preserveState: visit.preserveState });
@@ -40,6 +59,7 @@ export function useUnsavedGuard(form) {
     window.addEventListener('beforeunload', beforeUnload);
 
     onBeforeUnmount(() => {
+        guarded.delete(dirty);
         stop();
         window.removeEventListener('beforeunload', beforeUnload);
     });
