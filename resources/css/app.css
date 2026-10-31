@@ -20,3 +20,8 @@
 :where(select) { line-height: 1.4; }
 :where([dir="rtl"]) select:where(:not([multiple], [size]:not([size="1"]))) { background-position: left 0.6rem center; padding-left: 2.5rem; padding-right: 0.75rem; }
 :where([dir="ltr"]) select:where(:not([multiple], [size]:not([size="1"]))) { background-position: right 0.6rem center; padding-left: 0.75rem; padding-right: 2.5rem; }
+
+/* Native time inputs: Safari and Firefox lay out the hour, minute and AM/PM boxes in the input's direction, so in an
+   Arabic page 08:00 read «AM 00:08». Keep them left to right (Chrome already forces it) with the value on the right
+   like the other fields. One element of specificity, so a text-left/text-center utility on an input still wins. */
+:where([dir="rtl"]) input:where([type="time"], [type="datetime-local"]) { direction: ltr; text-align: right; }
