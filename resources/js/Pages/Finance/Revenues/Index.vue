@@ -14,6 +14,7 @@ import {
     BanknotesIcon,
     XMarkIcon,
     TrashIcon,
+    PrinterIcon,
     PencilSquareIcon,
     ArrowTrendingUpIcon,
 } from '@heroicons/vue/24/outline';
@@ -206,6 +207,7 @@ const formatCurrency = (val) => {
                                     {{ formatCurrency(rev.total_amount) }} <span class="text-3xs font-normal">﷼</span>
                                 </td>
                                 <td class="py-4 px-6 text-center whitespace-nowrap">
+                                    <a :href="route('documents.pdf', { type: 'revenue', id: rev.id })" target="_blank" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition inline-block" title="طباعة السند" data-row-print><PrinterIcon class="w-4 h-4" /></a>
                                     <Link v-if="$can('finance.revenues.edit')" :href="route('finance.revenues.edit', rev.id)" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition inline-block" title="تعديل" data-row-edit><PencilSquareIcon class="w-4 h-4" /></Link>
                                     <button 
                                         @click="deleteRevenue(rev.id, rev.revenue_number)"

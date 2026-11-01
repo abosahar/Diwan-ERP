@@ -8,8 +8,13 @@ use App\Models\Currency;
 use App\Models\Customer;
 use App\Models\CustomerPayment;
 use App\Models\DebitNote;
+use App\Models\Expense;
 use App\Models\Invoice;
+use App\Models\JournalEntry;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseOrder;
 use App\Models\Quotation;
+use App\Models\Revenue;
 use App\Models\SalesOrder;
 use App\Models\Supplier;
 use App\Models\SupplierPayment;
@@ -40,6 +45,11 @@ class TemplateData
         'debit_note' => ['إشعار مدين', DebitNote::class, true],
         'receipt' => ['سند قبض', CustomerPayment::class, false],
         'payment' => ['سند صرف لمورد', SupplierPayment::class, false],
+        'expense' => ['سند صرف (مصروف)', Expense::class, false],
+        'revenue' => ['سند قبض (إيراد)', Revenue::class, false],
+        'journal' => ['قيد يومية', JournalEntry::class, true],
+        'purchase_invoice' => ['فاتورة مشتريات', PurchaseInvoice::class, true],
+        'purchase_order' => ['أمر شراء', PurchaseOrder::class, true],
     ];
 
     public const METHODS = ['cash' => 'نقداً', 'credit' => 'آجل', 'bank_transfer' => 'تحويل بنكي', 'card' => 'بطاقة', 'mada' => 'مدى', 'cheque' => 'شيك',
@@ -55,6 +65,12 @@ class TemplateData
         throw new InvalidArgumentException('No template kind for '.$document::class);
     }
 
+    /** Single-amount documents (no item table). */
+    public static function isVoucher(string $kind): bool
+    {
+        return in_array($kind, ['receipt', 'payment', 'expense', 'revenue'], true);
+    }
+
     /** @return array{fields: array<string,string>, items: array<int,array<string,string>>, qr: ?string} */
     public function build(Model $document): array
     {
@@ -67,6 +83,11 @@ class TemplateData
             'debit_note' => $this->debitNote($document),
             'receipt' => $this->receipt($document),
             'payment' => $this->supplierPayment($document),
+            'expense' => $this->expense($document),
+            'revenue' => $this->revenue($document),
+            'journal' => $this->journal($document),
+            'purchase_invoice' => $this->purchaseInvoice($document),
+            'purchase_order' => $this->purchaseOrder($document),
         };
 
         $currency = $this->currency($document);
@@ -81,8 +102,12 @@ class TemplateData
     /** Designer catalogue: groups of [key, label], plus item columns. */
     public static function catalogue(string $kind): array
     {
-        $voucher = in_array($kind, ['receipt', 'payment'], true);
-        $party = $kind === 'payment' ? 'المورد' : 'العميل';
+        $voucher = self::isVoucher($kind);
+        $supplierSide = in_array($kind, ['payment', 'expense', 'purchase_invoice', 'purchase_order'], true);
+        $party = match ($kind) {
+            'expense' => 'المستفيد', 'revenue' => 'الدافع', 'journal' => 'الطرف',
+            default => $supplierSide ? 'المورد' : 'العميل',
+        };
 
         $groups = [
             'company' => ['الشركة', [
@@ -101,7 +126,11 @@ class TemplateData
                 in_array($kind, ['credit_note', 'debit_note'], true) ? ['doc.original_number', 'الفاتورة الأصلية'] : null,
                 in_array($kind, ['credit_note', 'debit_note'], true) ? ['doc.reason', 'السبب'] : null,
                 ['doc.reference', 'الرقم المرجعي'],
-                in_array($kind, ['invoice', 'receipt', 'payment'], true) ? ['doc.payment_method', 'طريقة الدفع'] : null,
+                in_array($kind, ['invoice', 'receipt', 'payment', 'expense', 'revenue', 'purchase_invoice'], true) ? ['doc.payment_method', 'طريقة الدفع'] : null,
+                in_array($kind, ['expense', 'revenue'], true) ? ['doc.account', 'الحساب'] : null,
+                $kind === 'journal' ? ['doc.description', 'بيان القيد'] : null,
+                $kind === 'purchase_invoice' ? ['doc.supplier_invoice', 'رقم فاتورة المورد'] : null,
+                $kind === 'purchase_order' ? ['doc.delivery_date', 'تاريخ التوريد المتوقع'] : null,
                 $kind === 'invoice' ? ['doc.payment_type', 'نقدي / آجل'] : null,
                 $voucher ? ['doc.bank', 'البنك / الصندوق'] : null,
                 $voucher ? ['doc.for', 'وذلك عن (الفاتورة)'] : null,
@@ -112,20 +141,22 @@ class TemplateData
             'party' => [$party, array_values(array_filter([
                 ['party.name', 'الاسم'], ['party.code', 'الرقم / الكود'], ['party.vat', 'الرقم الضريبي'], ['party.cr', 'السجل التجاري'],
                 ['party.phone', 'الجوال'], ['party.email', 'البريد'], ['party.address', 'العنوان الكامل'],
-                $kind === 'payment' ? null : ['party.national_address', 'العنوان الوطني (منسّق)'],
-                $kind === 'payment' ? null : ['party.building_number', 'رقم المبنى'],
-                $kind === 'payment' ? null : ['party.street', 'الشارع'],
-                $kind === 'payment' ? null : ['party.district', 'الحي'],
-                $kind === 'payment' ? null : ['party.city', 'المدينة'],
-                $kind === 'payment' ? null : ['party.postal_code', 'الرمز البريدي'],
-                $kind === 'payment' ? null : ['party.additional_number', 'الرقم الإضافي'],
-                $kind === 'payment' ? null : ['party.country', 'الدولة'],
+                $supplierSide || in_array($kind, ['revenue', 'journal'], true) ? null : ['party.national_address', 'العنوان الوطني (منسّق)'],
+                $supplierSide || in_array($kind, ['revenue', 'journal'], true) ? null : ['party.building_number', 'رقم المبنى'],
+                $supplierSide || in_array($kind, ['revenue', 'journal'], true) ? null : ['party.street', 'الشارع'],
+                $supplierSide || in_array($kind, ['revenue', 'journal'], true) ? null : ['party.district', 'الحي'],
+                $supplierSide || in_array($kind, ['revenue', 'journal'], true) ? null : ['party.city', 'المدينة'],
+                $supplierSide || in_array($kind, ['revenue', 'journal'], true) ? null : ['party.postal_code', 'الرمز البريدي'],
+                $supplierSide || in_array($kind, ['revenue', 'journal'], true) ? null : ['party.additional_number', 'الرقم الإضافي'],
+                $supplierSide || in_array($kind, ['revenue', 'journal'], true) ? null : ['party.country', 'الدولة'],
             ]))],
-            'totals' => [$voucher ? 'المبلغ' : 'الإجماليات', $voucher
-                ? [['totals.total', 'المبلغ'], ['totals.words', 'المبلغ كتابةً (تفقيط)'], ['totals.currency', 'العملة']]
+            'totals' => [$voucher ? 'المبلغ' : 'الإجماليات', $kind === 'journal'
+                ? [['totals.debit', 'إجمالي المدين'], ['totals.credit', 'إجمالي الدائن'], ['totals.words', 'المبلغ كتابةً (تفقيط)'], ['totals.currency', 'العملة']]
+                : ($voucher
+                ? [['totals.net', 'المبلغ قبل الضريبة'], ['totals.vat', 'الضريبة'], ['totals.total', 'المبلغ'], ['totals.words', 'المبلغ كتابةً (تفقيط)'], ['totals.currency', 'العملة']]
                 : [['totals.gross', 'المجموع قبل الخصم'], ['totals.discount', 'الخصم'], ['totals.net', 'الإجمالي بعد الخصم'], ['totals.vat_rate', 'نسبة الضريبة'],
                     ['totals.vat', 'ضريبة القيمة المضافة'], ['totals.total', 'الإجمالي شامل الضريبة'], ['totals.paid', 'المدفوع'], ['totals.remaining', 'المتبقي'],
-                    ['totals.words', 'الإجمالي كتابةً (تفقيط)'], ['totals.currency', 'العملة'], ['totals.items_count', 'عدد البنود'], ['totals.quantity', 'مجموع الكميات']]],
+                    ['totals.words', 'الإجمالي كتابةً (تفقيط)'], ['totals.currency', 'العملة'], ['totals.items_count', 'عدد البنود'], ['totals.quantity', 'مجموع الكميات']])],
         ];
 
         return [
@@ -133,13 +164,21 @@ class TemplateData
             'label' => self::KINDS[$kind][0],
             'has_items' => self::KINDS[$kind][2],
             'groups' => collect($groups)->map(fn ($g, $key) => ['key' => $key, 'label' => $g[0], 'fields' => array_map(fn ($f) => ['key' => $f[0], 'label' => $f[1]], $g[1])])->values()->all(),
-            'columns' => self::KINDS[$kind][2] ? self::columns() : [],
+            'columns' => self::KINDS[$kind][2] ? self::columns($kind) : [],
         ];
     }
 
     /** Item columns: key => [Arabic header, English header, default align]. */
-    public static function columns(): array
+    public static function columns(?string $kind = null): array
     {
+        if ($kind === 'journal') {
+            return collect([
+                'index' => ['م', 'S#', 'center'], 'account_code' => ['رقم الحساب', 'Account No.', 'center'], 'account' => ['الحساب', 'Account', 'right'],
+                'description' => ['البيان', 'Description', 'right'], 'cost_center' => ['مركز التكلفة', 'Cost Center', 'center'],
+                'debit' => ['مدين', 'Debit', 'center'], 'credit' => ['دائن', 'Credit', 'center'],
+            ])->map(fn ($c, $key) => ['key' => $key, 'label' => $c[0], 'label_en' => $c[1], 'align' => $c[2]])->values()->all();
+        }
+
         return collect([
             'index' => ['م', 'S#', 'center'], 'sku' => ['رقم الصنف', 'Item No.', 'center'], 'name' => ['الصنف', 'Item', 'right'],
             'description' => ['الوصف', 'Description', 'right'], 'name_description' => ['الصنف والوصف', 'Description', 'right'],
@@ -152,17 +191,21 @@ class TemplateData
     /** Plausible values for designing before (or without) a real document. */
     public function sample(string $kind, Company $company): array
     {
-        $voucher = in_array($kind, ['receipt', 'payment'], true);
-        $items = $voucher ? [] : [
+        $voucher = self::isVoucher($kind);
+        $items = $voucher ? [] : ($kind === 'journal' ? [
+            ['index' => '1', 'account_code' => '5201', 'account' => 'مصروف الإيجار', 'description' => 'إيجار شهر يناير', 'cost_center' => 'الإدارة', 'debit' => $this->money(2250), 'credit' => ''],
+            ['index' => '2', 'account_code' => '1111', 'account' => 'الصندوق الرئيسي', 'description' => 'سداد الإيجار', 'cost_center' => '', 'debit' => '', 'credit' => $this->money(2250)],
+        ] : [
             $this->row(1, 'PRD-00046', 'أعمال مشاريع', 'تنظيف الخزانات بالمراكز الصحية', 'عمل', 5, 450, 0, 15),
             $this->row(2, 'PRD-00012', 'صيانة دورية', 'صيانة مكيفات المبنى الرئيسي', 'زيارة', 2, 300, 50, 15),
-        ];
-        $gross = $voucher ? 0 : collect($items)->sum(fn ($r) => (float) str_replace(',', '', $r['gross']));
+        ]);
+        $gross = $voucher || $kind === 'journal' ? 0 : collect($items)->sum(fn ($r) => (float) str_replace(',', '', $r['gross']));
         $total = $voucher ? 2587.50 : 3122.50;
         $titles = [
             'invoice' => ['فاتورة ضريبية', 'Tax Invoice'], 'quotation' => ['عرض سعر', 'Quotation'], 'sales_order' => ['أمر بيع', 'Sales Order'],
             'credit_note' => ['إشعار دائن', 'Credit Note'], 'debit_note' => ['إشعار مدين', 'Debit Note'], 'receipt' => ['سند قبض', 'Receipt Voucher'],
-            'payment' => ['سند صرف', 'Payment Voucher'],
+            'payment' => ['سند صرف', 'Payment Voucher'], 'expense' => ['سند صرف', 'Payment Voucher'], 'revenue' => ['سند قبض', 'Receipt Voucher'],
+            'journal' => ['قيد يومية', 'Journal Voucher'], 'purchase_invoice' => ['فاتورة مشتريات', 'Purchase Invoice'], 'purchase_order' => ['أمر شراء', 'Purchase Order'],
         ];
 
         $fields = $this->company($company) + [
@@ -182,6 +225,8 @@ class TemplateData
             'totals.vat' => $this->money(round(($gross - 50) * 0.15, 2)), 'totals.total' => $this->money($total), 'totals.paid' => $this->money(0),
             'totals.remaining' => $this->money($total), 'totals.words' => Tafqeet::amount($total), 'totals.currency' => 'ر.س',
             'totals.items_count' => (string) count($items), 'totals.quantity' => '7',
+            'totals.debit' => $this->money(2250), 'totals.credit' => $this->money(2250),
+            'doc.account' => 'مصروف الإيجار', 'doc.description' => 'سداد إيجار المكتب', 'doc.supplier_invoice' => 'SUP-5521',
         ];
 
         return ['fields' => $fields, 'items' => $items, 'qr' => 'AQ1TYW1wbGUgU2VsbGVyAg8zMDAwMDAwMDAwMDAwMDM='];
@@ -305,6 +350,88 @@ class TemplateData
                 'doc.for' => $payment->purchaseInvoice ? 'سداد فاتورة المورد '.($payment->purchaseInvoice->supplier_invoice_number ?: $payment->purchaseInvoice->invoice_number) : 'دفعة على الحساب',
                 'doc.notes' => $payment->notes,
             ] + $this->supplier($supplier) + ['totals.total' => $this->money($payment->amount)],
+        ];
+    }
+
+    protected function voucherFields(Expense|Revenue $voucher, string $title, string $titleEn, string $number, $date, ?string $party): array
+    {
+        $voucher->loadMissing(['account:id,code,name_ar', 'bankAccount:id,name']);
+
+        return [
+            'date' => $date?->toDateString(),
+            'amount' => $voucher->total_amount,
+            'fields' => $this->doc($title, $titleEn, $number, $date, $voucher->created_at) + [
+                'doc.reference' => $voucher->reference_number, 'doc.payment_method' => self::METHODS[$voucher->payment_method] ?? $voucher->payment_method,
+                'doc.bank' => $voucher->bankAccount?->name, 'doc.for' => $voucher->title, 'doc.notes' => $voucher->notes,
+                'doc.account' => trim(($voucher->account?->code ?? '').' '.($voucher->account?->name_ar ?? '')), 'doc.description' => $voucher->category,
+                'party.name' => $party,
+                'totals.net' => $this->money($voucher->amount), 'totals.vat' => $this->money($voucher->tax_amount), 'totals.total' => $this->money($voucher->total_amount),
+            ],
+        ];
+    }
+
+    protected function expense(Expense $expense): array
+    {
+        $data = $this->voucherFields($expense, 'سند صرف', 'Payment Voucher', $expense->expense_number, $expense->expense_date, $expense->vendor_name);
+        $data['fields']['party.vat'] = $expense->vendor_tax_number;
+
+        return $data;
+    }
+
+    protected function revenue(Revenue $revenue): array
+    {
+        return $this->voucherFields($revenue, 'سند قبض', 'Receipt Voucher', $revenue->revenue_number, $revenue->revenue_date, $revenue->customer_name);
+    }
+
+    protected function journal(JournalEntry $entry): array
+    {
+        $entry->loadMissing(['lines.account:id,code,name_ar', 'lines.costCenter:id,name_ar', 'branch', 'creator:id,name']);
+
+        return [
+            'date' => $entry->date ? Carbon::parse($entry->date)->toDateString() : null,
+            'amount' => $entry->total_debit,
+            'items' => $entry->lines->values()->map(fn ($l, $i) => [
+                'index' => (string) ($i + 1), 'account_code' => (string) $l->account?->code, 'account' => (string) $l->account?->name_ar,
+                'description' => (string) $l->description, 'cost_center' => (string) $l->costCenter?->name_ar,
+                'debit' => (float) $l->debit > 0 ? $this->money($l->debit) : '', 'credit' => (float) $l->credit > 0 ? $this->money($l->credit) : '',
+            ])->all(),
+            'fields' => $this->doc('قيد يومية', 'Journal Voucher', $entry->entry_number, $entry->date, $entry->created_at) + [
+                'doc.reference' => $entry->reference, 'doc.description' => $entry->description, 'doc.notes' => $entry->description,
+                'doc.salesperson' => $entry->creator?->name, 'doc.branch' => $entry->branch?->name_ar,
+                'totals.debit' => $this->money($entry->total_debit), 'totals.credit' => $this->money($entry->total_credit),
+                'totals.total' => $this->money($entry->total_debit), 'totals.items_count' => (string) $entry->lines->count(),
+            ],
+        ];
+    }
+
+    protected function purchaseInvoice(PurchaseInvoice $invoice): array
+    {
+        $invoice->loadMissing(['items.product.unit', 'supplier', 'branch']);
+
+        return [
+            'date' => $invoice->invoice_date?->toDateString(),
+            'amount' => $invoice->total,
+            'items' => $this->items($invoice->items),
+            'fields' => $this->doc('فاتورة مشتريات', 'Purchase Invoice', $invoice->invoice_number, $invoice->invoice_date, $invoice->created_at) + [
+                'doc.supplier_invoice' => $invoice->supplier_invoice_number, 'doc.due_date' => $this->date($invoice->due_date),
+                'doc.payment_method' => self::METHODS[$invoice->payment_method] ?? $invoice->payment_method, 'doc.notes' => $invoice->notes,
+                'doc.branch' => $invoice->branch?->name_ar,
+            ] + $this->supplier($invoice->supplier) + $this->totals($invoice->items, $invoice->discount, $invoice->tax_amount, $invoice->total, $invoice->paid_amount, $invoice->remaining_amount),
+        ];
+    }
+
+    protected function purchaseOrder(PurchaseOrder $order): array
+    {
+        $order->loadMissing(['items.product.unit', 'supplier', 'creator:id,name']);
+
+        return [
+            'date' => $order->order_date?->toDateString(),
+            'amount' => $order->total,
+            'items' => $this->items($order->items),
+            'fields' => $this->doc('أمر شراء', 'Purchase Order', $order->order_number, $order->order_date, $order->created_at) + [
+                'doc.delivery_date' => $this->date($order->expected_delivery_date ?? null), 'doc.notes' => $order->notes,
+                'doc.salesperson' => $order->creator?->name,
+            ] + $this->supplier($order->supplier) + $this->totals($order->items, $order->discount ?? 0, $order->tax_amount, $order->total),
         ];
     }
 

@@ -14,6 +14,7 @@ import {
     BanknotesIcon,
     XMarkIcon,
     TrashIcon,
+    PrinterIcon,
     PencilSquareIcon,
     FunnelIcon,
     ArrowTrendingDownIcon,
@@ -207,6 +208,7 @@ const formatCurrency = (val) => {
                                     {{ formatCurrency(exp.total_amount) }} <span class="text-3xs font-normal">﷼</span>
                                 </td>
                                 <td class="py-4 px-6 text-center whitespace-nowrap">
+                                    <a :href="route('documents.pdf', { type: 'expense', id: exp.id })" target="_blank" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition inline-block" title="طباعة السند" data-row-print><PrinterIcon class="w-4 h-4" /></a>
                                     <Link v-if="$can('finance.expenses.edit')" :href="route('finance.expenses.edit', exp.id)" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition inline-block" title="تعديل" data-row-edit><PencilSquareIcon class="w-4 h-4" /></Link>
                                     <button 
                                         @click="deleteExpense(exp.id, exp.expense_number)"

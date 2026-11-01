@@ -1,4 +1,5 @@
 <script setup>
+import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -47,6 +48,7 @@ const formatCurrency = (val) => {
             <!-- Header Ribbon & Actions (Hidden on Print) -->
             <PageHeader :title="`فاتورة شراء ${invoice.invoice_number}`" :crumbs="[{ label: 'فواتير الشراء' }, { label: invoice.invoice_number }]">
 <template #actions>
+                    <ShareDocument v-if="$can('purchases.invoices.print')" type="purchase_invoice" :id="invoice.id" />
                     <Link v-if="!changeBlocker && $can('purchases.invoices.edit')" :href="route('purchases.invoices.edit', invoice.id)" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700">تعديل</Link>
                     <button v-if="!changeBlocker && $can('purchases.invoices.delete')" type="button" @click="removeInvoice" class="px-3 py-2 rounded-xl border border-rose-200 bg-white text-xs font-bold text-rose-600">حذف</button>
 <button 
