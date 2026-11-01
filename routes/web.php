@@ -797,6 +797,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
     Route::delete('/integrations/webhooks/{webhook}', [IntegrationController::class, 'destroyWebhook'])->name('webhooks.destroy');
     Route::post('/integrations/webhooks/{webhook}/test', [IntegrationController::class, 'testWebhook'])->name('webhooks.test');
 
+    // The idle warning's «متابعة الجلسة» (any request counts as activity).
+    Route::post('/session/keep-alive', fn () => response()->noContent())->name('session.keep-alive');
     Route::get('/recycle-bin', [RecycleBinController::class, 'index'])->name('recycle-bin.index');
     Route::post('/recycle-bin/{type}/{id}/restore', [RecycleBinController::class, 'restore'])->name('recycle-bin.restore');
     Route::delete('/recycle-bin/{type}/{id}', [RecycleBinController::class, 'purge'])->name('recycle-bin.purge');

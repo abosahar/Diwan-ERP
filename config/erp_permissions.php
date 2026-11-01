@@ -437,6 +437,7 @@ return [
         'recycle-bin.index' => 'admin.recycle_bin.view',
         'recycle-bin.restore' => 'admin.recycle_bin.manage',
         'recycle-bin.purge' => 'admin.recycle_bin.manage',
+        'session.keep-alive' => '@authenticated',
         'whats-new.index' => '@authenticated',
         'feature-requests.index' => '@authenticated',
         'notifications.index' => '@authenticated',

@@ -65,6 +65,8 @@ class HandleInertiaRequests extends Middleware
                     'default_branch_id' => $currentTenant && $user->company_id ? $user->defaultBranchId() : null,
                 ] : null,
             ],
+            // Idle sign-out: minutes without activity (0 = off); the layout warns a minute before.
+            'idleMinutes' => fn () => $user ? IdleTimeout::minutes() : 0,
             'tenant' => $currentTenant ? [
                 'id' => $currentTenant->id,
                 'name' => $currentTenant->name,
