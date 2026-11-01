@@ -12,7 +12,7 @@ const createForm = useForm({
 });
 useUnsavedGuard(createForm);
 // Free-form templates exist for every printable document kind.
-const kinds = { invoice: 'فاتورة مبيعات', quotation: 'عرض سعر', sales_order: 'أمر بيع', credit_note: 'إشعار دائن / مرتجع', debit_note: 'إشعار مدين', receipt: 'سند قبض', payment: 'سند صرف لمورد' };
+const kinds = { invoice: 'فاتورة مبيعات', quotation: 'عرض سعر', sales_order: 'أمر بيع', credit_note: 'إشعار دائن / مرتجع', debit_note: 'إشعار مدين', receipt: 'سند قبض', payment: 'سند صرف لمورد', expense: 'سند صرف (مصروف)', revenue: 'سند قبض (إيراد)', journal: 'قيد يومية', purchase_invoice: 'فاتورة مشتريات', purchase_order: 'أمر شراء' };
 const setMode = (mode) => { createForm.mode = mode; createForm.template_type = mode === 'freeform' ? 'invoice' : 'invoice_a4'; };
 
 const submitCreate = () => createForm.post(route('templates.store'));

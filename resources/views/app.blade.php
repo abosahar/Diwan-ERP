@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <link rel="icon" type="image/svg+xml" href="/brand/diwan-mark.svg">
         <title inertia>{{ config('app.name', 'الديوان') }}</title>
 
         <!-- Google Fonts: Cairo & IBM Plex Sans Arabic -->

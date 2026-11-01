@@ -12,6 +12,7 @@ import {
     BanknotesIcon,
     XMarkIcon,
     TrashIcon,
+    PencilSquareIcon,
     CreditCardIcon,
     WalletIcon,
 } from '@heroicons/vue/24/outline';
@@ -124,6 +125,8 @@ const formatCurrency = (val) => {
                                 </div>
                             </div>
 
+                            <span class="flex items-center">
+                            <Link v-if="$can('finance.banks.edit')" :href="route('finance.banks.edit', acc.id)" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition" title="تعديل" data-row-edit><PencilSquareIcon class="w-4 h-4" /></Link>
                             <button 
                                 @click="deleteAccount(acc.id, acc.name)"
                                 class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
@@ -131,6 +134,7 @@ const formatCurrency = (val) => {
                             >
                                 <TrashIcon class="w-4 h-4" />
                             </button>
+                            </span>
                         </div>
 
                         <!-- Bank Details -->

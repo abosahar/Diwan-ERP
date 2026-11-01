@@ -10,6 +10,7 @@ import {
     PlusIcon,
     TagIcon,
     TrashIcon,
+    PencilSquareIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -23,10 +24,17 @@ const form = useForm({
     color: '#4F46E5',
 });
 
+// The side form adds a category, or edits the one picked from the list.
+const editingId = ref(null);
+const editCategory = (cat) => {
+    editingId.value = cat.id;
+    Object.assign(form, { name_ar: cat.name_ar, name_en: cat.name_en || '', code: cat.code || '', color: cat.color || '#4F46E5' });
+};
+const cancelEdit = () => { editingId.value = null; form.reset(); };
 const submit = () => {
-    form.post(route('inventory.categories.store'), {
-        onSuccess: () => form.reset(),
-    });
+    const done = { onSuccess: () => cancelEdit() };
+    if (editingId.value) form.put(route('inventory.categories.update', editingId.value), done);
+    else form.post(route('inventory.categories.store'), done);
 };
 
 const deleteCategory = (id) => {
@@ -59,7 +67,7 @@ const deleteCategory = (id) => {
                 <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-2xs space-y-4">
                     <h3 class="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
                         <TagIcon class="w-4 h-4 text-indigo-600" />
-                        <span>إضافة تصنيف جديد</span>
+                        <span>{{ editingId ? 'تعديل التصنيف' : 'إضافة تصنيف جديد' }}</span>
                     </h3>
 
                     <form @submit.prevent="submit" class="space-y-4 text-xs">
@@ -99,8 +107,9 @@ const deleteCategory = (id) => {
                             :disabled="form.processing"
                             class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs disabled:opacity-50"
                         >
-                            إضافة التصنيف
+                            {{ editingId ? 'حفظ التعديل' : 'إضافة التصنيف' }}
                         </button>
+                        <button v-if="editingId" type="button" @click="cancelEdit" class="w-full py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs">إلغاء التعديل</button>
                     </form>
                 </div>
 
@@ -125,6 +134,10 @@ const deleteCategory = (id) => {
                                     <p class="text-2xs text-slate-400 mt-0.5">{{ cat.products_count }} منتج مرتبط</p>
                                 </div>
                             </div>
+                            <span class="flex items-center">
+                            <button v-if="$can('inventory.categories.edit')" @click="editCategory(cat)" class="p-1.5 text-slate-300 hover:text-indigo-600 transition-colors" title="تعديل" data-row-edit>
+                                <PencilSquareIcon class="w-4 h-4" />
+                            </button>
                             <button 
                                 @click="deleteCategory(cat.id)" 
                                 class="p-1.5 text-slate-300 hover:text-rose-600 transition-colors"
@@ -132,6 +145,7 @@ const deleteCategory = (id) => {
                             >
                                 <TrashIcon class="w-4 h-4" />
                             </button>
+                            </span>
                         </div>
                     </div>
                 </div>

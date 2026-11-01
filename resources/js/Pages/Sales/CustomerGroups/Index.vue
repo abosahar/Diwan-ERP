@@ -1,9 +1,10 @@
 <script setup>
+import RowActions from '@/Components/UI/RowActions.vue';
 import { reactive } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
-import { PencilSquareIcon, PlusIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({ groups: Array, total: Number, active: Number, filters: Object });
 const f = reactive({ search: props.filters.search || '', status: props.filters.status || 'active' });
@@ -38,7 +39,7 @@ const apply = () => router.get(route('sales.customer-groups.index'), { search: f
                         <td class="px-4 py-2"><span class="px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-100 font-bold">{{ g.customers_count }} عميل ({{ g.active_customers_count }} نشط)</span></td>
                         <td class="px-4 py-2 text-slate-500">{{ g.description }}</td>
                         <td class="px-4 py-2"><span :class="g.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-500 border-slate-200'" class="px-2 py-0.5 rounded-full border text-[11px] font-bold">{{ g.is_active ? 'نشطة' : 'معطلة' }}</span></td>
-                        <td class="px-4 py-2 text-end"><Link v-if="$can('sales.customer_groups.edit')" :href="route('sales.customer-groups.edit', g.id)" class="text-slate-400 hover:text-indigo-600"><PencilSquareIcon class="w-4 h-4" /></Link></td>
+                        <td class="px-4 py-2 text-end"><RowActions :edit="$can('sales.customer_groups.edit') ? route('sales.customer-groups.edit', g.id) : null" :remove="$can('sales.customer_groups.delete') && !g.customers_count ? route('sales.customer-groups.destroy', g.id) : null" :confirm="`حذف المجموعة ${g.name}؟`" /></td>
                     </tr>
                     <tr v-if="!groups.length"><td colspan="7" class="py-10 text-center text-slate-400">لا توجد مجموعات.</td></tr>
                 </tbody>

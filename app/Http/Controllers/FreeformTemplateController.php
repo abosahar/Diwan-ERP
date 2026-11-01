@@ -122,7 +122,8 @@ class FreeformTemplateController extends Controller
     {
         $class = TemplateData::KINDS[$kind][1];
         $number = ['invoice' => 'invoice_number', 'quotation' => 'quotation_number', 'sales_order' => 'order_number', 'credit_note' => 'credit_note_number',
-            'debit_note' => 'debit_note_number', 'receipt' => 'payment_number', 'payment' => 'payment_number'][$kind];
+            'debit_note' => 'debit_note_number', 'receipt' => 'payment_number', 'payment' => 'payment_number', 'expense' => 'expense_number',
+            'revenue' => 'revenue_number', 'journal' => 'entry_number', 'purchase_invoice' => 'invoice_number', 'purchase_order' => 'order_number'][$kind];
 
         return $class::latest('id')->limit(30)->get(['id', $number])->map(fn ($d) => ['id' => $d->id, 'number' => $d->{$number}])->all();
     }
