@@ -800,6 +800,8 @@ return [
         'sales.invoices.create' => 'sales.invoices.create',
         'sales.invoices.show' => 'sales.invoices.view',
         'sales.invoices.destroy' => 'sales.invoices.delete',
+        'sales.invoices.edit' => 'sales.invoices.edit',
+        'sales.invoices.update' => 'sales.invoices.edit',
         'sales.invoices.print' => 'sales.invoices.print',
         'sales.payments.index' => 'sales.payments.view',
         'sales.payments.store' => 'sales.payments.create',
