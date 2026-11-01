@@ -1,4 +1,5 @@
 <script setup>
+import RowActions from '@/Components/UI/RowActions.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -213,6 +214,7 @@ const formatCurrency = (val) => {
                                 </td>
                                 <td class="py-4 px-6 text-center">
                                     <Link :href="route('purchases.orders.show', order.id)" class="px-3 py-1 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs me-1">فتح</Link>
+                                    <RowActions :edit="['draft', 'rejected'].includes(order.status) && $can('purchases.orders.edit') ? route('purchases.orders.edit', order.id) : null" :remove="['draft', 'pending_approval', 'approved', 'rejected', 'cancelled'].includes(order.status) && $can('purchases.orders.cancel') ? route('purchases.orders.destroy', order.id) : null" :confirm="`نقل أمر الشراء ${order.order_number} إلى سلة المحذوفات؟`" />
                                     <button 
                                         v-if="['pending', 'approved'].includes(order.status) && $can('purchases.orders.convert')"
                                         @click="convertToInvoice(order)"

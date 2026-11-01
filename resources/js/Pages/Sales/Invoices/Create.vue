@@ -48,16 +48,19 @@ const props = defineProps({
     company: Object,
     defaultTaxRate: Number,
     defaultBranchId: Number,
+    invoice: { type: Object, default: null }, // editing an existing invoice
 });
+const editing = props.invoice;
 
 
 // Tax rules of the chosen branch (its country): default rate of new lines and the totals label.
-const selectedBranchId = ref(props.defaultBranchId || props.branches?.[0]?.id || '');
+const selectedBranchId = ref(props.invoice?.branch_id || props.defaultBranchId || props.branches?.[0]?.id || '');
 const branchTax = computed(() => props.branches?.find((b) => Number(b.id) === Number(selectedBranchId.value))?.tax);
 const lineRate = () => Number(branchTax.value?.rate ?? props.defaultTaxRate ?? taxRate());
 
 // Local state for dynamic lookup lists
 const customersList = ref([...(props.customers || [])]);
+if (props.invoice?.customer && !customersList.value.some((c) => c.id === props.invoice.customer_id)) customersList.value.unshift(props.invoice.customer);
 const productsList = ref([...(props.products || [])]);
 // Lists hold only a first slice; typing fetches more matches from the server.
 const searchCustomersRemote = createRemoteLookup('lookup.customers', customersList);
@@ -95,6 +98,32 @@ const form = useForm({
         }
     ]
 });
+// Editing: the invoice as saved (same number; saving undoes and re-posts it).
+if (editing) {
+    const d = (v) => (v ? String(v).substring(0, 10) : '');
+    Object.assign(form, {
+        customer_id: editing.customer_id,
+        branch_id: editing.branch_id,
+        invoice_number: editing.invoice_number,
+        reference_number: editing.reference_number || '',
+        invoice_date: d(editing.invoice_date),
+        due_date: d(editing.due_date),
+        supply_date: d(editing.supply_date),
+        payment_method: editing.payment_method || 'credit',
+        currency_code: editing.currency_code || '',
+        exchange_rate: editing.exchange_rate || '',
+        payment_status: editing.payment_status || 'unpaid',
+        bank_account_id: editing.bank_account_id || '',
+        paid_amount: Number(editing.paid_amount) || 0,
+        notes: editing.notes || '',
+        terms: editing.terms || '',
+        items: (editing.items || []).map((i) => ({
+            product_id: i.product_id, item_name: i.item_name, description: i.description || '', quantity: Number(i.quantity),
+            unit_price: Number(i.unit_price), discount: Number(i.discount) || 0, tax_rate: Number(i.tax_rate), isDropdownOpen: false,
+        })),
+    });
+    form.defaults();
+}
 useUnsavedGuard(form);
 
 // A new branch moves lines still on the old standard rate to the new one (reduced or zero rates stay).
@@ -396,7 +425,8 @@ const submitInvoice = () => {
     if (form.payment_status === 'paid') {
         form.paid_amount = grandTotal.value;
     }
-    form.post(route('sales.invoices.store'));
+    if (editing) form.put(route('sales.invoices.update', editing.id));
+    else form.post(route('sales.invoices.store'));
 };
 
 const formatCurrency = (val) => {
@@ -440,7 +470,7 @@ const importLines = (lines, replace) => {
 
 <template>
     <AppLayout own-errors>
-        <Head title="إنشاء فاتورة مبيعات جديدة" />
+        <Head :title="editing ? `تعديل الفاتورة ${editing.invoice_number}` : 'إنشاء فاتورة مبيعات جديدة'" />
 
         <!-- Floating Toast Message -->
         <transition
@@ -462,7 +492,7 @@ const importLines = (lines, replace) => {
 
         <div class="space-y-6 w-full pb-12">
             <!-- Header Ribbon & Action Bar -->
-            <PageHeader title="إنشاء فاتورة" :crumbs="[{ label: 'إنشاء فاتورة' }]">
+            <PageHeader :title="editing ? `تعديل الفاتورة ${editing.invoice_number}` : 'إنشاء فاتورة'" :crumbs="[{ label: editing ? 'تعديل فاتورة' : 'إنشاء فاتورة' }]">
 <template #actions>
 <Link 
                         :href="route('sales.invoices.index')"

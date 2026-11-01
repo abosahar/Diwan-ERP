@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="الديوان">
+  <defs>
+    <linearGradient id="dg" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3be3a2"/>
+      <stop offset="0.55" stop-color="#11998e"/>
+      <stop offset="1" stop-color="#0b6466"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="112" height="112" rx="28" fill="url(#dg)"/>
+  <g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M60 29 L87 43.5 L60 58 L33 43.5 Z"/>
+    <path d="M33 60 L60 74.5 L87 60"/>
+    <path d="M33 75.5 L60 90 L87 75.5"/>
+  </g>
+</svg>

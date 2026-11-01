@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ReleaseNotes;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -10,6 +11,6 @@ class ReleaseNotesController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('WhatsNew/Index', ['releases' => config('release_notes')]);
+        return Inertia::render('WhatsNew/Index', ['releases' => ReleaseNotes::visible()]);
     }
 }

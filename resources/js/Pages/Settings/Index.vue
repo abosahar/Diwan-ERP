@@ -109,6 +109,7 @@ const form = useForm({
     document_message: props.settings?.document_message || '',
     show_hijri: props.settings?.show_hijri !== '0',
     two_factor_required_roles: [...(props.twoFactorRoles || [])],
+    session_timeout_minutes: props.settings?.session_timeout_minutes ?? 30,
     pos_auto_print: props.settings?.pos_auto_print === '1',
 
     // ZATCA Settings
@@ -790,6 +791,12 @@ const removeLogo = async () => {
                                     <input v-model="form.two_factor_required_roles" type="checkbox" :value="r.name" :disabled="form.two_factor_required_roles.includes('*')" class="rounded border-slate-300 text-indigo-600" />
                                     {{ r.label }}
                                 </label>
+                            </div>
+                            <h2 class="text-sm font-black text-slate-900 border-b border-slate-100 pb-3 mb-2 mt-6">الأمان: تسجيل الخروج التلقائي</h2>
+                            <div class="flex flex-wrap items-center gap-3 text-xs">
+                                <label class="font-bold text-slate-700">المهلة دون نشاط قبل تسجيل الخروج (دقيقة)</label>
+                                <input v-model="form.session_timeout_minutes" type="text" inputmode="decimal" data-num class="w-24 rounded-xl border-slate-200 text-xs font-mono" data-session-timeout />
+                                <span class="text-slate-500">يظهر تنبيه بعدّ تنازلي قبل دقيقة من الخروج. صفر = بلا خروج تلقائي.</span>
                             </div>
                         </div>
 

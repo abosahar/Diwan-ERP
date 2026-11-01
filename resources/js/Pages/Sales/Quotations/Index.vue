@@ -12,6 +12,7 @@ import {
     ChevronRightIcon,
     EllipsisVerticalIcon,
     EyeIcon,
+    TrashIcon,
     ArrowRightCircleIcon,
     ChevronLeftIcon,
     DocumentDuplicateIcon,
@@ -63,6 +64,9 @@ const formatDateArabic = (dateStr) => {
     } catch {
         return dateStr;
     }
+};
+const removeQuotation = (q) => {
+    if (confirm(`نقل عرض السعر ${q.quotation_number} إلى سلة المحذوفات؟`)) router.delete(route('sales.quotations.destroy', q.id), { preserveScroll: true });
 };
 </script>
 
@@ -216,6 +220,15 @@ const formatDateArabic = (dateStr) => {
                                         >
                                             <ArrowRightCircleIcon class="w-4 h-4" />
                                             <span>تحويل إلى فاتورة مبيعات</span>
+                                        </button>
+                                        <button
+                                            v-if="q.status !== 'converted' && $can('sales.quotations.delete')"
+                                            @click="removeQuotation(q); closeMenu()"
+                                            class="w-full flex items-center gap-2 px-4 py-2 hover:bg-rose-50 transition-colors text-start font-bold text-rose-600"
+                                            data-row-delete
+                                        >
+                                            <TrashIcon class="w-4 h-4" />
+                                            <span>حذف (إلى سلة المحذوفات)</span>
                                         </button>
                                     </div>
                                 </td>

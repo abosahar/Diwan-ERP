@@ -41,6 +41,6 @@ const docLabel = { national_id: 'الهوية', iqama: 'الإقامة', border_
                 <Link v-for="(d, i) in expiring" :key="i" :href="route('hr.employees.show', d.employee_id)" class="text-amber-700 hover:underline">{{ d.name }} — {{ docLabel[d.type] || d.type }} — <span class="font-mono">{{ date(d.expiry) }}</span></Link>
             </div>
         </div>
-        <DocumentTable :paginator="employees" :columns="columns" :filters="filters" :statuses="statuses" search-route="hr.employees.index" :link="(r) => route('hr.employees.show', r.id)" />
+        <DocumentTable :paginator="employees" :columns="columns" :filters="filters" :statuses="statuses" search-route="hr.employees.index" :link="(r) => route('hr.employees.show', r.id)" :edit-link="$can('hr.employees.edit') ? (r) => route('hr.employees.edit', r.id) : null" :delete-link="$can('hr.employees.delete') ? (r) => route('hr.employees.destroy', r.id) : null" :delete-confirm="(r) => `حذف الموظف ${r.name}؟`" />
     </AppLayout>
 </template>

@@ -68,7 +68,7 @@ class RevenueController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, ?Revenue $replace = null)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -92,10 +92,14 @@ class RevenueController extends Controller
         $tax = ($validated['taxable'] ?? false) ? (float) ($validated['tax_amount'] ?? round($validated['amount'] * TaxProfile::rate() / 100, 2)) : 0.0;
         $total = $validated['amount'] + $tax;
 
-        $revenue = DB::transaction(function () use ($validated, $tax, $total) {
-            $revenueNumber = $this->nextNumber('revenue', $validated['revenue_date'] ?? null);
+        $revenue = DB::transaction(function () use ($validated, $tax, $total, $replace) {
+            // Editing: undo the old voucher (entry and box balance), keep its record and number.
+            if ($replace) {
+                $this->undo($replace, 'تعديل سند رقم '.$replace->revenue_number);
+            }
+            $revenueNumber = $replace?->revenue_number ?? $this->nextNumber('revenue', $validated['revenue_date'] ?? null);
 
-            $revenue = Revenue::create([
+            $attributes = [
                 'revenue_number' => $revenueNumber,
                 'account_id' => $validated['account_id'] ?? null,
                 'bank_account_id' => $validated['bank_account_id'] ?? null,
@@ -111,8 +115,9 @@ class RevenueController extends Controller
                 'reference_number' => $validated['reference_number'] ?? null,
                 'customer_name' => $validated['customer_name'] ?? null,
                 'notes' => $validated['notes'] ?? null,
-                'created_by' => auth()->id(),
-            ]);
+                'created_by' => $replace?->created_by ?? auth()->id(),
+            ];
+            $revenue = $replace ? tap($replace)->update($attributes) : Revenue::create($attributes);
 
             // Add to bank account balance if specified
             if (! empty($validated['bank_account_id'])) {
@@ -129,26 +134,37 @@ class RevenueController extends Controller
         $revenueNumber = $revenue->revenue_number;
 
         return redirect()->route('finance.revenues.index')
-            ->with('success', "تم تسجيل سند الإيراد بنجاح برقم {$revenueNumber}");
+            ->with('success', $replace ? "تم تعديل سند الإيراد رقم {$revenueNumber}" : "تم تسجيل سند الإيراد بنجاح برقم {$revenueNumber}");
     }
 
     public function destroy(Revenue $revenue)
     {
         // Cancelling a voucher reverses its journal entry; the audit log keeps the record.
         DB::transaction(function () use ($revenue) {
-            app(DocumentPoster::class)->reverse($revenue, 'إلغاء سند رقم '.$revenue->revenue_number);
-
-            if ($revenue->bank_account_id) {
-                $bank = BankAccount::find($revenue->bank_account_id);
-                if ($bank) {
-                    $bank->decrement('current_balance', $revenue->total_amount);
-                }
-            }
-
+            $this->undo($revenue, 'إلغاء سند رقم '.$revenue->revenue_number);
             $revenue->delete();
         });
 
         return redirect()->route('finance.revenues.index')
             ->with('success', 'تم حذف سند الإيراد بنجاح');
+    }
+
+    public function edit(Revenue $revenue): Response
+    {
+        return $this->create()->with('revenue', $revenue);
+    }
+
+    public function update(Request $request, Revenue $revenue)
+    {
+        return $this->store($request, $revenue);
+    }
+
+    /** Reverse the voucher's entry and give its amount back to the cash / bank box. */
+    protected function undo(Revenue $revenue, string $description): void
+    {
+        app(DocumentPoster::class)->reverse($revenue, $description);
+        if ($revenue->bank_account_id && ($bank = BankAccount::find($revenue->bank_account_id))) {
+            $bank->decrement('current_balance', $revenue->total_amount);
+        }
     }
 }

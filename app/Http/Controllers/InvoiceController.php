@@ -14,6 +14,7 @@ use App\Models\Warehouse;
 use App\Rules\AllowedBranch;
 use App\Services\Accounting\ExchangeRates;
 use App\Services\Documents\FreeformTemplates;
+use App\Services\Sales\InvoiceChanges;
 use App\Services\Sales\InvoiceService;
 use App\Services\Sales\PromotionEngine;
 use App\Services\Tax\TaxProfile;
@@ -76,6 +77,8 @@ class InvoiceController extends Controller
 
         return Inertia::render('Sales/Invoices/Index', [
             'invoices' => $invoices,
+            // Branches whose invoices may be edited / deleted (no government e-invoicing).
+            'editableBranches' => Branch::query()->get()->filter(fn ($b) => ! TaxProfile::forBranch($b)->einvoicing())->pluck('id')->values(),
             'filters' => [
                 'search' => $search,
                 'status' => $status,
@@ -89,7 +92,7 @@ class InvoiceController extends Controller
     /**
      * Show the form for creating a new invoice.
      */
-    public function create()
+    public function create(?Invoice $editing = null)
     {
         $tenantManager = app(TenantManager::class);
         $company = $tenantManager->getCompany();
@@ -170,15 +173,13 @@ class InvoiceController extends Controller
             'suggestedNumber' => $suggestedNumber,
             'company' => $company,
             'defaultTaxRate' => TaxProfile::rate(),
+            'invoice' => $editing?->load('items', 'customer:id,name,company_name,tax_number,phone,current_balance'),
         ]);
     }
 
-    /**
-     * Store a newly created invoice with ZATCA QR Code.
-     */
-    public function store(Request $request)
+    protected function validateInvoice(Request $request): array
     {
-        $validated = $request->validate([
+        return $request->validate([
             'customer_id' => 'required|tenant_exists:customers,id',
             'branch_id' => ['nullable', 'tenant_exists:branches,id', new AllowedBranch],
             'invoice_number' => 'nullable|string|max:50', // ignored: assigned by the system
@@ -208,6 +209,33 @@ class InvoiceController extends Controller
             'items.*.discount' => 'nullable|numeric|min:0',
             'items.*.tax_rate' => 'nullable|numeric|min:0',
         ] + ExchangeRates::rules());
+    }
+
+    /** Edit (branches without government e-invoicing only): the create form, filled. */
+    public function edit(Invoice $invoice, InvoiceChanges $changes)
+    {
+        if ($reason = $changes->blocker($invoice)) {
+            return redirect()->route('sales.invoices.show', $invoice->id)->with('error', $reason);
+        }
+
+        return $this->create($invoice);
+    }
+
+    public function update(Request $request, Invoice $invoice, InvoiceChanges $changes)
+    {
+        $validated = $this->validateInvoice($request);
+        [$validated['items']] = app(PromotionEngine::class)->apply($validated['items'], (int) $validated['customer_id'], 'invoice', $validated['invoice_date'] ?? null);
+        $changes->update($invoice, collect($validated)->except('items')->all(), $validated['items']);
+
+        return redirect()->route('sales.invoices.show', $invoice->id)->with('success', 'تم تعديل الفاتورة وإعادة ترحيلها');
+    }
+
+    /**
+     * Store a newly created invoice with ZATCA QR Code.
+     */
+    public function store(Request $request)
+    {
+        $validated = $this->validateInvoice($request);
 
         [$validated['items'], $promotions] = app(PromotionEngine::class)->apply($validated['items'], (int) $validated['customer_id'], 'invoice', $validated['invoice_date'] ?? null);
 
@@ -256,6 +284,8 @@ class InvoiceController extends Controller
             'template' => $template,
             'templates' => $templates,
             'zatcaPhase' => $zatcaPhase,
+            // Null when the invoice may be edited / deleted (no e-invoicing in its branch, nothing depends on it).
+            'changeBlocker' => app(InvoiceChanges::class)->blocker($invoice),
         ]);
     }
 
@@ -299,9 +329,13 @@ class InvoiceController extends Controller
     /**
      * Remove the specified invoice (Blocked by accounting & ZATCA regulations).
      */
-    public function destroy(Invoice $invoice)
+    public function destroy(Invoice $invoice, InvoiceChanges $changes)
     {
-        return redirect()->route('sales.invoices.index')
-            ->with('error', 'وفقاً لمتطلبات هيئة الزكاة والضريبة والجمارك (ZATCA) والمعايير المحاسبية، يُمنع حذف الفواتير الصادرة نهائياً لضمان سلامة التسلسل الرقمي والدفاتر المالية. يمكنك إصدار إشعار دائن (مرتجع) بدلاً من الحذف.');
+        if ($reason = $changes->blocker($invoice)) {
+            return redirect()->route('sales.invoices.show', $invoice->id)->with('error', $reason);
+        }
+        $changes->delete($invoice);
+
+        return redirect()->route('sales.invoices.index')->with('success', 'تم حذف الفاتورة وعكس قيدها وإرجاع المخزون');
     }
 }

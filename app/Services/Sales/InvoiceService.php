@@ -73,12 +73,13 @@ class InvoiceService
             $requestedSimplified = ($data['invoice_type'] ?? null) === 'simplified';
             $isSimplified = $requestedSimplified || $this->buyerNeedsSimplified($customer, $profile);
 
-            $invoice = Invoice::create([
+            $replace = $options['replace'] ?? null; // editing: the same record and number
+            $attributes = [
                 'branch_id' => $branchId,
                 'customer_id' => $customer->id,
                 'user_id' => auth()->id(),
                 'salesperson_id' => $data['salesperson_id'] ?? $customer->salesperson_id ?? auth()->id(),
-                'invoice_number' => $this->numbers->next($data['number_type'] ?? ($requestedSimplified ? 'pos_invoice' : 'sales_invoice'), $date),
+                'invoice_number' => $replace?->invoice_number ?? $this->numbers->next($data['number_type'] ?? ($requestedSimplified ? 'pos_invoice' : 'sales_invoice'), $date),
                 'invoice_type' => $isSimplified ? 'simplified' : 'standard',
                 'reference_number' => $data['reference_number'] ?? null,
                 'invoice_date' => $date->toDateString(),
@@ -101,11 +102,12 @@ class InvoiceService
                 'delivery_note_id' => $data['delivery_note_id'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'terms' => $data['terms'] ?? null,
-                'zatca_uuid' => (string) Str::uuid(),
+                'zatca_uuid' => $replace?->zatca_uuid ?? (string) Str::uuid(),
                 'zatca_status' => 'not_submitted',
                 'currency_code' => $currency,
                 'exchange_rate' => $rate,
-            ]);
+            ];
+            $invoice = $replace ? tap($replace)->update($attributes) : Invoice::create($attributes);
 
             foreach ($items as $item) {
                 $invoice->items()->create($item);

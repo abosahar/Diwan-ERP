@@ -12,6 +12,7 @@ use App\Models\Warehouse;
 use App\Services\Accounting\AccountMap;
 use App\Services\ActiveBranch;
 use App\Services\ActiveFiscalYear;
+use App\Services\Permissions\PermissionRegistry;
 use App\Services\Saas\PlanGuard;
 use App\Services\TenantManager;
 use Illuminate\Auth\Events\Failed;
@@ -20,6 +21,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +57,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->arabicAuthMails();
+
+        // Every update runs the migrations: new permissions (new screens and actions) appear then on every platform.
+        Event::listen(MigrationsEnded::class, function () {
+            if (Schema::hasTable('permissions')) {
+                app(PermissionRegistry::class)->syncPermissions();
+            }
+        });
 
         // Lists show only the documents of the fiscal year chosen in the top bar (an explicit date filter replaces it).
         Builder::macro('inActiveYear', function (string $column, bool $enabled = true) {

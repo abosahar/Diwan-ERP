@@ -14,6 +14,7 @@ import {
     EyeIcon,
     PrinterIcon,
     TrashIcon,
+    PencilSquareIcon,
     CheckCircleIcon,
     ClockIcon,
     ExclamationCircleIcon,
@@ -24,7 +25,14 @@ import {
 } from '@heroicons/vue/24/outline';
 import { timeZone } from '@/utils/format';
 
+// Invoices of branches without government e-invoicing can be edited / deleted (the server checks the rest).
+const changeable = (inv) => props.editableBranches.includes(inv.branch_id);
+const removeInvoice = (inv) => {
+    if (confirm(`حذف الفاتورة ${inv.invoice_number}؟ يُعكس قيدها ويعود المخزون.`)) router.delete(route('sales.invoices.destroy', inv.id), { preserveScroll: true });
+};
+
 const props = defineProps({
+    editableBranches: { type: Array, default: () => [] },
     invoices: Object,
     filters: Object,
     stats: Object,
@@ -330,6 +338,14 @@ const formatDateArabic = (dateStr) => {
                                             <PrinterIcon class="w-4 h-4 text-slate-400" />
                                             <span>طباعة الفاتورة</span>
                                         </Link>
+                                        <Link v-if="changeable(inv) && $can('sales.invoices.edit')" :href="route('sales.invoices.edit', inv.id)" class="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 hover:text-indigo-600 transition-colors" data-edit-invoice>
+                                            <PencilSquareIcon class="w-4 h-4 text-slate-400" />
+                                            <span>تعديل الفاتورة</span>
+                                        </Link>
+                                        <button v-if="changeable(inv) && $can('sales.invoices.delete')" type="button" @click="removeInvoice(inv)" class="w-full flex items-center gap-2 px-4 py-2 hover:bg-rose-50 text-rose-600 transition-colors" data-delete-invoice>
+                                            <TrashIcon class="w-4 h-4" />
+                                            <span>حذف الفاتورة</span>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

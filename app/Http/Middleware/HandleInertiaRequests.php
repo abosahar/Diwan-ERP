@@ -12,6 +12,7 @@ use App\Services\Tax\CountryFeatures;
 use App\Services\Tax\TaxProfile;
 use App\Services\TenantManager;
 use App\Support\CurrencyNames;
+use App\Support\ReleaseNotes;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -65,6 +66,8 @@ class HandleInertiaRequests extends Middleware
                     'default_branch_id' => $currentTenant && $user->company_id ? $user->defaultBranchId() : null,
                 ] : null,
             ],
+            // Idle sign-out: minutes without activity (0 = off); the layout warns a minute before.
+            'idleMinutes' => fn () => $user ? IdleTimeout::minutes() : 0,
             'tenant' => $currentTenant ? [
                 'id' => $currentTenant->id,
                 'name' => $currentTenant->name,
@@ -111,7 +114,7 @@ class HandleInertiaRequests extends Middleware
                 'tagline' => config('app.brand.tagline'),
                 'domain' => config('tenancy.central_domain'),
                 'version' => config('app.version'),
-                'latest_notes' => config('release_notes.0.version'),
+                'latest_notes' => ReleaseNotes::latest(),
                 'local_install' => (bool) config('app.local_install'),
             ],
             'locale' => app()->getLocale(),
