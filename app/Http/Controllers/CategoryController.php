@@ -58,6 +58,18 @@ class CategoryController extends Controller
         return back()->with('success', 'تمت إضافة التصنيف بنجاح');
     }
 
+    public function update(Request $request, Category $category)
+    {
+        $category->update($request->validate([
+            'name_ar' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'code' => 'nullable|string|max:50',
+            'color' => 'nullable|string|max:20',
+        ]));
+
+        return back()->with('success', 'تم تعديل التصنيف');
+    }
+
     /**
      * Delete category.
      */

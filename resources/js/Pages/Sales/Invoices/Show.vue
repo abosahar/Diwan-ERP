@@ -30,7 +30,12 @@ const props = defineProps({
     template: Object,
     templates: Array,
     zatcaPhase: String,
+    changeBlocker: { type: String, default: null },
 });
+
+const removeInvoice = () => {
+    if (confirm(`حذف الفاتورة ${props.invoice.invoice_number}؟ يُعكس قيدها ويعود المخزون.`)) router.delete(route('sales.invoices.destroy', props.invoice.id));
+};
 
 const currentTemplateId = ref(props.template?.id || props.templates?.[0]?.id || null);
 
@@ -489,6 +494,8 @@ const resolveTag = (tag) => {
                     >فاتورة دورية</Link>
 
                     <ShareDocument v-if="$can('sales.invoices.print')" type="invoice" :id="invoice.id" />
+                    <Link v-if="!changeBlocker && $can('sales.invoices.edit')" :href="route('sales.invoices.edit', invoice.id)" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700" data-edit-invoice>تعديل</Link>
+                    <button v-if="!changeBlocker && $can('sales.invoices.delete')" type="button" @click="removeInvoice" class="px-3 py-2 rounded-xl border border-rose-200 bg-white text-xs font-bold text-rose-600" data-delete-invoice>حذف</button>
 
                     <!-- Split / Quick Print Button with Dropdown Trigger -->
                     <div class="inline-flex rounded-xl shadow-xs">

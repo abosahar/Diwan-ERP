@@ -44,17 +44,20 @@ const props = defineProps({
     suggestedNumber: String,
     defaultTaxRate: Number,
     defaultBranchId: Number,
+    invoice: { type: Object, default: null }, // editing an existing bill
 });
+const editing = props.invoice;
 
 // Reactive Lists for Local Updates
 const suppliersList = ref([...(props.suppliers || [])]);
+if (props.invoice?.supplier && !suppliersList.value.some((x) => x.id === props.invoice.supplier_id)) suppliersList.value.unshift(props.invoice.supplier);
 const productsList = ref([...(props.products || [])]);
 const categoriesList = ref([...(props.categories || [])]);
 const unitsList = ref([...(props.units || [])]);
 
 
 // Tax rules of the chosen branch (its country): default rate of new lines.
-const selectedBranchId = ref(props.defaultBranchId || props.branches?.[0]?.id || '');
+const selectedBranchId = ref(props.invoice?.branch_id || props.defaultBranchId || props.branches?.[0]?.id || '');
 const branchTax = computed(() => props.branches?.find((b) => Number(b.id) === Number(selectedBranchId.value))?.tax);
 const lineRate = () => Number(branchTax.value?.rate ?? lineRate());
 
@@ -86,6 +89,29 @@ const form = useForm({
         }
     ],
 });
+// Editing: the bill as saved (same number; saving undoes and re-posts it).
+if (editing) {
+    const d = (v) => (v ? String(v).substring(0, 10) : '');
+    Object.assign(form, {
+        supplier_id: editing.supplier_id,
+        warehouse_id: editing.warehouse_id,
+        branch_id: editing.branch_id,
+        invoice_number: editing.invoice_number,
+        supplier_invoice_number: editing.supplier_invoice_number || '',
+        invoice_date: d(editing.invoice_date),
+        due_date: d(editing.due_date),
+        supply_date: d(editing.supply_date),
+        currency_code: editing.currency_code || '',
+        exchange_rate: editing.exchange_rate || '',
+        payments: (editing.payments || []).map((p) => ({ method: p.method, bank_account_id: p.bank_account_id || '', amount: Number(p.amount) })),
+        notes: editing.notes || '',
+        items: (editing.items || []).map((i) => ({
+            product_id: i.product_id, item_name: i.item_name, quantity: Number(i.quantity), unit_price: Number(i.unit_price),
+            discount: Number(i.discount) || 0, tax_rate: Number(i.tax_rate), isDropdownOpen: false,
+        })),
+    });
+    form.defaults();
+}
 useUnsavedGuard(form);
 
 // Warehouses of the chosen branch (and shared ones without a branch); all of them if none match.
@@ -412,7 +438,7 @@ const paidNow = computed(() => form.payments.reduce((sum, p) => sum + (Number(p.
 const remainingNow = computed(() => Math.round((total.value - paidNow.value) * 100) / 100);
 const submit = () => {
     form.transform((d) => ({ ...d, payments: d.payments.map((p) => ({ ...p, amount: Number(p.amount) || 0, bank_account_id: p.bank_account_id || null })), payment_method: d.payments.length ? d.payments[0].method : 'credit', payment_status: 'unpaid' }))
-        .post(route('purchases.invoices.store'));
+        .submit(editing ? 'put' : 'post', editing ? route('purchases.invoices.update', editing.id) : route('purchases.invoices.store'));
 };
 
 const formatCurrency = (val) => {
@@ -471,7 +497,7 @@ const importLines = (lines, replace) => {
 
 <template>
     <AppLayout>
-        <Head title="إنشاء فاتورة شراء جديدة" />
+        <Head :title="editing ? `تعديل فاتورة الشراء ${editing.invoice_number}` : 'إنشاء فاتورة شراء جديدة'" />
 
         <!-- Notification Toast -->
         <Transition
@@ -493,7 +519,7 @@ const importLines = (lines, replace) => {
 
         <div class="space-y-6 w-full">
             <!-- Header Ribbon -->
-            <PageHeader title="إنشاء فاتورة شراء" :crumbs="[{ label: 'فواتير الشراء' }, { label: 'إنشاء فاتورة شراء' }]">
+            <PageHeader :title="editing ? `تعديل فاتورة الشراء ${editing.invoice_number}` : 'إنشاء فاتورة شراء'" :crumbs="[{ label: 'فواتير الشراء' }, { label: editing ? 'تعديل' : 'إنشاء فاتورة شراء' }]">
 <template #actions>
 <Link 
                         :href="route('purchases.invoices.index')"

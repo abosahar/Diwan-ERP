@@ -111,7 +111,7 @@ class FreeformLayout
             $out['orientation'] = ($el['orientation'] ?? 'h') === 'v' ? 'v' : 'h';
             $out['style']['border_width'] = self::num($s['border_width'] ?? 0.3, 0.05, 5);
         } elseif ($type === 'table') {
-            $known = array_column(TemplateData::columns(), null, 'key');
+            $known = array_column(array_merge(TemplateData::columns(), TemplateData::columns('journal')), null, 'key');
             $columns = [];
             foreach (array_slice($el['columns'] ?? [], 0, 20) as $col) {
                 if (isset($known[$col['key'] ?? null])) {

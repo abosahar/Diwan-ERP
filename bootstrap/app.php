@@ -9,6 +9,7 @@ use App\Http\Middleware\EnsureTenant;
 use App\Http\Middleware\EnsureTwoFactorEnrolled;
 use App\Http\Middleware\ForceHttps;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\IdleTimeout;
 use App\Http\Middleware\ResolveTenant;
 use App\Http\Middleware\SaveAndNew;
 use App\Http\Middleware\SecurityHeaders;
@@ -47,6 +48,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ], append: [
             SetLocale::class,
             ResolveTenant::class,
+            IdleTimeout::class,
             SaveAndNew::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,

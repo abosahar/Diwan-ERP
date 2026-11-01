@@ -1,4 +1,5 @@
 <script setup>
+import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -20,7 +21,12 @@ import {
 const props = defineProps({
     invoice: Object,
     company: Object,
+    changeBlocker: { type: String, default: null },
 });
+
+const removeInvoice = () => {
+    if (confirm(`حذف فاتورة الشراء ${props.invoice.invoice_number}؟ يُعكس قيدها وتخرج بضاعتها من المخزون.`)) router.delete(route('purchases.invoices.destroy', props.invoice.id));
+};
 
 const printInvoice = () => {
     window.print();
@@ -42,6 +48,9 @@ const formatCurrency = (val) => {
             <!-- Header Ribbon & Actions (Hidden on Print) -->
             <PageHeader :title="`فاتورة شراء ${invoice.invoice_number}`" :crumbs="[{ label: 'فواتير الشراء' }, { label: invoice.invoice_number }]">
 <template #actions>
+                    <ShareDocument v-if="$can('purchases.invoices.print')" type="purchase_invoice" :id="invoice.id" />
+                    <Link v-if="!changeBlocker && $can('purchases.invoices.edit')" :href="route('purchases.invoices.edit', invoice.id)" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700">تعديل</Link>
+                    <button v-if="!changeBlocker && $can('purchases.invoices.delete')" type="button" @click="removeInvoice" class="px-3 py-2 rounded-xl border border-rose-200 bg-white text-xs font-bold text-rose-600">حذف</button>
 <button 
                         @click="printInvoice"
                         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs hover:shadow-indigo-500/20 transition-all flex items-center gap-1.5"

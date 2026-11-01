@@ -28,21 +28,25 @@ defineProps({
 
 <template>
     <div class="flex items-center gap-3 select-none">
-        <!-- Logo Icon: Geometric Indigo Badge with Modern Ledger & Star Symbol -->
-        <div 
-            :class="[
-                size === 'sm' ? 'w-8 h-8 rounded-lg' : size === 'lg' ? 'w-14 h-14 rounded-2xl' : 'w-10 h-10 rounded-xl',
-                'bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 shadow-md flex items-center justify-center text-white flex-shrink-0 relative overflow-hidden group'
-            ]"
+        <!-- The Diwan mark (public/brand/diwan-mark.svg): green rounded square with stacked layers. -->
+        <svg
+            :class="[size === 'sm' ? 'w-8 h-8' : size === 'lg' ? 'w-14 h-14' : 'w-10 h-10', 'flex-shrink-0 drop-shadow-sm']"
+            viewBox="0 0 120 120" role="img" aria-label="الديوان"
         >
-            <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <!-- Letter 'أ' or Quill/Ledger Icon in SVG -->
-            <svg class="w-3/5 h-3/5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                <path d="M2 17l10 5 10-5"></path>
-                <path d="M2 12l10 5 10-5"></path>
-            </svg>
-        </div>
+            <defs>
+                <linearGradient id="diwan-mark-gradient" x1="1" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#3be3a2" />
+                    <stop offset="0.55" stop-color="#11998e" />
+                    <stop offset="1" stop-color="#0b6466" />
+                </linearGradient>
+            </defs>
+            <rect x="4" y="4" width="112" height="112" rx="28" fill="url(#diwan-mark-gradient)" />
+            <g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M60 29 L87 43.5 L60 58 L33 43.5 Z" />
+                <path d="M33 60 L60 74.5 L87 60" />
+                <path d="M33 75.5 L60 90 L87 75.5" />
+            </g>
+        </svg>
 
         <div v-if="!compact" class="flex flex-col leading-tight">
             <span 
@@ -58,7 +62,7 @@ defineProps({
                 v-if="showSubtitle" 
                 :class="[
                     size === 'sm' ? 'text-[10px]' : size === 'lg' ? 'text-xs' : 'text-[11px]',
-                    white ? 'text-slate-400' : 'text-indigo-600',
+                    white ? 'text-slate-400' : 'text-teal-600',
                     'font-medium tracking-wide'
                 ]"
             >

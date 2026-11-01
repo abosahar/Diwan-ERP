@@ -9,9 +9,14 @@ use App\Models\Customer;
 use App\Models\CustomerPayment;
 use App\Models\DebitNote;
 use App\Models\DocumentDispatch;
+use App\Models\Expense;
 use App\Models\Invoice;
+use App\Models\JournalEntry;
 use App\Models\ProgressBilling;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseOrder;
 use App\Models\Quotation;
+use App\Models\Revenue;
 use App\Models\SalesOrder;
 use App\Models\SupplierPayment;
 use App\Support\CurrencyNames;
@@ -34,6 +39,11 @@ class DocumentSharing
         'receipt' => ['model' => CustomerPayment::class, 'permission' => 'sales.payments.print', 'label' => 'سند القبض', 'number' => 'payment_number', 'total' => 'amount'],
         'payment' => ['model' => SupplierPayment::class, 'permission' => 'purchases.payments.print', 'label' => 'سند الصرف', 'number' => 'payment_number', 'total' => 'amount'],
         'billing' => ['model' => ProgressBilling::class, 'permission' => 'projects.billings.print', 'label' => 'المستخلص', 'number' => 'number', 'total' => 'net_payable'],
+        'expense' => ['model' => Expense::class, 'permission' => 'finance.expenses.view', 'label' => 'سند الصرف', 'number' => 'expense_number', 'total' => 'total_amount'],
+        'revenue' => ['model' => Revenue::class, 'permission' => 'finance.revenues.view', 'label' => 'سند القبض', 'number' => 'revenue_number', 'total' => 'total_amount'],
+        'journal' => ['model' => JournalEntry::class, 'permission' => 'accounting.journals.view', 'label' => 'القيد', 'number' => 'entry_number', 'total' => 'total_debit'],
+        'purchase_invoice' => ['model' => PurchaseInvoice::class, 'permission' => 'purchases.invoices.print', 'label' => 'فاتورة المشتريات', 'number' => 'invoice_number', 'total' => 'total'],
+        'purchase_order' => ['model' => PurchaseOrder::class, 'permission' => 'purchases.orders.print', 'label' => 'أمر الشراء', 'number' => 'order_number', 'total' => 'total'],
         'statement' => ['model' => Customer::class, 'permission' => 'sales.clients.view', 'label' => 'كشف الحساب', 'number' => 'code', 'total' => 'current_balance'],
     ];
 
@@ -62,6 +72,8 @@ class DocumentSharing
             $document instanceof Customer => $document,
             $document instanceof ProgressBilling => $document->project?->customer,
             $document instanceof SupplierPayment => null,
+            // Supplier documents, vouchers and journal entries have no customer.
+            ! isset($document->customer_id) => null,
             default => $document->customer,
         };
     }
@@ -104,7 +116,7 @@ class DocumentSharing
         $def = self::TYPES[$this->typeOf($document)];
 
         return strtr($template, [
-            '{customer}' => $this->customer($document)?->name ?? ($document instanceof SupplierPayment ? $document->supplier?->name : null) ?? 'عميلنا العزيز',
+            '{customer}' => $this->customer($document)?->name ?? (isset($document->supplier_id) ? $document->supplier?->name : null) ?? 'عميلنا العزيز',
             '{document}' => $def['label'],
             '{number}' => $this->number($document),
             '{total}' => number_format((float) $document->{$def['total']}, 2),

@@ -5,6 +5,7 @@ import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 import {
+    PencilSquareIcon,
     PlusIcon,
     MagnifyingGlassIcon,
     ArrowPathIcon,
@@ -22,10 +23,17 @@ import {
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
+    editableBranches: { type: Array, default: () => [] },
     invoices: Object,
     filters: Object,
     stats: Object,
 });
+
+// Bills of branches without government e-invoicing can be edited / deleted (the server checks the rest).
+const changeable = (inv) => inv.source !== 'grn' && !inv.purchase_order_id && props.editableBranches.includes(inv.branch_id);
+const removeInvoice = (inv) => {
+    if (confirm(`حذف فاتورة الشراء ${inv.invoice_number}؟ يُعكس قيدها وتخرج بضاعتها من المخزون.`)) router.delete(route('purchases.invoices.destroy', inv.id), { preserveScroll: true });
+};
 
 const isFilterOpen = ref(false);
 const search = ref(props.filters?.search || '');
@@ -264,6 +272,8 @@ const formatCurrency = (val) => {
                                     >
                                         <EyeIcon class="w-4 h-4" />
                                     </Link>
+                                    <Link v-if="changeable(inv) && $can('purchases.invoices.edit')" :href="route('purchases.invoices.edit', inv.id)" class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 inline-block" title="تعديل"><PencilSquareIcon class="w-4 h-4" /></Link>
+                                    <button v-if="changeable(inv) && $can('purchases.invoices.delete')" type="button" @click="removeInvoice(inv)" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 inline-block" title="حذف"><TrashIcon class="w-4 h-4" /></button>
                                 </td>
                             </tr>
                             <tr v-if="!invoices.data || invoices.data.length === 0">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Middleware\IdleTimeout;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\CompanySetting;
@@ -85,6 +86,7 @@ class CompanySettingController extends Controller
             'two_factor_required_roles' => 'nullable|array',
             'two_factor_required_roles.*' => 'string|max:100',
             'pos_auto_print' => 'nullable|boolean',
+            'session_timeout_minutes' => 'nullable|integer|min:0|max:1440',
 
             // ZATCA settings
             'zatca_phase' => 'nullable|string|in:phase1,phase2',
@@ -157,6 +159,7 @@ class CompanySettingController extends Controller
             'document_message' => $validated['document_message'] ?? '',
             'show_hijri' => ($validated['show_hijri'] ?? true) ? '1' : '0',
             'pos_auto_print' => ! empty($validated['pos_auto_print']) ? '1' : '0',
+            'session_timeout_minutes' => (string) ($validated['session_timeout_minutes'] ?? IdleTimeout::DEFAULT_MINUTES),
             'zatca_phase' => $validated['zatca_phase'] ?? 'phase1',
             'zatca_environment' => $validated['zatca_environment'] ?? 'sandbox',
 

@@ -1,4 +1,5 @@
 <script setup>
+import RowActions from '@/Components/UI/RowActions.vue';
 import { ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -51,7 +52,7 @@ const rentalLabel = (r) => r ? (r.customer?.name || (r.project ? `${r.project.co
         <div class="bg-white border border-slate-200 rounded-2xl overflow-x-auto">
             <table class="w-full text-xs">
                 <thead class="bg-slate-50 text-slate-500">
-                    <tr><th class="px-3 py-2 text-start">الرمز</th><th class="px-3 py-2 text-start">المعدة</th><th class="px-3 py-2 text-start">الحالة</th><th class="px-3 py-2 text-start">العداد</th><th class="px-3 py-2 text-start">أقرب صيانة</th><th class="px-3 py-2 text-start">السعر</th></tr>
+                    <tr><th class="px-3 py-2 text-start">الرمز</th><th class="px-3 py-2 text-start">المعدة</th><th class="px-3 py-2 text-start">الحالة</th><th class="px-3 py-2 text-start">العداد</th><th class="px-3 py-2 text-start">أقرب صيانة</th><th class="px-3 py-2 text-start">السعر</th><th class="px-3 py-2"></th></tr>
                 </thead>
                 <tbody>
                     <tr v-for="e in equipment.data" :key="e.id" class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer" @click="router.visit(route('equipment.show', e.id))">
@@ -61,8 +62,9 @@ const rentalLabel = (r) => r ? (r.customer?.name || (r.project ? `${r.project.co
                         <td class="px-3 py-2 font-mono whitespace-nowrap"><div v-if="['hours','both'].includes(e.meter_type)">{{ Number(e.current_hours).toLocaleString('en-US') }} س</div><div v-if="['km','both'].includes(e.meter_type)">{{ Number(e.current_km).toLocaleString('en-US') }} كم</div><div v-if="e.last_reading_date" class="text-slate-400 font-sans">{{ e.last_reading_date.substring(0, 10) }}</div></td>
                         <td class="px-3 py-2"><template v-if="e.next_maintenance"><div class="text-slate-600 mb-1">{{ e.next_maintenance.name }}</div><MaintenanceStatus :status="e.next_maintenance" compact /></template><span v-else class="text-slate-300">لا يوجد جدول صيانة</span></td>
                         <td class="px-3 py-2 whitespace-nowrap text-slate-600"><div v-if="Number(e.hourly_rate)">{{ money(e.hourly_rate) }} / ساعة</div><div v-if="Number(e.daily_rate)">{{ money(e.daily_rate) }} / يوم</div><div v-if="Number(e.monthly_rate)">{{ money(e.monthly_rate) }} / شهر</div></td>
+                        <td class="px-3 py-2 text-end" @click.stop><RowActions :view="route('equipment.show', e.id)" :remove="$can('equipment.assets.delete') ? route('equipment.destroy', e.id) : null" :confirm="`حذف المعدة ${e.name}؟`" /></td>
                     </tr>
-                    <tr v-if="!equipment.data.length"><td colspan="6" class="px-3 py-10 text-center text-slate-400">لا توجد معدات بعد. أضف أول معدة من زر «معدة جديدة».</td></tr>
+                    <tr v-if="!equipment.data.length"><td colspan="7" class="px-3 py-10 text-center text-slate-400">لا توجد معدات بعد. أضف أول معدة من زر «معدة جديدة».</td></tr>
                 </tbody>
             </table>
         </div>

@@ -5,13 +5,21 @@ namespace Tests\Feature;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\CustomerPayment;
+use App\Models\Expense;
 use App\Models\Invoice;
+use App\Models\JournalEntry;
 use App\Models\PrintTemplate;
+use App\Models\PurchaseInvoice;
+use App\Models\Revenue;
+use App\Models\Supplier;
+use App\Models\Warehouse;
 use App\Services\Accounting\AccountingSetupService;
+use App\Services\Accounting\AccountMap;
 use App\Services\Documents\FreeformLayout;
 use App\Services\Documents\FreeformRenderer;
 use App\Services\Documents\FreeformTemplates;
 use App\Services\Documents\TemplateData;
+use App\Services\Purchases\PurchaseCycleService;
 use App\Services\Sales\InvoiceService;
 use App\Services\TenantManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -189,5 +197,33 @@ class FreeformTemplateTest extends TestCase
         $this->actingAs($this->userWithRole($other));
         $this->get(route('templates.designer', $template->id))->assertNotFound();
         $this->post(route('templates.preview', $template->id), ['freeform' => []])->assertNotFound();
+    }
+
+    public function test_vouchers_journals_and_purchase_documents_print_and_can_be_designed(): void
+    {
+        $map = app(AccountMap::class);
+        $this->post(route('finance.expenses.store'), ['title' => 'إيجار', 'category' => 'عام', 'payment_method' => 'cash', 'account_id' => $map->id('rent_expense'), 'expense_date' => '2026-06-15', 'amount' => 900, 'vendor_name' => 'مالك العقار'])->assertSessionHasNoErrors();
+        $this->post(route('finance.revenues.store'), ['title' => 'عمولة', 'category' => 'عام', 'payment_method' => 'cash', 'revenue_date' => '2026-06-15', 'amount' => 300])->assertSessionHasNoErrors();
+        $supplier = Supplier::create(['name' => 'مورد', 'status' => 'active']);
+        $warehouse = Warehouse::create(['name_ar' => 'رئيسي', 'code' => 'W1', 'is_main' => true, 'is_active' => true]);
+        $this->post(route('purchases.invoices.store'), ['supplier_id' => $supplier->id, 'warehouse_id' => $warehouse->id, 'invoice_date' => '2026-06-15', 'payment_method' => 'credit', 'payment_status' => 'unpaid',
+            'items' => [['item_name' => 'خدمة', 'quantity' => 2, 'unit_price' => 100, 'tax_rate' => 15]]])->assertSessionHasNoErrors();
+        $order = app(PurchaseCycleService::class)->createOrder(['supplier_id' => $supplier->id, 'warehouse_id' => $warehouse->id, 'order_date' => '2026-06-15'],
+            [['item_name' => 'صنف', 'quantity' => 3, 'unit_price' => 50, 'tax_rate' => 15]]);
+
+        $documents = [
+            'expense' => Expense::firstOrFail(), 'revenue' => Revenue::firstOrFail(),
+            'journal' => JournalEntry::firstOrFail(), 'purchase_invoice' => PurchaseInvoice::firstOrFail(), 'purchase_order' => $order,
+        ];
+        foreach ($documents as $type => $document) {
+            $this->assertStringStartsWith('%PDF', $this->get(route('documents.pdf', ['type' => $type, 'id' => $document->id]))->assertOk()->getContent(), $type);
+            $template = $this->freeform($type);
+            $this->get(route('templates.designer', $template))->assertOk();
+        }
+
+        $journal = app(TemplateData::class)->build($documents['journal']);
+        $this->assertNotEmpty($journal['items']);
+        $this->assertArrayHasKey('debit', $journal['items'][0]);
+        $this->assertSame('مالك العقار', app(TemplateData::class)->build($documents['expense'])['fields']['party.name']);
     }
 }

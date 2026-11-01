@@ -32,6 +32,40 @@ die()  { echo "${c_err}✗ $*${c_off}" >&2; exit 1; }
 trap 'echo "${c_err}✗ Setup stopped at line $LINENO. Take a screenshot of the messages above to ask for help, then run the same command again (it is safe to repeat).${c_off}" >&2' ERR
 as_app() { sudo -u "$APP_USER" -H "$@"; }
 
+# Ubuntu's Software Updater (aptd) or unattended-upgrades may hold the package
+# manager: wait for it instead of stopping (up to 15 minutes), then retry.
+APT_LOCKS=(/var/lib/dpkg/lock-frontend /var/lib/dpkg/lock /var/lib/apt/lists/lock /var/cache/apt/archives/lock)
+apt_busy() {
+    local f
+    for f in "${APT_LOCKS[@]}"; do
+        [[ -e $f ]] || continue
+        flock -n "$f" true 2> /dev/null || return 0
+    done
+    return 1
+}
+apt_wait() {
+    local waited=0
+    apt_busy || return 0
+    echo "${c_warn}! Another program is updating the system (Software Updater). Waiting for it to finish...${c_off}"
+    while apt_busy; do
+        if (( waited >= 900 )); then
+            echo
+            die "The system is still busy updating after 15 minutes. Close Software Updater (or restart the computer), then run the same command again."
+        fi
+        sleep 10; waited=$((waited + 10)); printf '.'
+    done
+    echo
+}
+apt_get() {
+    local try
+    for try in 1 2 3; do
+        apt_wait
+        if apt-get -o DPkg::Lock::Timeout=600 "$@"; then return 0; fi
+        (( try < 3 )) && sleep 5
+    done
+    return 1
+}
+
 [[ $EUID -eq 0 ]] || die "Run the command with sudo, exactly as in the guide."
 command -v apt-get > /dev/null || die "This installer is for Ubuntu, Debian and Mint. For other systems see docs/INSTALL-LINUX.md"
 export DEBIAN_FRONTEND=noninteractive
@@ -43,8 +77,8 @@ echo "════════════════════════�
 
 # ------------------------------------------------------------------ 1. packages
 step "1/6 Installing PHP and the database"
-apt-get update -qq
-apt-get install -y -qq curl unzip ca-certificates lsb-release gnupg > /dev/null
+apt_get update -qq
+apt_get install -y -qq curl unzip ca-certificates lsb-release gnupg > /dev/null
 php_ok() { command -v php > /dev/null && php -r 'exit(PHP_VERSION_ID >= 80200 && PHP_VERSION_ID < 80500 ? 0 : 1);'; }
 # (Read the whole output first: "grep -q" closing the pipe early would fail it under pipefail.)
 POLICY=$(apt-cache policy php8.3-cli 2> /dev/null || true)
@@ -53,16 +87,17 @@ if [[ -z $PHPV ]]; then
     # Older Ubuntu / Debian: PHP 8.3 from the well-known Ondřej Surý repository.
     . /etc/os-release
     if [[ ${ID:-} == ubuntu || ${ID_LIKE:-} == *ubuntu* ]]; then
-        apt-get install -y -qq software-properties-common > /dev/null
+        apt_get install -y -qq software-properties-common > /dev/null
+        apt_wait
         add-apt-repository -y ppa:ondrej/php > /dev/null
     else
         curl -fsSL https://packages.sury.org/php/apt.gpg -o /usr/share/keyrings/sury-php.gpg
         echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/sury-php.list
     fi
-    apt-get update -qq
+    apt_get update -qq
     PHPV=8.3
 fi
-apt-get install -y -qq "php$PHPV-cli" "php$PHPV-mysql" "php$PHPV-mbstring" "php$PHPV-intl" "php$PHPV-xml" "php$PHPV-zip" \
+apt_get install -y -qq "php$PHPV-cli" "php$PHPV-mysql" "php$PHPV-mbstring" "php$PHPV-intl" "php$PHPV-xml" "php$PHPV-zip" \
     "php$PHPV-bcmath" "php$PHPV-gd" "php$PHPV-curl" default-mysql-server default-mysql-client > /dev/null
 php_ok || die "Could not install PHP 8.2 - 8.4."
 ok "PHP $(php -r 'echo PHP_VERSION;') and the database are ready."

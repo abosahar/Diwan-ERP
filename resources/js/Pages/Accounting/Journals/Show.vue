@@ -1,4 +1,5 @@
 <script setup>
+import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ask } from '@/composables/useDialog';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -58,6 +59,7 @@ const deleteDraft = () => {
                 </Link>
 
                 <div class="flex items-center gap-2">
+                <ShareDocument type="journal" :id="entry.id" />
                 <button v-if="entry.status === 'draft' && $can('accounting.journals.post')" @click="postEntry" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold">ترحيل القيد</button>
                 <button v-if="entry.status === 'draft' && $can('accounting.journals.delete')" @click="deleteDraft" class="px-4 py-2 bg-white border border-rose-200 text-rose-600 rounded-xl text-xs font-bold">حذف المسودة</button>
                 <button v-if="entry.status === 'posted' && manualTypes.includes(entry.entry_type) && $can('accounting.journals.cancel')" @click="reverseEntry" class="px-4 py-2 bg-white border border-amber-300 text-amber-700 rounded-xl text-xs font-bold">عكس القيد</button>

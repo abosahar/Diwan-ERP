@@ -1,4 +1,5 @@
 <script setup>
+import ShareDocument from '@/Components/Documents/ShareDocument.vue';
 import DatePicker from '@/Components/UI/DatePicker.vue';
 import SelectCreate from '@/Components/UI/SelectCreate.vue';
 import { computed, ref } from 'vue';
@@ -36,6 +37,7 @@ const receive = () => form.transform((d) => ({ ...d, lines: d.lines.map(({ name,
         <Head :title="`أمر شراء ${order.order_number}`" />
         <PageHeader :title="`أمر شراء ${order.order_number}`" :crumbs="[{ label: 'المشتريات' }, { label: 'أوامر الشراء', href: route('purchases.orders.index') }, { label: order.order_number }]">
             <template #actions>
+                <ShareDocument v-if="$can('purchases.orders.print')" type="purchase_order" :id="order.id" />
                 <StatusBadge :status="order.status" />
                 <template v-if="['draft', 'rejected'].includes(order.status)">
                     <Link v-if="$can('purchases.orders.edit')" :href="route('purchases.orders.edit', order.id)" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold">تعديل</Link>

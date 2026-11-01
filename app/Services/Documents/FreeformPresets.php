@@ -14,7 +14,11 @@ class FreeformPresets
 
     public static function for(string $kind): array
     {
-        return in_array($kind, ['receipt', 'payment'], true) ? (new self)->voucher($kind) : (new self)->document($kind);
+        return match (true) {
+            TemplateData::isVoucher($kind) => (new self)->voucher($kind),
+            $kind === 'journal' => (new self)->journal(),
+            default => (new self)->document($kind),
+        };
     }
 
     /** Accent colour of the starting layouts (editable in the designer like any other colour). */
@@ -29,7 +33,8 @@ class FreeformPresets
         $meta = match ($kind) {
             'invoice' => "رقم الفاتورة: {{doc.number}}\nتاريخ الإصدار: {{doc.date}}  {{doc.time}}\nتاريخ التوريد: {{doc.supply_date}}\nالتاريخ الهجري: {{doc.hijri_date}}\nالدفع: {{doc.payment_type}} — {{doc.payment_method}}",
             'quotation' => "رقم العرض: {{doc.number}}\nالتاريخ: {{doc.date}}\nالتاريخ الهجري: {{doc.hijri_date}}\nصالح حتى: {{doc.valid_until}}",
-            'sales_order' => "رقم الأمر: {{doc.number}}\nالتاريخ: {{doc.date}}\nالتاريخ الهجري: {{doc.hijri_date}}\nتاريخ التسليم: {{doc.delivery_date}}",
+            'sales_order', 'purchase_order' => "رقم الأمر: {{doc.number}}\nالتاريخ: {{doc.date}}\nالتاريخ الهجري: {{doc.hijri_date}}\nتاريخ التسليم: {{doc.delivery_date}}",
+            'purchase_invoice' => "رقم الفاتورة: {{doc.number}}\nفاتورة المورد: {{doc.supplier_invoice}}\nالتاريخ: {{doc.date}}\nالاستحقاق: {{doc.due_date}}\nالدفع: {{doc.payment_method}}",
             default => "رقم الإشعار: {{doc.number}}\nالتاريخ: {{doc.date}}\nالفاتورة الأصلية: {{doc.original_number}}\nالسبب: {{doc.reason}}",
         };
         $withQr = in_array($kind, ['invoice', 'credit_note', 'debit_note'], true);
@@ -48,7 +53,9 @@ class FreeformPresets
 
             // Customer card (right) and document details (left).
             $this->box(76, 57, 124, 36, ['border_width' => 0.3, 'border_color' => '#cbd5e1', 'radius' => 1.5]),
-            $this->text(79, 58, 118, 6, $kind === 'quotation' ? 'مقدّم إلى' : 'العميل', ['size' => 8, 'bold' => true, 'color' => self::ACCENT]),
+            $this->text(79, 58, 118, 6, match ($kind) {
+                'quotation' => 'مقدّم إلى', 'purchase_invoice', 'purchase_order' => 'المورد', default => 'العميل'
+            }, ['size' => 8, 'bold' => true, 'color' => self::ACCENT]),
             $this->text(79, 64, 118, 7, '{{party.name}}', ['size' => 10.5, 'bold' => true]),
             $this->text(79, 71, 118, 21, "الرقم الضريبي: {{party.vat}}     رقم العميل: {{party.code}}\nالجوال: {{party.phone}}\nالعنوان الوطني: {{party.national_address}}",
                 ['size' => 8.5, 'valign' => 'top', 'line_height' => 1.55, 'color' => '#334155']),
@@ -83,7 +90,7 @@ class FreeformPresets
 
     protected function voucher(string $kind): array
     {
-        $party = $kind === 'receipt' ? 'استلمنا من السادة' : 'صرفنا إلى السادة';
+        $party = in_array($kind, ['receipt', 'revenue'], true) ? 'استلمنا من السادة' : 'صرفنا إلى السادة';
         $dotted = ['size' => 11, 'border_width' => 0.3, 'border_style' => 'dotted', 'border_sides' => ['top' => false, 'right' => false, 'bottom' => true, 'left' => false]];
 
         $elements = [
@@ -105,6 +112,43 @@ class FreeformPresets
         ];
 
         return $this->layout('A5', $elements, 'landscape');
+    }
+
+    /** Journal voucher: header, entry details, the lines table, debit / credit totals and signatures. */
+    protected function journal(): array
+    {
+        $known = array_column(TemplateData::columns('journal'), null, 'key');
+        $cols = [['index', 5], ['account_code', 12], ['account', 25], ['description', 28], ['cost_center', 12], ['debit', 9], ['credit', 9]];
+        $signature = ['size' => 9, 'align' => 'center', 'color' => self::MUTED, 'border_width' => 0.3, 'border_style' => 'dotted', 'border_color' => '#94a3b8',
+            'border_sides' => ['top' => true, 'right' => false, 'bottom' => false, 'left' => false]];
+        $white = ['color' => '#ffffff', 'bold' => true];
+
+        return $this->layout('A4', [
+            $this->box(0, 0, 210, 3, ['bg' => self::ACCENT]),
+            $this->text(80, 9, 120, 9, '{{company.name}}', ['size' => 15, 'bold' => true, 'color' => self::ACCENT]),
+            $this->text(80, 18, 120, 12, "الرقم الضريبي: {{company.vat}}\n{{company.address}}", ['size' => 8.5, 'valign' => 'top', 'color' => self::MUTED, 'line_height' => 1.5]),
+            ['type' => 'image', 'name' => 'الشعار', 'x' => 10, 'y' => 8, 'w' => 55, 'h' => 26, 'src' => 'logo', 'fit' => 'contain'],
+            $this->box(10, 37, 190, 12, ['bg' => self::ACCENT, 'radius' => 1.5]),
+            $this->text(105, 37, 92, 12, '{{doc.title}}', ['size' => 15] + $white),
+            $this->text(13, 37, 92, 12, '{{doc.title_en}}', ['size' => 12, 'align' => 'left', 'dir' => 'ltr'] + $white),
+            $this->box(10, 53, 190, 22, ['bg' => self::SOFT, 'radius' => 1.5]),
+            $this->text(105, 55, 93, 18, "رقم القيد: {{doc.number}}\nالتاريخ: {{doc.date}}   {{doc.hijri_date}}\nالمرجع: {{doc.reference}}", ['size' => 9, 'valign' => 'top', 'line_height' => 1.6]),
+            $this->text(12, 55, 93, 18, "البيان: {{doc.description}}\nالفرع: {{doc.branch}}", ['size' => 9, 'valign' => 'top', 'line_height' => 1.6]),
+            $this->base('table', 'سطور القيد', 10, 79, 190, 150, ['size' => 8.5, 'border_width' => 0.3, 'border_color' => '#cbd5e1']) + [
+                'columns' => array_map(fn ($c) => ['key' => $c[0], 'label' => $known[$c[0]]['label'], 'label_en' => $known[$c[0]]['label_en'], 'width' => $c[1],
+                    'align' => $known[$c[0]]['align']], $cols),
+                'header_height' => 10, 'row_height' => 9, 'header_bg' => self::ACCENT, 'header_color' => '#ffffff', 'header_size' => 8,
+                'grid_color' => '#e2e8f0', 'grid_width' => 0.2, 'row_lines' => true, 'col_lines' => true, 'stripe' => '#f8fafc',
+            ],
+            $this->box(10, 233, 190, 9, ['bg' => self::ACCENT, 'radius' => 1.5], 'last'),
+            $this->text(60, 233, 138, 9, 'الإجمالي — مدين: {{totals.debit}}     دائن: {{totals.credit}}', ['size' => 10, 'align' => 'center'] + $white, 'last'),
+            $this->text(10, 245, 190, 8, 'المبلغ كتابةً: {{totals.words}}', ['size' => 9, 'bold' => true], 'last'),
+            $this->text(145, 266, 55, 8, 'إعداد', $signature, 'last'),
+            $this->text(77.5, 266, 55, 8, 'مراجعة', $signature, 'last'),
+            $this->text(10, 266, 55, 8, 'اعتماد', $signature, 'last'),
+            $this->text(10, 285, 45, 6, 'صفحة {{page.number}} من {{page.total}}', ['size' => 7.5, 'align' => 'left', 'color' => self::MUTED]),
+            $this->box(0, 294, 210, 3, ['bg' => self::ACCENT]),
+        ]);
     }
 
     /** @return array[] label/value rows on the left (RTL: the end) of the page, the grand total on a coloured band */

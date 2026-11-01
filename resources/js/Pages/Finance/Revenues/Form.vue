@@ -9,7 +9,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { today } from '@/utils/format';
 
-const props = defineProps({ revenueAccounts: Array, bankAccounts: Array, costCenters: Array, projects: Array, dimensionPolicy: Object });
+const props = defineProps({ revenueAccounts: Array, bankAccounts: Array, costCenters: Array, projects: Array, dimensionPolicy: Object, revenue: { type: Object, default: null } });
+const editing = props.revenue;
 
 const form = useForm({
     title: '',
@@ -27,6 +28,17 @@ const form = useForm({
     customer_name: '',
     notes: '',
 });
+// Editing: the voucher as saved (same number; saving reverses and re-posts it).
+if (editing) {
+    Object.assign(form, {
+        title: editing.title, category: editing.category, account_id: editing.account_id || '', cost_center_id: editing.cost_center_id || '',
+        project_id: editing.project_id || '', bank_account_id: editing.bank_account_id || '', amount: Number(editing.amount),
+        tax_amount: Number(editing.tax_amount) || '', taxable: Number(editing.tax_amount) > 0,
+        revenue_date: String(editing.revenue_date).substring(0, 10), payment_method: editing.payment_method,
+        reference_number: editing.reference_number || '', customer_name: editing.customer_name || '', notes: editing.notes || '',
+    });
+    form.defaults();
+}
 useUnsavedGuard(form);
 
 const onAmountChange = () => {
@@ -39,13 +51,13 @@ const onAmountChange = () => {
 
 const formatCurrency = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-const submitRevenue = () => form.post(route('finance.revenues.store'));
+const submitRevenue = () => (editing ? form.put(route('finance.revenues.update', editing.id)) : form.post(route('finance.revenues.store')));
 </script>
 
 <template>
     <AppLayout>
-        <Head title="سند إيراد جديد" />
-        <PageHeader title="سند إيراد جديد" :crumbs="[{ label: 'المالية' }, { label: 'الإيرادات', href: route('finance.revenues.index') }, { label: 'جديد' }]" />
+        <Head :title="editing ? `تعديل السند ${editing.revenue_number}` : 'سند إيراد جديد'" />
+        <PageHeader :title="editing ? `تعديل السند ${editing.revenue_number}` : 'سند إيراد جديد'" :crumbs="[{ label: 'المالية' }, { label: 'الإيرادات', href: route('finance.revenues.index') }, { label: editing ? 'تعديل' : 'جديد' }]" />
 
         <div class="bg-white border border-slate-200/80 rounded-2xl p-6">
             <form @submit.prevent="submitRevenue" class="form-grid text-xs">
