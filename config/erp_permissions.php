@@ -744,6 +744,8 @@ return [
         'purchases.invoices.create' => 'purchases.invoices.create',
         'purchases.invoices.show' => 'purchases.invoices.view',
         'purchases.invoices.destroy' => 'purchases.invoices.delete',
+        'purchases.invoices.edit' => 'purchases.invoices.edit',
+        'purchases.invoices.update' => 'purchases.invoices.edit',
         'purchases.orders.index' => 'purchases.orders.view',
         'purchases.orders.convert' => 'purchases.orders.convert',
         'purchases.orders.invoice-form' => 'purchases.orders.convert',

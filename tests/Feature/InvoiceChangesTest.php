@@ -5,10 +5,14 @@ namespace Tests\Feature;
 use App\Models\Account;
 use App\Models\Branch;
 use App\Models\Company;
+use App\Models\Currency;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\JournalEntryLine;
 use App\Models\Product;
+use App\Models\PurchaseInvoice;
+use App\Models\Supplier;
+use App\Models\SupplierPayment;
 use App\Models\Warehouse;
 use App\Services\Accounting\AccountingSetupService;
 use App\Services\Accounting\AccountMap;
@@ -107,7 +111,7 @@ class InvoiceChangesTest extends TestCase
 
     public function test_saudi_invoices_and_invoices_with_payments_stay_locked(): void
     {
-        \App\Models\Currency::create(['code' => 'SAR', 'name_ar' => 'ريال سعودي', 'name_en' => 'Saudi Riyal', 'symbol_ar' => 'ر.س', 'symbol_en' => 'SAR', 'exchange_rate' => 1]);
+        Currency::create(['code' => 'SAR', 'name_ar' => 'ريال سعودي', 'name_en' => 'Saudi Riyal', 'symbol_ar' => 'ر.س', 'symbol_en' => 'SAR', 'exchange_rate' => 1]);
         $this->post(route('context.branch'), ['branch_id' => $this->riyadh->id]);
         $this->post(route('sales.invoices.store'), ['invoice_type' => 'simplified'] + $this->payload($this->riyadh, 1) + ['payment_status' => 'paid', 'payment_method' => 'cash'])->assertSessionHasNoErrors();
         $saudi = Invoice::where('branch_id', $this->riyadh->id)->firstOrFail();
@@ -121,5 +125,32 @@ class InvoiceChangesTest extends TestCase
         \DB::table('customer_payments')->insert(['company_id' => $local->company_id, 'customer_id' => $this->customer->id, 'invoice_id' => $local->id, 'payment_number' => 'R1', 'amount' => 10, 'payment_date' => now()->toDateString(), 'payment_method' => 'cash', 'created_at' => now(), 'updated_at' => now()]);
         $this->delete(route('sales.invoices.destroy', $local->id))->assertSessionHas('error');
         $this->assertDatabaseHas('invoices', ['id' => $local->id]);
+    }
+
+    public function test_a_purchase_bill_is_edited_and_deleted_outside_e_invoicing(): void
+    {
+        $supplier = Supplier::create(['name' => 'مورد', 'status' => 'active']);
+        $bill = fn (float $qty) => [
+            'supplier_id' => $supplier->id, 'warehouse_id' => $this->warehouse->id, 'branch_id' => $this->sanaa->id, 'invoice_date' => now()->toDateString(),
+            'payments' => [['method' => 'cash', 'amount' => 50]],
+            'items' => [['product_id' => $this->product->id, 'item_name' => 'صنف', 'quantity' => $qty, 'unit_price' => 40, 'tax_rate' => 0]],
+        ];
+        $this->post(route('purchases.invoices.store'), $bill(10))->assertSessionHasNoErrors();
+        $invoice = PurchaseInvoice::firstOrFail();
+        $this->assertSame(30.0, $this->onHand());
+
+        $this->get(route('purchases.invoices.edit', $invoice->id))->assertOk()->assertInertia(fn ($p) => $p->where('invoice.id', $invoice->id));
+        $this->put(route('purchases.invoices.update', $invoice->id), $bill(5))->assertSessionHasNoErrors();
+        $this->assertSame($invoice->invoice_number, $invoice->fresh()->invoice_number);
+        $this->assertEquals(200, $invoice->fresh()->total);
+        $this->assertSame(25.0, $this->onHand());
+        $this->assertSame(1, SupplierPayment::count());
+        $this->assertEquals(150, $supplier->fresh()->current_balance);
+
+        $this->delete(route('purchases.invoices.destroy', $invoice->id))->assertRedirect(route('purchases.invoices.index'));
+        $this->assertSame(20.0, $this->onHand());
+        $this->assertSame(0, SupplierPayment::count());
+        $this->assertEquals(0, $supplier->fresh()->current_balance);
+        $this->assertEqualsWithDelta((float) JournalEntryLine::sum('debit'), (float) JournalEntryLine::sum('credit'), 0.001);
     }
 }

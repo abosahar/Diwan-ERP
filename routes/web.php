@@ -409,6 +409,8 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/invoices', [PurchaseInvoiceController::class, 'store'])->name('invoices.store');
         Route::get('/invoices/{invoice}', [PurchaseInvoiceController::class, 'show'])->name('invoices.show');
         Route::delete('/invoices/{invoice}', [PurchaseInvoiceController::class, 'destroy'])->name('invoices.destroy');
+        Route::get('/invoices/{invoice}/edit', [PurchaseInvoiceController::class, 'edit'])->name('invoices.edit');
+        Route::put('/invoices/{invoice}', [PurchaseInvoiceController::class, 'update'])->name('invoices.update');
 
         // Purchase Orders
         Route::get('/orders', [PurchaseOrderController::class, 'index'])->name('orders.index');
