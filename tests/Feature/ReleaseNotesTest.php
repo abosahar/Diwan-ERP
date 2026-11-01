@@ -33,7 +33,7 @@ class ReleaseNotesTest extends TestCase
     public function test_whats_new_lists_releases_newest_first(): void
     {
         $this->get(route('whats-new.index'))->assertOk()
-            ->assertInertia(fn ($page) => $page->component('WhatsNew/Index')->where('releases.0.version', \App\Support\ReleaseNotes::latest()));
+            ->assertInertia(fn ($page) => $page->component('WhatsNew/Index')->where('releases.0.version', ReleaseNotes::latest()));
     }
 
     public function test_notes_of_a_later_version_wait_for_its_release(): void
