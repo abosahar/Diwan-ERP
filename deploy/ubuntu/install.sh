@@ -29,6 +29,40 @@ ok()   { echo "${c_ok}✓ $*${c_off}"; }
 warn() { echo "${c_warn}! $*${c_off}"; }
 die()  { echo "${c_err}✗ $*${c_off}" >&2; exit 1; }
 run()  { if [[ $DRY_RUN == 1 ]]; then echo "  [dry-run] $*"; else "$@"; fi; }
+
+# Ubuntu's Software Updater (aptd) or unattended-upgrades may hold the package
+# manager: wait for it instead of stopping (up to 15 minutes), then retry.
+APT_LOCKS=(/var/lib/dpkg/lock-frontend /var/lib/dpkg/lock /var/lib/apt/lists/lock /var/cache/apt/archives/lock)
+apt_busy() {
+    local f
+    for f in "${APT_LOCKS[@]}"; do
+        [[ -e $f ]] || continue
+        flock -n "$f" true 2> /dev/null || return 0
+    done
+    return 1
+}
+apt_wait() {
+    local waited=0
+    apt_busy || return 0
+    echo "${c_warn}! Another program is updating the system (Software Updater). Waiting for it to finish...${c_off}"
+    while apt_busy; do
+        if (( waited >= 900 )); then
+            echo
+            die "The system is still busy updating after 15 minutes. Close Software Updater (or restart the computer), then run the same command again."
+        fi
+        sleep 10; waited=$((waited + 10)); printf '.'
+    done
+    echo
+}
+apt_get() {
+    local try
+    for try in 1 2 3; do
+        apt_wait
+        if apt-get -o DPkg::Lock::Timeout=600 "$@"; then return 0; fi
+        (( try < 3 )) && sleep 5
+    done
+    return 1
+}
 as_app() { run sudo -u "$APP_USER" -H env HOME="$APP_HOME" COMPOSER_HOME="$APP_HOME/.composer" "$@"; }
 artisan() { as_app php "$APP_DIR/artisan" "$@"; }
 # PhpSpreadsheet 1.x (Excel import) declares PHP < 8.5; every other package supports 8.5.
@@ -128,8 +162,8 @@ ok "Domain: $DOMAIN - server address: $SERVER_IP"
 # ------------------------------------------------------------------ 1. system
 step "1/11 System update, swap and firewall"
 export DEBIAN_FRONTEND=noninteractive
-run apt-get update -y
-run apt-get upgrade -y
+run apt_get update -y
+run apt_get upgrade -y
 if ! swapon --show | grep -q /swapfile; then
     run fallocate -l 2G /swapfile
     run chmod 600 /swapfile
@@ -143,10 +177,10 @@ run timedatectl set-timezone Asia/Riyadh || true
 
 # ------------------------------------------------------------------ 2. packages
 step "2/11 Packages: Nginx, PHP, MySQL, Redis and Supervisor"
-run apt-get install -y nginx mysql-server redis-server supervisor git unzip curl ufw certbot \
+run apt_get install -y nginx mysql-server redis-server supervisor git unzip curl ufw certbot \
     php-fpm php-cli php-mysql php-mbstring php-intl php-xml php-zip php-bcmath php-gd php-curl php-redis \
     composer nodejs npm
-[[ -n $DO_TOKEN ]] && run apt-get install -y python3-certbot-dns-digitalocean
+[[ -n $DO_TOKEN ]] && run apt_get install -y python3-certbot-dns-digitalocean
 run ufw allow OpenSSH
 run ufw allow 'Nginx Full'
 run ufw --force enable

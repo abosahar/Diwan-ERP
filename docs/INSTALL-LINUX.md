@@ -24,6 +24,7 @@ sudo bash -c "$(curl -fsSL https://github.com/turkialawlqy/Diwan-ERP/releases/la
 ```
 
 - **إن ظهر `curl: command not found`:** نفّذ أولاً `sudo apt install -y curl`، ثم الصق الأمر مرة أخرى.
+- **إن ظهرت رسالة `Waiting for it to finish` أو `Could not get lock`:** «مُحدِّث البرمجيات» في أوبونتو يعمل في الخلفية؛ ينتظره المثبّت تلقائيًا حتى 15 دقيقة. إن طال الانتظار أغلق مُحدِّث البرمجيات أو أعد تشغيل الجهاز ثم الصق الأمر مرة أخرى.
 - **عند `[sudo] password`:** اكتب كلمة مرور حسابك، واضغط Enter. لن تظهر الحروف أثناء الكتابة، وهذا طبيعي.
 
 ## الخطوة 3: انتظر حتى ينتهي
