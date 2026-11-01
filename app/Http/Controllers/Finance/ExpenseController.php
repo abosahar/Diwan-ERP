@@ -69,7 +69,7 @@ class ExpenseController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, ?Expense $replace = null)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -97,10 +97,14 @@ class ExpenseController extends Controller
         }
         $total = $validated['amount'] + $tax;
 
-        $expense = DB::transaction(function () use ($validated, $tax, $total) {
-            $expenseNumber = $this->nextNumber('expense', $validated['expense_date'] ?? null);
+        $expense = DB::transaction(function () use ($validated, $tax, $total, $replace) {
+            // Editing: undo the old voucher (entry and box balance), keep its record and number.
+            if ($replace) {
+                $this->undo($replace, 'تعديل سند رقم '.$replace->expense_number);
+            }
+            $expenseNumber = $replace?->expense_number ?? $this->nextNumber('expense', $validated['expense_date'] ?? null);
 
-            $expense = Expense::create([
+            $attributes = [
                 'expense_number' => $expenseNumber,
                 'account_id' => $validated['account_id'] ?? null,
                 'bank_account_id' => $validated['bank_account_id'] ?? null,
@@ -117,8 +121,9 @@ class ExpenseController extends Controller
                 'vendor_name' => $validated['vendor_name'] ?? null,
                 'vendor_tax_number' => $validated['vendor_tax_number'] ?? null,
                 'notes' => $validated['notes'] ?? null,
-                'created_by' => auth()->id(),
-            ]);
+                'created_by' => $replace?->created_by ?? auth()->id(),
+            ];
+            $expense = $replace ? tap($replace)->update($attributes) : Expense::create($attributes);
 
             // Deduct from bank account balance if specified
             if (! empty($validated['bank_account_id'])) {
@@ -135,27 +140,37 @@ class ExpenseController extends Controller
         $expenseNumber = $expense->expense_number;
 
         return redirect()->route('finance.expenses.index')
-            ->with('success', "تم تسجيل سند المصروف بنجاح برقم {$expenseNumber}");
+            ->with('success', $replace ? "تم تعديل سند المصروف رقم {$expenseNumber}" : "تم تسجيل سند المصروف بنجاح برقم {$expenseNumber}");
     }
 
     public function destroy(Expense $expense)
     {
         // Cancelling a voucher reverses its journal entry; the audit log keeps the record.
         DB::transaction(function () use ($expense) {
-            app(DocumentPoster::class)->reverse($expense, 'إلغاء سند رقم '.$expense->expense_number);
-
-            // Refund bank account balance if specified
-            if ($expense->bank_account_id) {
-                $bank = BankAccount::find($expense->bank_account_id);
-                if ($bank) {
-                    $bank->increment('current_balance', $expense->total_amount);
-                }
-            }
-
+            $this->undo($expense, 'إلغاء سند رقم '.$expense->expense_number);
             $expense->delete();
         });
 
         return redirect()->route('finance.expenses.index')
             ->with('success', 'تم حذف سند المصروف بنجاح');
+    }
+
+    public function edit(Expense $expense): Response
+    {
+        return $this->create()->with('expense', $expense);
+    }
+
+    public function update(Request $request, Expense $expense)
+    {
+        return $this->store($request, $expense);
+    }
+
+    /** Reverse the voucher's entry and give its amount back to the cash / bank box. */
+    protected function undo(Expense $expense, string $description): void
+    {
+        app(DocumentPoster::class)->reverse($expense, $description);
+        if ($expense->bank_account_id && ($bank = BankAccount::find($expense->bank_account_id))) {
+            $bank->increment('current_balance', $expense->total_amount);
+        }
     }
 }

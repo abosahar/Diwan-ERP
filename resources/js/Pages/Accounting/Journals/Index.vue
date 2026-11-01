@@ -1,4 +1,5 @@
 <script setup>
+import RowActions from '@/Components/UI/RowActions.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -187,6 +188,7 @@ const formatCurrency = (val) => {
                                         <EyeIcon class="w-3.5 h-3.5" />
                                         <span>عرض السند</span>
                                     </Link>
+                                    <RowActions :remove="entry.status === 'draft' && $can('accounting.journals.delete') ? route('accounting.journals.destroy', entry.id) : null" :confirm="`حذف مسودة القيد ${entry.entry_number}؟`" />
                                 </td>
                             </tr>
                             <tr v-if="!entries.data || entries.data.length === 0">

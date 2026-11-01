@@ -71,6 +71,16 @@ class CustomerGroupController extends Controller
         return redirect()->route('sales.customer-groups.index')->with('success', 'تم تحديث مجموعة العملاء');
     }
 
+    public function destroy(CustomerGroup $group)
+    {
+        if ($group->customers()->exists()) {
+            return back()->with('error', 'لا يمكن حذف مجموعة فيها عملاء؛ انقلهم إلى مجموعة أخرى أولاً.');
+        }
+        $group->delete();
+
+        return redirect()->route('sales.customer-groups.index')->with('success', 'تم حذف المجموعة');
+    }
+
     protected function lookups(): array
     {
         return ['accounts' => Account::where('type', 'asset')->where('is_parent', false)->where('is_active', true)->orderBy('code')->get(['id', 'code', 'name_ar'])];

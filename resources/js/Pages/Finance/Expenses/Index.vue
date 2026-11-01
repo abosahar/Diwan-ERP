@@ -14,6 +14,7 @@ import {
     BanknotesIcon,
     XMarkIcon,
     TrashIcon,
+    PencilSquareIcon,
     FunnelIcon,
     ArrowTrendingDownIcon,
 } from '@heroicons/vue/24/outline';
@@ -205,7 +206,8 @@ const formatCurrency = (val) => {
                                 <td class="py-4 px-6 font-mono font-black text-rose-600 text-end">
                                     {{ formatCurrency(exp.total_amount) }} <span class="text-3xs font-normal">﷼</span>
                                 </td>
-                                <td class="py-4 px-6 text-center">
+                                <td class="py-4 px-6 text-center whitespace-nowrap">
+                                    <Link v-if="$can('finance.expenses.edit')" :href="route('finance.expenses.edit', exp.id)" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition inline-block" title="تعديل" data-row-edit><PencilSquareIcon class="w-4 h-4" /></Link>
                                     <button 
                                         @click="deleteExpense(exp.id, exp.expense_number)"
                                         class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"

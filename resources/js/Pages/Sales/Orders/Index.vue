@@ -29,6 +29,6 @@ const statuses = [
                 <Link v-if="$can('sales.orders.create')" :href="route('sales.orders.create')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"><PlusIcon class="w-4 h-4" /> أمر بيع</Link>
             </template>
         </PageHeader>
-        <DocumentTable :paginator="orders" :columns="columns" :filters="filters" :statuses="statuses" search-route="sales.orders.index" :link="(r) => route('sales.orders.show', r.id)" />
+        <DocumentTable :paginator="orders" :columns="columns" :filters="filters" :statuses="statuses" search-route="sales.orders.index" :link="(r) => route('sales.orders.show', r.id)" :delete-link="$can('sales.orders.cancel') ? (r) => (['draft', 'pending_approval', 'confirmed', 'rejected', 'cancelled'].includes(r.status) ? route('sales.orders.destroy', r.id) : null) : null" :delete-confirm="(r) => `نقل أمر البيع ${r.order_number} إلى سلة المحذوفات؟`" />
     </AppLayout>
 </template>

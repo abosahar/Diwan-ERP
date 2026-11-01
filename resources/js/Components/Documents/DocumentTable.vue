@@ -3,15 +3,20 @@ import { ref } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import Pagination from '@/Components/UI/Pagination.vue';
 import StatusBadge from '@/Components/Documents/StatusBadge.vue';
+import RowActions from '@/Components/UI/RowActions.vue';
 import { money, date, qty } from '@/utils/format';
 
 /**
  * Paginated document list. columns: [{ key: 'a.b', label, type?: money|date|status|mono|qty }]
+ * Row actions: link (view), editLink and deleteLink (row => url, or null to hide for that row).
  */
 const props = defineProps({
     paginator: { type: Object, required: true },
     columns: { type: Array, required: true },
     link: { type: Function, default: null },
+    editLink: { type: Function, default: null },
+    deleteLink: { type: Function, default: null },
+    deleteConfirm: { type: Function, default: () => 'حذف هذا المستند؟' },
     searchRoute: { type: String, default: null },
     filters: { type: Object, default: () => ({}) },
     statuses: { type: Array, default: null },
@@ -46,7 +51,7 @@ const format = (row, col) => {
                 <thead class="bg-slate-50 text-slate-500">
                     <tr>
                         <th v-for="c in columns" :key="c.key" class="px-4 py-2" :class="c.type === 'money' ? 'text-end' : 'text-start'">{{ c.label }}</th>
-                        <th class="w-16"></th>
+                        <th class="w-24"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,7 +61,7 @@ const format = (row, col) => {
                             <template v-else>{{ format(row, c) }}</template>
                         </td>
                         <td class="px-4 py-2 text-end whitespace-nowrap">
-                            <slot name="actions" :row="row"><Link v-if="link" :href="link(row)" class="text-indigo-600 font-bold">فتح</Link></slot>
+                            <slot name="actions" :row="row"><RowActions :view="link ? link(row) : null" :edit="editLink ? editLink(row) : null" :remove="deleteLink ? deleteLink(row) : null" :confirm="deleteConfirm(row)" /></slot>
                         </td>
                     </tr>
                     <tr v-if="!paginator.data.length"><td :colspan="columns.length + 1" class="py-10 text-center text-slate-400">{{ $t('ui.no_data') }}</td></tr>

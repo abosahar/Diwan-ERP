@@ -1,4 +1,5 @@
 <script setup>
+import RowActions from '@/Components/UI/RowActions.vue';
 import { ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -31,15 +32,16 @@ const num = (v) => Number(v || 0).toLocaleString('en-US', { maximumFractionDigit
         </div>
         <div class="bg-white border border-slate-200/80 rounded-2xl overflow-x-auto">
             <table class="w-full text-xs">
-                <thead class="bg-slate-50 text-slate-500"><tr><th class="text-start px-4 py-3">الرقم</th><th class="text-start px-4 py-3">المنتج</th><th class="text-start px-4 py-3">الكمية</th><th class="text-start px-4 py-3">المستلم</th><th class="text-start px-4 py-3">بداية</th><th class="text-start px-4 py-3">نهاية مخططة</th><th class="text-start px-4 py-3">الحالة</th></tr></thead>
+                <thead class="bg-slate-50 text-slate-500"><tr><th class="text-start px-4 py-3">الرقم</th><th class="text-start px-4 py-3">المنتج</th><th class="text-start px-4 py-3">الكمية</th><th class="text-start px-4 py-3">المستلم</th><th class="text-start px-4 py-3">بداية</th><th class="text-start px-4 py-3">نهاية مخططة</th><th class="text-start px-4 py-3">الحالة</th><th class="px-4 py-3"></th></tr></thead>
                 <tbody class="divide-y divide-slate-100">
                     <tr v-for="o in orders.data" :key="o.id" class="hover:bg-slate-50/60 cursor-pointer" @click="router.visit(route('manufacturing.orders.show', o.id))">
                         <td class="px-4 py-3 font-mono font-bold text-indigo-700">{{ o.order_number }}</td><td class="px-4 py-3 font-bold text-slate-800">{{ o.product?.name_ar }}</td>
                         <td class="px-4 py-3 font-mono">{{ num(o.quantity) }}</td><td class="px-4 py-3 font-mono">{{ num(o.received_quantity) }}</td>
                         <td class="px-4 py-3 font-mono">{{ String(o.planned_start || '').slice(0, 10) }}</td><td class="px-4 py-3 font-mono">{{ String(o.planned_end || '').slice(0, 10) }}</td>
                         <td class="px-4 py-3"><StatusPill :status="o.status" /></td>
+                        <td class="px-4 py-3 text-end" @click.stop><RowActions :remove="o.status === 'draft' && $can('manufacturing.orders.delete') ? route('manufacturing.orders.destroy', o.id) : null" :confirm="`حذف أمر الإنتاج ${o.order_number}؟`" /></td>
                     </tr>
-                    <tr v-if="!orders.data.length"><td colspan="7" class="px-4 py-10 text-center text-slate-400">لا توجد أوامر.</td></tr>
+                    <tr v-if="!orders.data.length"><td colspan="8" class="px-4 py-10 text-center text-slate-400">لا توجد أوامر.</td></tr>
                 </tbody>
             </table>
         </div>

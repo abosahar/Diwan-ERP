@@ -252,6 +252,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::post('/customer-groups', [CustomerGroupController::class, 'store'])->name('customer-groups.store');
         Route::get('/customer-groups/{group}/edit', [CustomerGroupController::class, 'edit'])->name('customer-groups.edit');
         Route::put('/customer-groups/{group}', [CustomerGroupController::class, 'update'])->name('customer-groups.update');
+        Route::delete('/customer-groups/{group}', [CustomerGroupController::class, 'destroy'])->name('customer-groups.destroy');
         Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions.index');
         Route::get('/promotions/create', [PromotionController::class, 'create'])->name('promotions.create');
         Route::post('/promotions', [PromotionController::class, 'store'])->name('promotions.store');
@@ -371,6 +372,7 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
         Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
         Route::post('/units', [UnitController::class, 'store'])->name('units.store');
+        Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
         Route::get('/operations', [InventoryOperationController::class, 'index'])->name('operations.index');
         Route::get('/operations/transfer', [InventoryOperationController::class, 'transferForm'])->name('operations.transfer.create');
@@ -524,18 +526,24 @@ Route::middleware(['auth', 'verified', 'two_factor', 'tenant', 'plan', 'country.
         Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
         Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+        Route::get('/expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
+        Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
 
         // Revenues
         Route::get('/revenues', [RevenueController::class, 'index'])->name('revenues.index');
         Route::get('/revenues/create', [RevenueController::class, 'create'])->name('revenues.create');
         Route::post('/revenues', [RevenueController::class, 'store'])->name('revenues.store');
         Route::delete('/revenues/{revenue}', [RevenueController::class, 'destroy'])->name('revenues.destroy');
+        Route::get('/revenues/{revenue}/edit', [RevenueController::class, 'edit'])->name('revenues.edit');
+        Route::put('/revenues/{revenue}', [RevenueController::class, 'update'])->name('revenues.update');
 
         // Banks & Treasuries
         Route::get('/banks', [BankAccountController::class, 'index'])->name('banks.index');
         Route::get('/banks/create', [BankAccountController::class, 'create'])->name('banks.create');
         Route::post('/banks', [BankAccountController::class, 'store'])->name('banks.store');
         Route::delete('/banks/{bank}', [BankAccountController::class, 'destroy'])->name('banks.destroy');
+        Route::get('/banks/{bank}/edit', [BankAccountController::class, 'edit'])->name('banks.edit');
+        Route::put('/banks/{bank}', [BankAccountController::class, 'update'])->name('banks.update');
 
         Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
         Route::get('/transfers/create', [TransferController::class, 'create'])->name('transfers.create');

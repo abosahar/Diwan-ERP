@@ -6,7 +6,8 @@ import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
 
-const props = defineProps({ chartAccounts: Array });
+const props = defineProps({ chartAccounts: Array, bank: { type: Object, default: null } });
+const editing = props.bank;
 
 const form = useForm({
     name: '',
@@ -18,15 +19,20 @@ const form = useForm({
     opening_balance: '0.00',
     account_id: props.chartAccounts?.[0]?.id || '',
 });
+// Editing: names and bank details only (the balance and ledger account follow the postings).
+if (editing) {
+    Object.assign(form, { name: editing.name, type: editing.type, bank_name: editing.bank_name || '', account_number: editing.account_number || '', iban: editing.iban || '', currency: editing.currency, opening_balance: editing.opening_balance, account_id: editing.account_id || '' });
+    form.defaults();
+}
 useUnsavedGuard(form);
 
-const submitAccount = () => form.post(route('finance.banks.store'));
+const submitAccount = () => (editing ? form.put(route('finance.banks.update', editing.id)) : form.post(route('finance.banks.store')));
 </script>
 
 <template>
     <AppLayout>
-        <Head title="حساب بنك أو صندوق جديد" />
-        <PageHeader title="حساب بنك أو صندوق جديد" :crumbs="[{ label: 'المالية' }, { label: 'البنوك والصناديق', href: route('finance.banks.index') }, { label: 'جديد' }]" />
+        <Head :title="editing ? `تعديل ${editing.name}` : 'حساب بنك أو صندوق جديد'" />
+        <PageHeader :title="editing ? `تعديل ${editing.name}` : 'حساب بنك أو صندوق جديد'" :crumbs="[{ label: 'المالية' }, { label: 'البنوك والصناديق', href: route('finance.banks.index') }, { label: editing ? 'تعديل' : 'جديد' }]" />
 
         <div class="bg-white border border-slate-200/80 rounded-2xl p-6">
             <form @submit.prevent="submitAccount" class="form-grid text-xs">
@@ -46,6 +52,7 @@ const submitAccount = () => form.post(route('finance.banks.store'));
                                     <label class="block font-medium text-slate-700 mb-1">النوع <span class="text-rose-500">*</span></label>
                                     <select 
                                         v-model="form.type" 
+                                        :disabled="!!editing"
                                         class="w-full py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500"
                                     >
                                         <option value="bank">حساب بنكي</option>
@@ -56,6 +63,7 @@ const submitAccount = () => form.post(route('finance.banks.store'));
                                     <label class="block font-medium text-slate-700 mb-1">الرصيد الافتتاحي (﷼) <span class="text-rose-500">*</span></label>
                                     <input 
                                         v-model.number="form.opening_balance" 
+                                        :disabled="!!editing"
                                         type="text" inputmode="decimal" data-num 
                                         step="0.01" 
                                         required 

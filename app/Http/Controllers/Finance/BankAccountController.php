@@ -89,6 +89,24 @@ class BankAccountController extends Controller
             ->with('success', 'تم إضافة الحساب البنكي / الخزينة بنجاح');
     }
 
+    public function edit(BankAccount $bank): Response
+    {
+        return $this->create()->with('bank', $bank);
+    }
+
+    /** Names and bank details; the balance and ledger account follow the postings. */
+    public function update(Request $request, BankAccount $bank)
+    {
+        $bank->update($request->validate([
+            'name' => 'required|string|max:255',
+            'bank_name' => 'nullable|string|max:100',
+            'account_number' => 'nullable|string|max:100',
+            'iban' => 'nullable|string|max:50',
+        ]));
+
+        return redirect()->route('finance.banks.index')->with('success', 'تم تعديل بيانات الحساب');
+    }
+
     public function destroy(BankAccount $bank)
     {
         if (abs($bank->ledgerBalance()) > 0.009) {
