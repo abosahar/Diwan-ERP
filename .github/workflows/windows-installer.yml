@@ -20,7 +20,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: windows-installer-${{ github.ref }}
+  # Throwaway branch: its own group, so this run does not cancel the one before it.
+  group: windows-installer-probe-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -28,11 +29,42 @@ permissions:
 
 jobs:
   functions:
-    name: Installer functions (Pester)
-    runs-on: windows-latest
+    name: Installer functions (Pester, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-latest]
     steps:
       - uses: actions/checkout@v4
+      - name: Probe Move-Item of a folder from %TEMP% to another drive
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          Write-Host "PSVersion $($PSVersionTable.PSVersion) BuildVersion $($PSVersionTable.BuildVersion) Edition $($PSVersionTable.PSEdition) CLR $($PSVersionTable.CLRVersion)"
+          Write-Host "OS $([Environment]::OSVersion.VersionString); System.Management.Automation $((Get-Item ([PSObject].Assembly.Location)).VersionInfo.FileVersion)"
+          Write-Host ".NET Framework release $((Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full').Release); mscorlib $((Get-Item ([object].Assembly.Location)).VersionInfo.FileVersion)"
+          Write-Host "TEMP $env:TEMP  TMP $env:TMP  GetTempPath $([IO.Path]::GetTempPath())  RUNNER_TEMP $env:RUNNER_TEMP"
+          Get-PSDrive -PSProvider FileSystem | ForEach-Object { Write-Host "drive $($_.Root) free $([math]::Round($_.Free / 1GB)) GB" }
+          function New-Probe($base) {
+            $dir = Join-Path $base ('probe-' + [guid]::NewGuid().ToString('N'))
+            New-Item -ItemType Directory -Force -Path "$dir\diwan-erp\public" | Out-Null
+            Set-Content -Path "$dir\diwan-erp\VERSION" -Value '9.9.9'
+            return "$dir\diwan-erp"
+          }
+          $source = New-Probe $env:TEMP
+          $target = Join-Path (Split-Path -Parent (New-Probe $env:RUNNER_TEMP)) 'release'
+          try { Move-Item $source $target -ErrorAction Stop; Write-Host "Move-Item folder $source -> $target : MOVED (target VERSION: $(Test-Path "$target\VERSION"), source left: $(Test-Path $source))" }
+          catch { Write-Host "Move-Item folder $source -> $target : FAILED $($_.Exception.GetType().FullName) [$($_.FullyQualifiedErrorId)] $($_.Exception.Message)" }
+          $source = New-Probe $env:TEMP
+          $target = Join-Path (Split-Path -Parent (New-Probe $env:RUNNER_TEMP)) 'release'
+          try { [IO.Directory]::Move($source, $target); Write-Host "[IO.Directory]::Move $source -> $target : MOVED" }
+          catch { Write-Host "[IO.Directory]::Move $source -> $target : FAILED $($_.Exception.GetType().FullName) $($_.Exception.Message)" }
+          $source = New-Probe $env:TEMP
+          $target = Join-Path (Split-Path -Parent (New-Probe $env:RUNNER_TEMP)) 'release'
+          try { (New-Object IO.DirectoryInfo $source).MoveTo($target); Write-Host "DirectoryInfo.MoveTo $source -> $target : MOVED" }
+          catch { Write-Host "DirectoryInfo.MoveTo $source -> $target : FAILED $($_.Exception.GetType().FullName) $($_.Exception.Message)" }
       - name: Pester 5
         shell: powershell
         run: |
@@ -53,9 +85,9 @@ jobs:
           Invoke-Pester -Configuration $config
 
   install:
-    name: Full install and a run again (${{ matrix.root }})
+    name: Full install and a run again (${{ matrix.root }}, windows-2022)
     # Throwaway branch to confirm the failure on another drive: runs even when Pester fails.
-    runs-on: windows-latest
+    runs-on: windows-2022
     timeout-minutes: 90
     strategy:
       fail-fast: false
