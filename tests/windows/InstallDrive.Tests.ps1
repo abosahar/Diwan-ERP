@@ -141,20 +141,27 @@ Describe 'Move-Item of Windows PowerShell 5.1' -Skip:(-not $OtherDrive) {
     BeforeAll { $script:Other = New-OtherDriveFolder }
     AfterAll { Remove-Item -LiteralPath $Other -Recurse -Force -ErrorAction SilentlyContinue }
 
-    It 'does not move a folder of %TEMP% to another drive: why a download unpacks on the drive of the install folder' {
-        # As install.ps1 and local-update.ps1 moved a release: from where it was unpacked into the install folder.
+    It 'moves a folder of %TEMP% to another drive, as install.ps1 and local-update.ps1 move a release' {
         $unpacked = Join-Path $TestDrive 'diwan-update\diwan-erp'
         [IO.Directory]::CreateDirectory((Join-Path $unpacked 'public')) | Out-Null
         [IO.File]::WriteAllText((Join-Path $unpacked 'VERSION'), '9.9.9')
         $release = Join-Path $Other 'Diwan\releases\20261123033000-9.9.9'
         [IO.Directory]::CreateDirectory((Split-Path -Parent $release)) | Out-Null
+        Move-Item $unpacked $release
+        Get-Content -LiteralPath (Join-Path $release 'VERSION') | Should -Be '9.9.9'
+        Test-Path -LiteralPath (Join-Path $release 'public') -PathType Container | Should -BeTrue
+        Test-Path -LiteralPath $unpacked | Should -BeFalse
+    }
+
+    It 'unlike [IO.Directory]::Move of .NET, which moves a folder only within one drive' {
+        $unpacked = Join-Path $TestDrive 'diwan-unpack\diwan-erp'
+        [IO.Directory]::CreateDirectory($unpacked) | Out-Null
+        $release = Join-Path $Other 'Diwan\releases\20261123033001-9.9.9'
+        # "Source and destination path must have identical roots. Move will not work across volumes."
         $failure = $null
-        try { Move-Item $unpacked $release -ErrorAction Stop } catch { $failure = $_ }
-        if ($failure) { Write-Host "    Move-Item from $unpacked to $release`: $($failure.Exception.Message)" }
-        $failure | Should -Not -BeNullOrEmpty -Because 'Move-Item of Windows PowerShell 5.1 moves a folder only within one drive'
-        $failure.Exception | Should -BeOfType ([IO.IOException])
+        try { [IO.Directory]::Move($unpacked, $release) } catch { $failure = $_.Exception.InnerException }
+        $failure | Should -BeOfType ([IO.IOException])
         Test-Path -LiteralPath $release | Should -BeFalse
-        Test-Path -LiteralPath (Join-Path $unpacked 'VERSION') | Should -BeTrue
     }
 
     It 'moves a folder within the drive of the install folder' {

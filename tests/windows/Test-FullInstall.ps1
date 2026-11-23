@@ -151,12 +151,15 @@ Check (-not (Test-Path -LiteralPath $oldMenu)) 'the Start menu folder of earlier
 
 Write-Host ''
 Write-Host '==== The daily update (task Diwan Update)' -ForegroundColor Cyan
-# The installed release is the latest published one: from here on its update and tools are this
-# checkout's, as the next release brings them. It reports an older version, so the update installs the
-# latest release again next to it.
-foreach ($name in 'local-update.ps1', 'local-tools.ps1') {
-    Copy-Item -LiteralPath (Join-Path $repo "deploy\windows\$name") -Destination "$Root\current\deploy\windows\$name" -Force
+# The installed release is the latest published one: its update and tools become this checkout's, as
+# the next release brings them. It reports an older version, so the update installs the latest release
+# again next to it.
+function Copy-Tools {
+    foreach ($name in 'local-update.ps1', 'local-tools.ps1') {
+        Copy-Item -LiteralPath (Join-Path $repo "deploy\windows\$name") -Destination "$Root\current\deploy\windows\$name" -Force
+    }
 }
+Copy-Tools
 $version = (Get-Content -LiteralPath "$Root\current\VERSION" -Raw).Trim()
 $running = @(Get-ChildItem -LiteralPath "$Root\releases" -Directory | ForEach-Object { $_.Name })
 [IO.File]::WriteAllText("$Root\current\VERSION", "0.0.1`r`n")
@@ -184,7 +187,9 @@ Check ((Get-FileHash -LiteralPath "$Root\shared\.env").Hash -eq $envHash) 'share
 Write-Host ''
 Write-Host '==== The Start menu shortcut Update Diwan' -ForegroundColor Cyan
 # As Windows runs it: local-tools.ps1 finds the install folder and runs local-update.ps1, which finds
-# the release up to date. An empty input answers its "Press Enter to close".
+# the release up to date. An empty input answers its "Press Enter to close". The update switched to the
+# published release: its tools become this checkout's again.
+Copy-Tools
 $link = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path ([Environment]::GetFolderPath('CommonPrograms')) 'Diwan ERP\Update Diwan.lnk'))
 $empty = Join-Path $env:TEMP 'diwan-test-input.txt'
 $shown = Join-Path $env:TEMP 'diwan-test-output.txt'
