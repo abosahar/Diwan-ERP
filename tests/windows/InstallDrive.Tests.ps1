@@ -3,11 +3,13 @@
     Pester 5 tests of an install folder on another drive than %TEMP% (DIWAN_DIR=D:\Diwan, with %TEMP% on C:),
     on Windows PowerShell 5.1:
         Invoke-Pester -Path tests/windows
-    install.ps1 (MariaDB, the release) and local-update.ps1 (the new release) unpack a download, then move
-    the folder it holds into the install folder; Move-Item of Windows PowerShell 5.1 moves a folder only
-    within one drive. local-update.ps1 runs here as a script, as the "Diwan Update" task runs it, in installs
-    laid out as the installer lays them out, with a stand-in php.exe that refuses to prepare the new release:
-    it stops there, before it switches anything.
+    install.ps1 (MariaDB, the release) and local-update.ps1 (the new release) unpack a download in %TEMP%,
+    then move the folder it holds into the install folder with Move-Item. Move-Item of Windows PowerShell 5.1
+    moves a folder to another drive too (it copies, then deletes), unlike [IO.Directory]::Move of .NET
+    ("Source and destination path must have identical roots"): the scripts must keep Move-Item.
+    local-update.ps1 runs here as a script, as the "Diwan Update" task runs it, in installs laid out as the
+    installer lays them out, with a stand-in php.exe that refuses to prepare the new release: it stops
+    there, before it switches anything.
     The tests on another drive need a folder on it, in DIWAN_TEST_OTHER_DRIVE (the workflow gives the
     D:\a\_temp of its runner); without it they are skipped.
     Keep this file UTF-8 with BOM, like the other Windows scripts.
