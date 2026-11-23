@@ -1,9 +1,10 @@
 name: Windows installer
 
 # The Windows installer (deploy/windows) on real Windows, in Windows PowerShell 5.1 as on the offices'
-# computers: its functions with Pester (tests/windows/Installer.Tests.ps1), then a full install with
-# Diwan-Setup.bat from a folder with spaces, damage on purpose and a run again over it
-# (tests/windows/Test-FullInstall.ps1). Runs when those files change, and by hand (Run workflow).
+# computers: its functions with Pester (tests/windows/*.Tests.ps1), then a full install with
+# Diwan-Setup.bat from a folder with spaces, damage on purpose, a run again over it and the daily
+# update (tests/windows/Test-FullInstall.ps1), in C:\Diwan and in D:\Diwan: another drive than the
+# %TEMP% of the runner (C:). Runs when those files change, and by hand (Run workflow).
 
 on:
   push:
@@ -40,6 +41,9 @@ jobs:
           }
       - name: Tests
         shell: powershell
+        env:
+          # A folder on another drive than %TEMP% (C:), for tests/windows/InstallDrive.Tests.ps1.
+          DIWAN_TEST_OTHER_DRIVE: ${{ runner.temp }}
         run: |
           Import-Module Pester -MinimumVersion 5.5.0
           $config = New-PesterConfiguration
@@ -49,28 +53,35 @@ jobs:
           Invoke-Pester -Configuration $config
 
   install:
-    name: Full install and a run again
-    needs: functions
+    name: Full install and a run again (${{ matrix.root }})
+    # Throwaway branch to confirm the failure on another drive: runs even when Pester fails.
     runs-on: windows-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The default folder, and DIWAN_DIR on another drive than %TEMP%.
+          - root: 'D:\Diwan'
+            name: d-diwan
     steps:
       - uses: actions/checkout@v4
-      - name: Install, damage, run again, check
+      - name: Install, damage, run again, update, check
         shell: powershell
-        run: .\tests\windows\Test-FullInstall.ps1 -ThrowawayWindows
+        run: .\tests\windows\Test-FullInstall.ps1 -ThrowawayWindows -Root '${{ matrix.root }}'
       - name: Logs of the installation
         if: always()
         shell: powershell
         run: |
-          Get-ChildItem C:\Diwan\logs -File -ErrorAction SilentlyContinue | ForEach-Object {
+          Get-ChildItem '${{ matrix.root }}\logs' -File -ErrorAction SilentlyContinue | ForEach-Object {
             Write-Host "==== $($_.FullName)"
             Get-Content -LiteralPath $_.FullName -Tail 300
           }
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: windows-install-logs
+          name: windows-install-logs-${{ matrix.name }}
           path: |
-            C:\Diwan\logs
-            C:\Diwan\shared\storage\logs
+            ${{ matrix.root }}\logs
+            ${{ matrix.root }}\shared\storage\logs
           retention-days: 7
